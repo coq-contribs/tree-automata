@@ -1,7 +1,7 @@
 Name:tree_automata
 Title:Tree automatas
 Author:Xavier Rival (http://www.eleves.ens.fr/home/rival)
-Institution:Dyade / Inria Rocqencourt
+Institution: Dyade / INRIA Rocquencourt
 Date:september 1999
 Description: provides tree automatas algorithms in Coq (merge,
   intersection, vacuity test, deletion of empty states, coaccessiblity test,
