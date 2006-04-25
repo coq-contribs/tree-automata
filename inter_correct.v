@@ -15,6 +15,7 @@
 
 
 Require Import Bool.
+Require Import NArith Ndec Ndigits.
 Require Import ZArith.
 Require Import Allmaps.
 Require Import bases.
@@ -42,40 +43,40 @@ Lemma st_produit_l_correct_wrt_sign_invar_with_offset :
 Proof.
 	simple induction s0. unfold state_correct_wrt_sign_with_offset in |- *.
 	intros. inversion H1. unfold state_correct_wrt_sign_with_offset in |- *.
-	intros. simpl in H1. elim (bool_is_true_or_false (ad_eq a1 a)); intros; rewrite H2 in H1. simpl in H1. elim (bool_is_true_or_false (ad_eq a1 a2)); intros; rewrite H3 in H1. inversion H1. elim (H a a0). elim (H0 a1 p). intros. elim H4. elim H6. intros. rewrite (ad_eq_complete _ _ H2) in H9. rewrite H9 in H7. inversion H7.
-	split with x. rewrite <- (ad_eq_complete _ _ H3). rewrite (ad_eq_complete _ _ H2). split. exact H9. rewrite H12 in H7.
+	intros. simpl in H1. elim (bool_is_true_or_false (Neqb a1 a)); intros; rewrite H2 in H1. simpl in H1. elim (bool_is_true_or_false (Neqb a1 a2)); intros; rewrite H3 in H1. inversion H1. elim (H a a0). elim (H0 a1 p). intros. elim H4. elim H6. intros. rewrite (Neqb_complete _ _ H2) in H9. rewrite H9 in H7. inversion H7.
+	split with x. rewrite <- (Neqb_complete _ _ H3). rewrite (Neqb_complete _ _ H2). split. exact H9. rewrite H12 in H7.
 	rewrite <- H12 in H8. exact (pl_tl_length_prod p a0 x H10 H8).
-	simpl in |- *. rewrite (ad_eq_correct a1). reflexivity. simpl in |- *.
-	rewrite (ad_eq_correct a). reflexivity. inversion H1.
+	simpl in |- *. rewrite (Neqb_correct a1). reflexivity. simpl in |- *.
+	rewrite (Neqb_correct a). reflexivity. inversion H1.
 	inversion H1. intros. elim (state_correct_wrt_sign_with_offset_M2 m m0 sigma pa H1). intros. unfold state_correct_wrt_sign_with_offset in |- *.
 	intros. unfold state_correct_wrt_sign_with_offset in H.
 	unfold state_correct_wrt_sign_with_offset in H0. induction  a as [| p1].
-	induction  a0 as [| p1]. simpl in H5. elim (H ad_z p sigma (pre_ad_O pa) H3) with (a := ad_z) (p0 := p0). intros. split with x. elim H6. intros.
+	induction  a0 as [| p1]. simpl in H5. elim (H N0 p sigma (pre_ad_O pa) H3) with (a := N0) (p0 := p0). intros. split with x. elim H6. intros.
 	split. induction  pa as [| pa Hrecpa| pa Hrecpa]; simpl in |- *; simpl in H7;
   exact H7.
-	exact H8. intros. elim (H2 ad_z p). intros. split with x.
+	exact H8. intros. elim (H2 N0 p). intros. split with x.
 	induction  a as [| p2]. simpl in H6. inversion H6. rewrite <- H9. simpl in |- *.
 	exact H7. induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]. inversion H6. inversion H6. inversion H6. reflexivity. exact H5. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. simpl in H5.
-	inversion H5. simpl in H5. elim (H ad_z p sigma (pre_ad_O pa) H3) with (a := ad_x p1) (p0 := p0). intros. split with x. simpl in H6.
+	inversion H5. simpl in H5. elim (H N0 p sigma (pre_ad_O pa) H3) with (a := Npos p1) (p0 := p0). intros. split with x. simpl in H6.
 	exact H6. intros. unfold state_correct_wrt_sign_with_offset in H2.
-	induction  a as [| p3]. simpl in H6. inversion H6. elim (H2 ad_z p). intros.
+	induction  a as [| p3]. simpl in H6. inversion H6. elim (H2 N0 p). intros.
 	split with x. rewrite <- H8. induction  pa as [| pa Hrecpa| pa Hrecpa]; exact H7. reflexivity.
 	simpl in H6. inversion H6. exact H5. simpl in H5. inversion H5.
 	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. clear Hrecp1. induction  a0 as [| p2]. simpl in H5.
-	inversion H5. induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]; simpl in H5. elim (H0 (ad_x p1) p sigma (pre_ad_I pa) H4) with (a := ad_x p2) (p0 := p0).
+	inversion H5. induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]; simpl in H5. elim (H0 (Npos p1) p sigma (pre_ad_I pa) H4) with (a := Npos p2) (p0 := p0).
 	intros. split with x. simpl in H6. exact H6. intros.
-	unfold state_correct_wrt_sign_with_offset in H2. induction  a as [| p4]. inversion H6. elim (H2 (ad_x (xI p4)) p3). intros. split with x. simpl in |- *. exact H7. simpl in |- *. simpl in H6. exact H6.
-	exact H5. inversion H5. elim (H0 (ad_x p1) p sigma (pre_ad_I pa) H4) with (a := ad_z) (p0 := p0). intros. split with x. simpl in H6. exact H6. intros. induction  a as [| p3]. inversion H6. elim (H2 (ad_x (xI p3)) p2). intros. split with x. simpl in |- *. 
-	exact H7. simpl in |- *. simpl in H6. exact H6. exact H5. induction  a0 as [| p2]. simpl in H5. elim (H (ad_x p1) p sigma (pre_ad_O pa) H3) with (a := ad_z) (p0 := p0). intros. split with x. simpl in H6.
-	exact H6. intros. induction  a as [| p3]. inversion H6. elim (H2 (ad_x (xO p3)) p2). intros. split with x. simpl in |- *. exact H7. simpl in |- *.
+	unfold state_correct_wrt_sign_with_offset in H2. induction  a as [| p4]. inversion H6. elim (H2 (Npos (xI p4)) p3). intros. split with x. simpl in |- *. exact H7. simpl in |- *. simpl in H6. exact H6.
+	exact H5. inversion H5. elim (H0 (Npos p1) p sigma (pre_ad_I pa) H4) with (a := N0) (p0 := p0). intros. split with x. simpl in H6. exact H6. intros. induction  a as [| p3]. inversion H6. elim (H2 (Npos (xI p3)) p2). intros. split with x. simpl in |- *. 
+	exact H7. simpl in |- *. simpl in H6. exact H6. exact H5. induction  a0 as [| p2]. simpl in H5. elim (H (Npos p1) p sigma (pre_ad_O pa) H3) with (a := N0) (p0 := p0). intros. split with x. simpl in H6.
+	exact H6. intros. induction  a as [| p3]. inversion H6. elim (H2 (Npos (xO p3)) p2). intros. split with x. simpl in |- *. exact H7. simpl in |- *.
 	simpl in H6. exact H6. exact H5. induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]; simpl in H5.
-	inversion H5. elim (H (ad_x p1) p sigma (pre_ad_O pa) H3) with (a := ad_x p2) (p0 := p0). intros. split with x. simpl in H6. exact H6. intros. induction  a as [| p4]. inversion H6. elim (H2 (ad_x (xO p4)) p3). intros. split with x. simpl in |- *. exact H7.
+	inversion H5. elim (H (Npos p1) p sigma (pre_ad_O pa) H3) with (a := Npos p2) (p0 := p0). intros. split with x. simpl in H6. exact H6. intros. induction  a as [| p4]. inversion H6. elim (H2 (Npos (xO p4)) p3). intros. split with x. simpl in |- *. exact H7.
 	simpl in |- *. simpl in H6. exact H6. exact H5. inversion H5.
-	induction  a0 as [| p1]. simpl in H5. inversion H5. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]; simpl in H5. elim (H0 ad_z p sigma (pre_ad_I pa) H4) with (a := ad_x p1) (p0 := p0). intros. split with x. simpl in H6. exact H6.
-	intros. induction  a as [| p3]. elim (H2 (ad_x 1) p2). intros.
-	split with x. simpl in |- *. exact H7. simpl in |- *. simpl in H6. exact H6. inversion H6. exact H5. inversion H5. elim (H0 ad_z p sigma (pre_ad_I pa) H4) with (a := ad_z) (p0 := p0). intros.
+	induction  a0 as [| p1]. simpl in H5. inversion H5. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]; simpl in H5. elim (H0 N0 p sigma (pre_ad_I pa) H4) with (a := Npos p1) (p0 := p0). intros. split with x. simpl in H6. exact H6.
+	intros. induction  a as [| p3]. elim (H2 (Npos 1) p2). intros.
+	split with x. simpl in |- *. exact H7. simpl in |- *. simpl in H6. exact H6. inversion H6. exact H5. inversion H5. elim (H0 N0 p sigma (pre_ad_I pa) H4) with (a := N0) (p0 := p0). intros.
 	split with x. simpl in H6. exact H6. intros. induction  a as [| p2].
-	elim (H2 (ad_x 1) p1). intros. split with x. simpl in |- *.
+	elim (H2 (Npos 1) p1). intros. split with x. simpl in |- *.
 	exact H7. simpl in |- *. simpl in H6. exact H6. inversion H6.
 	exact H5.
 Qed.
@@ -89,29 +90,29 @@ Lemma st_produit_r_correct_wrt_sign_invar_with_offset :
 Proof.
 	simple induction s0. unfold state_correct_wrt_sign_with_offset in |- *.
 	intros. inversion H1. unfold state_correct_wrt_sign_with_offset in |- *.
-	intros. simpl in H1. elim (bool_is_true_or_false (ad_eq a1 a)); intros; rewrite H2 in H1. simpl in H1. elim (bool_is_true_or_false (ad_eq a1 a2)); intros; rewrite H3 in H1. inversion H1. elim (H a a0). elim (H0 a1 p). intros.
-	elim H4. elim H6. intros. rewrite (ad_eq_complete _ _ H2) in H9. rewrite H9 in H7. inversion H7. split with x. 
-	rewrite <- (ad_eq_complete _ _ H3). rewrite (ad_eq_complete _ _ H2). split. exact H9. rewrite H12 in H7. rewrite <- H12 in H8. exact (pl_tl_length_prod a0 p x H8 H10). simpl in |- *.
-	rewrite (ad_eq_correct a1). reflexivity. simpl in |- *. rewrite (ad_eq_correct a). reflexivity. inversion H1. inversion H1.
+	intros. simpl in H1. elim (bool_is_true_or_false (Neqb a1 a)); intros; rewrite H2 in H1. simpl in H1. elim (bool_is_true_or_false (Neqb a1 a2)); intros; rewrite H3 in H1. inversion H1. elim (H a a0). elim (H0 a1 p). intros.
+	elim H4. elim H6. intros. rewrite (Neqb_complete _ _ H2) in H9. rewrite H9 in H7. inversion H7. split with x. 
+	rewrite <- (Neqb_complete _ _ H3). rewrite (Neqb_complete _ _ H2). split. exact H9. rewrite H12 in H7. rewrite <- H12 in H8. exact (pl_tl_length_prod a0 p x H8 H10). simpl in |- *.
+	rewrite (Neqb_correct a1). reflexivity. simpl in |- *. rewrite (Neqb_correct a). reflexivity. inversion H1. inversion H1.
 	intros. elim (state_correct_wrt_sign_with_offset_M2 m m0 sigma pa H1). intros. unfold state_correct_wrt_sign_with_offset in |- *.
 	intros. unfold state_correct_wrt_sign_with_offset in H.
-	unfold state_correct_wrt_sign_with_offset in H0. induction  a as [| p1]. induction  a0 as [| p1]. simpl in H5. elim (H ad_z p sigma (pre_ad_O pa) H3) with (a := ad_z) (p0 := p0). intros. split with x. simpl in H6. exact H6. intros. elim (H2 ad_z p1). intros. split with x. simpl in |- *. induction  a as [| p2]. exact H7. inversion H6.
-	induction  a as [| p2]. exact H6. inversion H6. exact H5. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]; simpl in H5. inversion H5. elim (H ad_z p sigma (pre_ad_O pa) H3) with (a := ad_x p1) (p0 := p0). intros. split with x. simpl in H6. exact H6. intros. induction  a as [| p3]. elim (H2 ad_z p2). intros. split with x. simpl in |- *. exact H7.
-	exact H6. inversion H6. exact H5. inversion H5. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. induction  a0 as [| p2]. simpl in H5. inversion H5. induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]; simpl in H5. elim (H0 (ad_x p1) p sigma (pre_ad_I pa) H4) with (a := ad_x p2) (p0 := p0). intros. split with x. simpl in H6. exact H6. intros. induction  a as [| p4]. inversion H6. elim (H2 (ad_x (xI p4)) p3). intros. split with x. simpl in |- *.
+	unfold state_correct_wrt_sign_with_offset in H0. induction  a as [| p1]. induction  a0 as [| p1]. simpl in H5. elim (H N0 p sigma (pre_ad_O pa) H3) with (a := N0) (p0 := p0). intros. split with x. simpl in H6. exact H6. intros. elim (H2 N0 p1). intros. split with x. simpl in |- *. induction  a as [| p2]. exact H7. inversion H6.
+	induction  a as [| p2]. exact H6. inversion H6. exact H5. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]; simpl in H5. inversion H5. elim (H N0 p sigma (pre_ad_O pa) H3) with (a := Npos p1) (p0 := p0). intros. split with x. simpl in H6. exact H6. intros. induction  a as [| p3]. elim (H2 N0 p2). intros. split with x. simpl in |- *. exact H7.
+	exact H6. inversion H6. exact H5. inversion H5. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. induction  a0 as [| p2]. simpl in H5. inversion H5. induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]; simpl in H5. elim (H0 (Npos p1) p sigma (pre_ad_I pa) H4) with (a := Npos p2) (p0 := p0). intros. split with x. simpl in H6. exact H6. intros. induction  a as [| p4]. inversion H6. elim (H2 (Npos (xI p4)) p3). intros. split with x. simpl in |- *.
 	exact H7. simpl in |- *. simpl in H6. exact H6. exact H5.
-	inversion H5. elim (H0 (ad_x p1) p sigma (pre_ad_I pa) H4) with (a := ad_z) (p0 := p0). intros. split with x. exact H6.
-	intros. induction  a as [| p3]. inversion H6. elim (H2 (ad_x (xI p3)) p2). intros. split with x. simpl in |- *. exact H7. simpl in |- *. exact H6. exact H5. induction  a0 as [| p2]. simpl in H5. elim (H (ad_x p1) p sigma (pre_ad_O pa) H3) with (a := ad_z) (p0 := p0). intros.
+	inversion H5. elim (H0 (Npos p1) p sigma (pre_ad_I pa) H4) with (a := N0) (p0 := p0). intros. split with x. exact H6.
+	intros. induction  a as [| p3]. inversion H6. elim (H2 (Npos (xI p3)) p2). intros. split with x. simpl in |- *. exact H7. simpl in |- *. exact H6. exact H5. induction  a0 as [| p2]. simpl in H5. elim (H (Npos p1) p sigma (pre_ad_O pa) H3) with (a := N0) (p0 := p0). intros.
 	split with x. simpl in H6. exact H6. intros. induction  a as [| p3].
-	inversion H6. elim (H2 (ad_x (xO p3)) p2). intros. split with x. simpl in |- *. exact H7. simpl in |- *. simpl in H6. exact H6.
-	exact H5. induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]; simpl in H5. inversion H5. elim (H (ad_x p1) p sigma (pre_ad_O pa) H3) with (a := ad_x p2) (p0 := p0). intros. split with x. simpl in H6. exact H6.
-	intros. induction  a as [| p4]. inversion H6. elim (H2 (ad_x (xO p4)) p3). intros. split with x. simpl in |- *. exact H7. simpl in |- *. simpl in H6. exact H6. exact H5. inversion H5. induction  a0 as [| p1].
+	inversion H6. elim (H2 (Npos (xO p3)) p2). intros. split with x. simpl in |- *. exact H7. simpl in |- *. simpl in H6. exact H6.
+	exact H5. induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]; simpl in H5. inversion H5. elim (H (Npos p1) p sigma (pre_ad_O pa) H3) with (a := Npos p2) (p0 := p0). intros. split with x. simpl in H6. exact H6.
+	intros. induction  a as [| p4]. inversion H6. elim (H2 (Npos (xO p4)) p3). intros. split with x. simpl in |- *. exact H7. simpl in |- *. simpl in H6. exact H6. exact H5. inversion H5. induction  a0 as [| p1].
 	simpl in H5. inversion H5. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]; simpl in H5.
-	elim (H0 ad_z p sigma (pre_ad_I pa) H4) with (a := ad_x p1) (p0 := p0). intros. split with x. simpl in H6. exact H6.
-	intros. induction  a as [| p3]. elim (H2 (ad_x 1) p2). intros.
+	elim (H0 N0 p sigma (pre_ad_I pa) H4) with (a := Npos p1) (p0 := p0). intros. split with x. simpl in H6. exact H6.
+	intros. induction  a as [| p3]. elim (H2 (Npos 1) p2). intros.
 	split with x. simpl in |- *. exact H7. simpl in |- *. simpl in H6.
-	exact H6. inversion H6. exact H5. inversion H5. elim (H0 ad_z p sigma (pre_ad_I pa) H4) with (a := ad_z) (p0 := p0).
+	exact H6. inversion H6. exact H5. inversion H5. elim (H0 N0 p sigma (pre_ad_I pa) H4) with (a := N0) (p0 := p0).
 	intros. split with x. simpl in H6. exact H6. intros.
-	induction  a as [| p2]. elim (H2 (ad_x 1) p1). intros. split with x. simpl in |- *. exact H7. simpl in |- *. simpl in H6. exact H6.
+	induction  a as [| p2]. elim (H2 (Npos 1) p1). intros. split with x. simpl in |- *. exact H7. simpl in |- *. simpl in H6. exact H6.
 	inversion H6. exact H5.
 Qed.
 
@@ -139,7 +140,7 @@ Proof.
   (st_produit_r_correct_wrt_sign_invar_with_offset 
      (M2 prec_list m m0) a a0 sigma pa H1 H2). reflexivity. intros. unfold state_correct_wrt_sign_with_offset in |- *. simpl in |- *. intros.
 	elim (state_correct_wrt_sign_with_offset_M2 _ _ _ _ H3).
-	intros. elim (state_correct_wrt_sign_with_offset_M2 _ _ _ _ H4). intros. induction  a as [| p0]. exact (H _ _ _ H6 H8 ad_z p H5). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. exact (H0 _ _ _ H7 H9 (ad_x p0) p H5).
+	intros. elim (state_correct_wrt_sign_with_offset_M2 _ _ _ _ H4). intros. induction  a as [| p0]. exact (H _ _ _ H6 H8 N0 p H5). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. exact (H0 _ _ _ H7 H9 (Npos p0) p H5).
 	exact (H _ _ _ H6 H8 _ _ H5). exact (H0 _ _ _ H7 H9 _ _ H5).
 Qed.
 
@@ -173,29 +174,29 @@ Lemma preDTA_produit_l_correct_wrt_sign_invar :
  predta_correct_wrt_sign (M1 state a s) sigma ->
  predta_correct_wrt_sign (preDTA_produit_l a s d) sigma.
 Proof.
-	simple induction d. intros. simpl in |- *. exact H. simpl in |- *. unfold predta_correct_wrt_sign in |- *. intros. simpl in H1. elim (bool_is_true_or_false (ad_eq (iad_conv a1 a) a2)); intros;
-  rewrite H2 in H1. inversion H1. apply (st_produit_correct_wrt_sign_invar s a0 sigma). apply (H0 a1 s). simpl in |- *. rewrite (ad_eq_correct a1).
-	reflexivity. apply (H a a0). simpl in |- *. rewrite (ad_eq_correct a).
+	simple induction d. intros. simpl in |- *. exact H. simpl in |- *. unfold predta_correct_wrt_sign in |- *. intros. simpl in H1. elim (bool_is_true_or_false (Neqb (iad_conv a1 a) a2)); intros;
+  rewrite H2 in H1. inversion H1. apply (st_produit_correct_wrt_sign_invar s a0 sigma). apply (H0 a1 s). simpl in |- *. rewrite (Neqb_correct a1).
+	reflexivity. apply (H a a0). simpl in |- *. rewrite (Neqb_correct a).
 	reflexivity. inversion H1. intros. elim (predta_correct_wrt_sign_M2 m m0 sigma H1). intros. induction  a as [| p]. simpl in |- *. unfold predta_correct_wrt_sign in |- *. intros. induction  a as [| p]. 
-	simpl in H5. exact (H ad_z s sigma H3 H2 ad_z s0 H5).
+	simpl in H5. exact (H N0 s sigma H3 H2 N0 s0 H5).
 	elim (positive_sum p); intros. rewrite H6 in H5.
 	simpl in H5. inversion H5. elim H6. intros. elim H7.
-	intros. rewrite H8 in H5. simpl in H5. elim (positive_sum x). intros. rewrite H9 in H5. exact (H0 ad_z s sigma H4 H2 ad_z s0 H5). intros. elim H9. intros. elim H10. intros.
-	rewrite H11 in H5. exact (H ad_z s sigma H3 H2 (ad_x x0) s0 H5). intros. elim H10. intros. rewrite H11 in H5.
-	exact (H0 ad_z s sigma H4 H2 (ad_x x0) s0 H5). intros.
-	elim H7. intros. rewrite H8 in H5. simpl in H5. inversion H5. induction  p as [p Hrecp| p Hrecp| ]. cut (predta_correct_wrt_sign (M1 state (ad_x p) s) sigma). intros. unfold predta_correct_wrt_sign in |- *.
-	intros. simpl in H6. induction  a as [| p0]. inversion H6. elim (positive_sum p0); intros. rewrite H7 in H6. exact (H (ad_x p) s sigma H3 H5 ad_z s0 H6). elim H7; intros; elim H8; intros; rewrite H9 in H6. inversion H6. elim (positive_sum x). intros. rewrite H10 in H6. exact (H0 (ad_x p) s _ H4 H5 _ _ H6). intros. elim H10; intros; elim H11; intros; rewrite H12 in H6. exact (H _ _ _ H3 H5 _ _ H6). exact (H0 _ _ _ H4 H5 _ _ H6). unfold predta_correct_wrt_sign in |- *. simple induction a. exact (H2 (ad_x 1)). intro. exact (H2 (ad_x (xI p0))). cut (predta_correct_wrt_sign (M1 state (ad_x p) s) sigma).
+	intros. rewrite H8 in H5. simpl in H5. elim (positive_sum x). intros. rewrite H9 in H5. exact (H0 N0 s sigma H4 H2 N0 s0 H5). intros. elim H9. intros. elim H10. intros.
+	rewrite H11 in H5. exact (H N0 s sigma H3 H2 (Npos x0) s0 H5). intros. elim H10. intros. rewrite H11 in H5.
+	exact (H0 N0 s sigma H4 H2 (Npos x0) s0 H5). intros.
+	elim H7. intros. rewrite H8 in H5. simpl in H5. inversion H5. induction  p as [p Hrecp| p Hrecp| ]. cut (predta_correct_wrt_sign (M1 state (Npos p) s) sigma). intros. unfold predta_correct_wrt_sign in |- *.
+	intros. simpl in H6. induction  a as [| p0]. inversion H6. elim (positive_sum p0); intros. rewrite H7 in H6. exact (H (Npos p) s sigma H3 H5 N0 s0 H6). elim H7; intros; elim H8; intros; rewrite H9 in H6. inversion H6. elim (positive_sum x). intros. rewrite H10 in H6. exact (H0 (Npos p) s _ H4 H5 _ _ H6). intros. elim H10; intros; elim H11; intros; rewrite H12 in H6. exact (H _ _ _ H3 H5 _ _ H6). exact (H0 _ _ _ H4 H5 _ _ H6). unfold predta_correct_wrt_sign in |- *. simple induction a. exact (H2 (Npos 1)). intro. exact (H2 (Npos (xI p0))). cut (predta_correct_wrt_sign (M1 state (Npos p) s) sigma).
 	intro. unfold predta_correct_wrt_sign in |- *. intros. simpl in H6. induction  a as [| p0]. exact (H _ _ _ H3 H5 _ _ H6). elim (positive_sum p0); intros. rewrite H7 in H6. inversion H6.
 	elim H7; intros; elim H8; intros; rewrite H9 in H6.
 	elim (positive_sum x); intros. rewrite H10 in H6. exact (H0 _ _ _ H4 H5 _ _ H6). elim H10; intros; elim H11; intros; rewrite H12 in H6. exact (H _ _ _ H3 H5 _ _ H6).
-	exact (H0 _ _ _ H4 H5 _ _ H6). inversion H6. unfold predta_correct_wrt_sign in |- *. simple induction a. exact (H2 ad_z).
-	intro. exact (H2 (ad_x (xO p0))). cut (predta_correct_wrt_sign (M1 state ad_z s) sigma). intros.
+	exact (H0 _ _ _ H4 H5 _ _ H6). inversion H6. unfold predta_correct_wrt_sign in |- *. simple induction a. exact (H2 N0).
+	intro. exact (H2 (Npos (xO p0))). cut (predta_correct_wrt_sign (M1 state N0 s) sigma). intros.
 	unfold predta_correct_wrt_sign in |- *. intros. simpl in H6.
 	induction  a as [| p]. inversion H6. elim (positive_sum p); intros.
 	rewrite H7 in H6. exact (H _ _ _ H3 H5 _ _ H6). elim H7; intros; elim H8; intros; rewrite H9 in H6. inversion H6.
 	elim (positive_sum x); intros. rewrite H10 in H6. exact (H0 _ _ _ H4 H5 _ _ H6). elim H10; intros; elim H11; intros; rewrite H12 in H6. exact (H _ _ _ H3 H5 _ _ H6).
 	exact (H0 _ _ _ H4 H5 _ _ H6). unfold predta_correct_wrt_sign in |- *.
-	simple induction a. exact (H2 (ad_x 1)). intro. exact (H2 (ad_x (xI p))).
+	simple induction a. exact (H2 (Npos 1)). intro. exact (H2 (Npos (xI p))).
 Qed.
 
 Lemma preDTA_produit_r_correct_wrt_sign_invar :
@@ -204,12 +205,12 @@ Lemma preDTA_produit_r_correct_wrt_sign_invar :
  predta_correct_wrt_sign (M1 state a s) sigma ->
  predta_correct_wrt_sign (preDTA_produit_r a s d) sigma.
 Proof.
-	simple induction d. intros. simpl in |- *. exact H. unfold predta_correct_wrt_sign in |- *. intros. simpl in H1. elim (bool_is_true_or_false (ad_eq (iad_conv a a1) a2)); intros;
-  rewrite H2 in H1. inversion H1. apply (st_produit_correct_wrt_sign_invar a0 s sigma). apply (H a a0). simpl in |- *. rewrite (ad_eq_correct a).
-	reflexivity. apply (H0 a1 s). simpl in |- *. rewrite (ad_eq_correct a1). reflexivity. inversion H1.
+	simple induction d. intros. simpl in |- *. exact H. unfold predta_correct_wrt_sign in |- *. intros. simpl in H1. elim (bool_is_true_or_false (Neqb (iad_conv a a1) a2)); intros;
+  rewrite H2 in H1. inversion H1. apply (st_produit_correct_wrt_sign_invar a0 s sigma). apply (H a a0). simpl in |- *. rewrite (Neqb_correct a).
+	reflexivity. apply (H0 a1 s). simpl in |- *. rewrite (Neqb_correct a1). reflexivity. inversion H1.
 	intros. elim (predta_correct_wrt_sign_M2 m m0 sigma H1). intros. induction  a as [| p]. simpl in |- *. unfold predta_correct_wrt_sign in |- *. intros. simpl in H5.
 	induction  a as [| p]. exact (H _ _ _ H3 H2 _ _ H5). elim (positive_sum p); intros. rewrite H6 in H5. exact (H0 _ _ _ H4 H2 _ _ H5). elim H6; intros; elim H7; intros; rewrite H8 in H5. elim (positive_sum x); intros. rewrite H9 in H5. inversion H5. elim H9; intros; elim H10; intros; rewrite H11 in H5. exact (H _ _ _ H3 H2 _ _ H5). inversion H5. elim (positive_sum x); intros. rewrite H9 in H5. inversion H5. elim H9; intros; elim H10; intros; rewrite H11 in H5. exact (H0 _ _ _ H4 H2 _ _ H5). inversion H5.
-	induction  p as [p Hrecp| p Hrecp| ]. cut (predta_correct_wrt_sign (M1 state (ad_x p) s) sigma). intros. unfold predta_correct_wrt_sign in |- *.
+	induction  p as [p Hrecp| p Hrecp| ]. cut (predta_correct_wrt_sign (M1 state (Npos p) s) sigma). intros. unfold predta_correct_wrt_sign in |- *.
 	intros. simpl in H6. induction  a as [| p0]. inversion H6.
 	elim (positive_sum p0); intros. rewrite H7 in H6.
 	inversion H6. elim H7; intros; elim H8; intros; rewrite H9 in H6. elim (positive_sum x); intros.
@@ -217,19 +218,19 @@ Proof.
 	elim H10; intros; elim H11; intros; rewrite H12 in H6. inversion H6. exact (H _ _ _ H3 H5 _ _ H6).
 	elim (positive_sum x); intros. rewrite H10 in H6.
 	exact (H0 _ _ _ H4 H5 _ _ H6). elim H10; intros; elim H11; intros; rewrite H12 in H6. inversion H6.
-	exact (H0 _ _ _ H4 H5 _ _ H6). unfold predta_correct_wrt_sign in |- *. simple induction a. exact (H2 (ad_x 1)). intro. exact (H2 (ad_x (xI p0))). cut (predta_correct_wrt_sign (M1 state (ad_x p) s) sigma).
+	exact (H0 _ _ _ H4 H5 _ _ H6). unfold predta_correct_wrt_sign in |- *. simple induction a. exact (H2 (Npos 1)). intro. exact (H2 (Npos (xI p0))). cut (predta_correct_wrt_sign (M1 state (Npos p) s) sigma).
 	intro. unfold predta_correct_wrt_sign in |- *. intros.
 	simpl in H6. induction  a as [| p0]. exact (H _ _ _ H3 H5 _ _ H6).
 	elim (positive_sum p0); intros. rewrite H7 in H6.
 	exact (H0 _ _ _ H4 H5 _ _ H6). elim H7; intros; elim H8; intros; rewrite H9 in H6. elim (positive_sum x); intros. rewrite H10 in H6. inversion H6. elim H10; intros; elim H11; intros; rewrite H12 in H6. exact (H _ _ _ H3 H5 _ _ H6). inversion H6. elim (positive_sum x); intros. rewrite H10 in H6. inversion H6.
 	elim H10; intros; elim H11; intros; rewrite H12 in H6.
-	exact (H0 _ _ _ H4 H5 _ _ H6). inversion H6. unfold predta_correct_wrt_sign in |- *. simple induction a. exact (H2 ad_z).
-	intro. exact (H2 (ad_x (xO p0))). cut (predta_correct_wrt_sign (M1 state ad_z s) sigma).
+	exact (H0 _ _ _ H4 H5 _ _ H6). inversion H6. unfold predta_correct_wrt_sign in |- *. simple induction a. exact (H2 N0).
+	intro. exact (H2 (Npos (xO p0))). cut (predta_correct_wrt_sign (M1 state N0 s) sigma).
 	intro. unfold predta_correct_wrt_sign in |- *. intros.
 	simpl in H6. induction  a as [| p]. inversion H6. elim (positive_sum p); intros. rewrite H7 in H6. inversion H6. elim H7; intros; elim H8; intros; rewrite H9 in H6. elim (positive_sum x); intros. rewrite H10 in H6. exact (H _ _ _ H3 H5 _ _ H6). elim H10; intros; elim H11; intros; rewrite H12 in H6.
 	inversion H6. exact (H _ _ _ H3 H5 _ _ H6). elim (positive_sum x); intros. rewrite H10 in H6.
 	exact (H0 _ _ _ H4 H5 _ _ H6). elim H10; intros; elim H11; intros; rewrite H12 in H6. inversion H6.
-	exact (H0 _ _ _ H4 H5 _ _ H6). unfold predta_correct_wrt_sign in |- *. simple induction a. exact (H2 (ad_x 1)). intro. exact (H2 (ad_x (xI p))).
+	exact (H0 _ _ _ H4 H5 _ _ H6). unfold predta_correct_wrt_sign in |- *. simple induction a. exact (H2 (Npos 1)). intro. exact (H2 (Npos (xI p))).
 Qed.
 
 Lemma preDTA_produit_correct_wrt_sign_invar :
@@ -254,7 +255,7 @@ Proof.
 	elim (predta_correct_wrt_sign_M2 _ _ _ H3). intros.
 	elim (predta_correct_wrt_sign_M2 _ _ _ H4). intros.
 	unfold predta_correct_wrt_sign in |- *. intros. simpl in H9.
-	induction  a as [| p]. exact (H _ _ H5 H7 ad_z s H9). elim (positive_sum p); intros. rewrite H10 in H9.
+	induction  a as [| p]. exact (H _ _ H5 H7 N0 s H9). elim (positive_sum p); intros. rewrite H10 in H9.
 	exact (H0 _ _ H6 H7 _ _ H9). elim H10; intros; elim H11; intros; rewrite H12 in H9. elim (positive_sum x); intros. rewrite H13 in H9. exact (H _ _ H5 H8 _ _ H9). elim H13; intros; elim H14; intros; rewrite H15 in H9. exact (H _ _ H5 H7 _ _ H9). exact (H _ _ H5 H8 _ _ H9). elim (positive_sum x); intros.
 	rewrite H13 in H9. exact (H0 _ _ H6 H8 _ _ H9).
 	elim H13; intros; elim H14; intros; rewrite H15 in H9.
@@ -398,23 +399,23 @@ Lemma s_produit_l_ref_ok :
  state_ref_ok (s_produit_l a p s) (preDTA_produit d0 d1).
 Proof.
 	simple induction s. simpl in |- *. unfold state_ref_ok in |- *. intros. inversion H1.
-	simpl in |- *. unfold state_ref_ok in |- *. intros. elim (bool_is_true_or_false (ad_eq a1 a)); intros. rewrite H2 in H1. simpl in H1. elim (bool_is_true_or_false (ad_eq a1 a2)); intros; rewrite H3 in H1;
+	simpl in |- *. unfold state_ref_ok in |- *. intros. elim (bool_is_true_or_false (Neqb a1 a)); intros. rewrite H2 in H1. simpl in H1. elim (bool_is_true_or_false (Neqb a1 a2)); intros; rewrite H3 in H1;
   inversion H1. apply (pl_produit_ref_ok p a0 d0 d1).
-	apply (H0 a1 p). simpl in |- *. rewrite (ad_eq_correct a1). reflexivity.
-	apply (H a a0). simpl in |- *. rewrite (ad_eq_correct a). reflexivity.
+	apply (H0 a1 p). simpl in |- *. rewrite (Neqb_correct a1). reflexivity.
+	apply (H a a0). simpl in |- *. rewrite (Neqb_correct a). reflexivity.
 	rewrite H2 in H1. inversion H1. intro. intro. intro. intro.
-	unfold state_ref_ok in |- *. intros. cut (forall a : ad, state_ref_ok (M1 prec_list a p) d0). intros. elim (state_ref_ok_M2_destr _ _ _ H1). intros. simpl in H3. induction  a as [| p1]. induction  a0 as [| p1]. simpl in H3. exact (H _ _ _ _ H5 (H4 ad_z) _ _ H3). induction  p1 as [p1 Hrecp1| p1 Hrecp1| ].
-	simpl in H3. inversion H3. simpl in H3. exact (H _ _ _ _ H5 (H4 ad_z) _ _ H3). simpl in H3. inversion H3. elim (positive_sum p1). intros. rewrite H7 in H3. simpl in H3.
+	unfold state_ref_ok in |- *. intros. cut (forall a : ad, state_ref_ok (M1 prec_list a p) d0). intros. elim (state_ref_ok_M2_destr _ _ _ H1). intros. simpl in H3. induction  a as [| p1]. induction  a0 as [| p1]. simpl in H3. exact (H _ _ _ _ H5 (H4 N0) _ _ H3). induction  p1 as [p1 Hrecp1| p1 Hrecp1| ].
+	simpl in H3. inversion H3. simpl in H3. exact (H _ _ _ _ H5 (H4 N0) _ _ H3). simpl in H3. inversion H3. elim (positive_sum p1). intros. rewrite H7 in H3. simpl in H3.
 	induction  a0 as [| p2]. inversion H3. elim (positive_sum p2); intros.
-	rewrite H8 in H3. exact (H0 _ _ _ _ H6 (H4 ad_z) _ _ H3).
+	rewrite H8 in H3. exact (H0 _ _ _ _ H6 (H4 N0) _ _ H3).
 	elim H8; intros; elim H9; intros; rewrite H10 in H3.
-	inversion H3. exact (H0 _ _ _ _ H6 (H4 ad_z) _ _ H3).
+	inversion H3. exact (H0 _ _ _ _ H6 (H4 N0) _ _ H3).
 	intros. elim H7; intros; elim H8; intros; rewrite H9 in H3.
-	simpl in H3. induction  a0 as [| p2]. exact (H _ _ _ _ H5 (H4 (ad_x x)) _ _ H3). elim (positive_sum p2); intros. rewrite H10 in H3.
-	inversion H3. elim H10; intros; elim H11; intros; rewrite H12 in H3. exact (H _ _ _ _ H5 (H4 (ad_x x)) _ _ H3).
+	simpl in H3. induction  a0 as [| p2]. exact (H _ _ _ _ H5 (H4 (Npos x)) _ _ H3). elim (positive_sum p2); intros. rewrite H10 in H3.
+	inversion H3. elim H10; intros; elim H11; intros; rewrite H12 in H3. exact (H _ _ _ _ H5 (H4 (Npos x)) _ _ H3).
 	inversion H3. simpl in H3. induction  a0 as [| p2]. inversion H3.
-	elim (positive_sum p2); intros. rewrite H10 in H3. exact (H0 _ _ _ _ H6 (H4 (ad_x x)) _ _ H3). elim H10; intros; elim H11; intros; rewrite H12 in H3. inversion H3. exact (H0 _ _ _ _ H6 (H4 (ad_x x)) _ _ H3). intros. unfold state_ref_ok in |- *. intros. simpl in H4. elim (bool_is_true_or_false (ad_eq a1 a2)); intros; rewrite H5 in H4. inversion H4.
-	rewrite <- H7. apply (H2 a p). simpl in |- *. rewrite (ad_eq_correct a).
+	elim (positive_sum p2); intros. rewrite H10 in H3. exact (H0 _ _ _ _ H6 (H4 (Npos x)) _ _ H3). elim H10; intros; elim H11; intros; rewrite H12 in H3. inversion H3. exact (H0 _ _ _ _ H6 (H4 (Npos x)) _ _ H3). intros. unfold state_ref_ok in |- *. intros. simpl in H4. elim (bool_is_true_or_false (Neqb a1 a2)); intros; rewrite H5 in H4. inversion H4.
+	rewrite <- H7. apply (H2 a p). simpl in |- *. rewrite (Neqb_correct a).
 	reflexivity. inversion H4.
 Qed.
 
@@ -425,16 +426,16 @@ Lemma s_produit_r_ref_ok :
  state_ref_ok (s_produit_r a p s) (preDTA_produit d1 d0).
 Proof.
 	simple induction s. simpl in |- *. unfold state_ref_ok in |- *. intros. inversion H1.
-	simpl in |- *. unfold state_ref_ok in |- *. intros. elim (bool_is_true_or_false (ad_eq a1 a)); intros. rewrite H2 in H1. simpl in H1. elim (bool_is_true_or_false (ad_eq a1 a2)); intros; rewrite H3 in H1;
-  inversion H1. apply (pl_produit_ref_ok a0 p d1 d0). apply (H a a0). simpl in |- *. rewrite (ad_eq_correct a). reflexivity.
-	apply (H0 a1 p). simpl in |- *. rewrite (ad_eq_correct a1). reflexivity.
+	simpl in |- *. unfold state_ref_ok in |- *. intros. elim (bool_is_true_or_false (Neqb a1 a)); intros. rewrite H2 in H1. simpl in H1. elim (bool_is_true_or_false (Neqb a1 a2)); intros; rewrite H3 in H1;
+  inversion H1. apply (pl_produit_ref_ok a0 p d1 d0). apply (H a a0). simpl in |- *. rewrite (Neqb_correct a). reflexivity.
+	apply (H0 a1 p). simpl in |- *. rewrite (Neqb_correct a1). reflexivity.
 	rewrite H2 in H1. inversion H1. intro. intro. intro. intro.
-	unfold state_ref_ok in |- *. intros. cut (forall a : ad, state_ref_ok (M1 prec_list a p) d0). intro. elim (state_ref_ok_M2_destr _ _ _ H1). intros. simpl in H3. induction  a as [| p1]. simpl in H3. induction  a0 as [| p1]. exact (H _ _ _ _ H5 (H4 ad_z) _ _ H3). elim (positive_sum p1). intros. rewrite H7 in H3. inversion H3. intros. elim H7; intros; elim H8; intros; rewrite H9 in H3. exact (H _ _ _ _ H5 (H4 ad_z) _ _ H3). inversion H3. elim (positive_sum p1); intros. rewrite H7 in H3. simpl in H3. induction  a0 as [| p2]. inversion H3. elim (positive_sum p2); intros. rewrite H8 in H3. exact (H0 _ _ _ _ H6 (H4 ad_z) _ _ H3). elim H8; intros; elim H9; intros; rewrite H10 in H3. inversion H3. exact (H0 _ _ _ _ H6 (H4 ad_z) _ _ H3). elim H7; intros; elim H8; intros; rewrite H9 in H3. simpl in H3. induction  a0 as [| p2]. exact (H _ _ _ _ H5 (H4 (ad_x x)) _ _ H3). elim (positive_sum p2); intros.
-	rewrite H10 in H3. inversion H3. elim H10; intros; elim H11; intros; rewrite H12 in H3. exact (H _ _ _ _ H5 (H4 (ad_x x)) _ _ H3). inversion H3. simpl in H3. induction  a0 as [| p2]. inversion H3. elim (positive_sum p2); intros. rewrite H10 in H3. exact (H0 _ _ _ _ H6 (H4 (ad_x x)) _ _ H3).
+	unfold state_ref_ok in |- *. intros. cut (forall a : ad, state_ref_ok (M1 prec_list a p) d0). intro. elim (state_ref_ok_M2_destr _ _ _ H1). intros. simpl in H3. induction  a as [| p1]. simpl in H3. induction  a0 as [| p1]. exact (H _ _ _ _ H5 (H4 N0) _ _ H3). elim (positive_sum p1). intros. rewrite H7 in H3. inversion H3. intros. elim H7; intros; elim H8; intros; rewrite H9 in H3. exact (H _ _ _ _ H5 (H4 N0) _ _ H3). inversion H3. elim (positive_sum p1); intros. rewrite H7 in H3. simpl in H3. induction  a0 as [| p2]. inversion H3. elim (positive_sum p2); intros. rewrite H8 in H3. exact (H0 _ _ _ _ H6 (H4 N0) _ _ H3). elim H8; intros; elim H9; intros; rewrite H10 in H3. inversion H3. exact (H0 _ _ _ _ H6 (H4 N0) _ _ H3). elim H7; intros; elim H8; intros; rewrite H9 in H3. simpl in H3. induction  a0 as [| p2]. exact (H _ _ _ _ H5 (H4 (Npos x)) _ _ H3). elim (positive_sum p2); intros.
+	rewrite H10 in H3. inversion H3. elim H10; intros; elim H11; intros; rewrite H12 in H3. exact (H _ _ _ _ H5 (H4 (Npos x)) _ _ H3). inversion H3. simpl in H3. induction  a0 as [| p2]. inversion H3. elim (positive_sum p2); intros. rewrite H10 in H3. exact (H0 _ _ _ _ H6 (H4 (Npos x)) _ _ H3).
 	elim H10; intros; elim H11; intros; rewrite H12 in H3.
-	inversion H3. exact (H0 _ _ _ _ H6 (H4 (ad_x x)) _ _ H3).
-	unfold state_ref_ok in |- *. intros. simpl in H4. elim (bool_is_true_or_false (ad_eq a1 a2)); intros; rewrite H5 in H4. inversion H4. rewrite <- H7. apply (H2 a p).
-	simpl in |- *. rewrite (ad_eq_correct a). reflexivity.
+	inversion H3. exact (H0 _ _ _ _ H6 (H4 (Npos x)) _ _ H3).
+	unfold state_ref_ok in |- *. intros. simpl in H4. elim (bool_is_true_or_false (Neqb a1 a2)); intros; rewrite H5 in H4. inversion H4. rewrite <- H7. apply (H2 a p).
+	simpl in |- *. rewrite (Neqb_correct a). reflexivity.
 	inversion H4.
 Qed.
 
@@ -463,7 +464,7 @@ Proof.
 	intros. simpl in |- *. elim (state_ref_ok_M2_destr _ _ _ H3).
 	intros. elim (state_ref_ok_M2_destr _ _ _ H4). intros.
 	unfold state_ref_ok in |- *. intros. induction  a as [| p0]. simpl in H9.
-	exact (H _ _ _ H5 H7 ad_z p H9). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]; simpl in H9. exact (H0 _ _ _ H6 H8 (ad_x p0) p H9). exact (H _ _ _ H5 H7 _ _ H9). exact (H0 _ _ _ H6 H8 _ _ H9).
+	exact (H _ _ _ H5 H7 N0 p H9). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]; simpl in H9. exact (H0 _ _ _ H6 H8 (Npos p0) p H9). exact (H _ _ _ H5 H7 _ _ H9). exact (H0 _ _ _ H6 H8 _ _ H9).
 Qed.
 
 Lemma preDTA_produit_l_ref_ok :
@@ -473,31 +474,31 @@ Lemma preDTA_produit_l_ref_ok :
  preDTA_ref_ok_distinct (preDTA_produit_l a s d) (preDTA_produit d0 d1).
 Proof.
 	unfold preDTA_ref_ok_distinct in |- *. simple induction d. intros.
-	inversion H1. intros. simpl in H1. elim (bool_is_true_or_false (ad_eq (iad_conv a1 a) a2)); intros;
+	inversion H1. intros. simpl in H1. elim (bool_is_true_or_false (Neqb (iad_conv a1 a) a2)); intros;
   rewrite H2 in H1; inversion H1. apply (s_produit_ref_ok s a0 d0 d1). apply (H0 a1 s).
-	simpl in |- *. rewrite (ad_eq_correct a1). reflexivity.
-	apply (H a a0). simpl in |- *; rewrite (ad_eq_correct a).
+	simpl in |- *. rewrite (Neqb_correct a1). reflexivity.
+	apply (H a a0). simpl in |- *; rewrite (Neqb_correct a).
 	reflexivity. intros. elim (preDTA_ref_ok_distinct_dest m m0 d1 H1). intros. cut (forall a : ad, preDTA_ref_ok_distinct (M1 state a s) d0). intros. induction  a as [| p]. simpl in H3.
-	induction  a0 as [| p]. exact (H _ _ _ _ H4 (H6 ad_z) _ _ H3).
+	induction  a0 as [| p]. exact (H _ _ _ _ H4 (H6 N0) _ _ H3).
 	induction  p as [p Hrecp| p Hrecp| ]. inversion H3. elim (positive_sum p).
-	intros. rewrite H7 in H3. exact (H0 _ _ _ _ H5 (H6 ad_z) _ _ H3). intros. elim H7; intros; elim H8; intros; rewrite H9 in H3. exact (H _ _ _ _ H4 (H6 ad_z) _ _ H3). exact (H0 _ _ _ _ H5 (H6 ad_z) _ _ H3).
+	intros. rewrite H7 in H3. exact (H0 _ _ _ _ H5 (H6 N0) _ _ H3). intros. elim H7; intros; elim H8; intros; rewrite H9 in H3. exact (H _ _ _ _ H4 (H6 N0) _ _ H3). exact (H0 _ _ _ _ H5 (H6 N0) _ _ H3).
 	inversion H3. induction  p as [p Hrecp| p Hrecp| ]. induction  a0 as [| p0]. simpl in H3.
 	inversion H3. clear Hrecp. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]; simpl in H3.
 	elim (positive_sum p0); intros. rewrite H7 in H3.
-	exact (H0 _ _ _ _ H5 (H6 (ad_x p)) _ _ H3).
+	exact (H0 _ _ _ _ H5 (H6 (Npos p)) _ _ H3).
 	elim H7; intros; elim H8; intros; rewrite H9 in H3.
-	exact (H _ _ _ _ H4 (H6 (ad_x p)) _ _ H3). exact (H0 _ _ _ _ H5 (H6 (ad_x p)) _ _ H3). inversion H3.
-	exact (H _ _ _ _ H4 (H6 (ad_x p)) _ _ H3). 
-	induction  a0 as [| p0]. simpl in H3. exact (H _ _ _ _ H4 (H6 (ad_x p)) _ _ H3). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]; simpl in H3.
+	exact (H _ _ _ _ H4 (H6 (Npos p)) _ _ H3). exact (H0 _ _ _ _ H5 (H6 (Npos p)) _ _ H3). inversion H3.
+	exact (H _ _ _ _ H4 (H6 (Npos p)) _ _ H3). 
+	induction  a0 as [| p0]. simpl in H3. exact (H _ _ _ _ H4 (H6 (Npos p)) _ _ H3). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]; simpl in H3.
 	inversion H3. elim (positive_sum p0); intros.
-	rewrite H7 in H3. exact (H0 _ _ _ _ H5 (H6 (ad_x p)) _ _ H3). elim H7; intros; elim H8; intros; rewrite H9 in H3. exact (H _ _ _ _ H4 (H6 (ad_x p)) _ _ H3). exact (H0 _ _ _ _ H5 (H6 (ad_x p)) _ _ H3). inversion H3. induction  a0 as [| p]. simpl in H3.
+	rewrite H7 in H3. exact (H0 _ _ _ _ H5 (H6 (Npos p)) _ _ H3). elim H7; intros; elim H8; intros; rewrite H9 in H3. exact (H _ _ _ _ H4 (H6 (Npos p)) _ _ H3). exact (H0 _ _ _ _ H5 (H6 (Npos p)) _ _ H3). inversion H3. induction  a0 as [| p]. simpl in H3.
 	inversion H3. induction  p as [p Hrecp| p Hrecp| ]. simpl in H3. elim (positive_sum p); intros. rewrite H7 in H3.
-	exact (H0 _ _ _ _ H5 (H6 ad_z) _ _ H3). elim H7; intros; elim H8; intros; rewrite H9 in H3.
-	exact (H _ _ _ _ H4 (H6 ad_z) _ _ H3). exact (H0 _ _ _ _ H5 (H6 ad_z) _ _ H3). simpl in H3. 
-	inversion H3. simpl in H3. exact (H _ _ _ _ H4 (H6 ad_z) _ _ H3). unfold preDTA_ref_ok_distinct in |- *.
-	intros. simpl in H6. elim (bool_is_true_or_false (ad_eq a1 a2)); intros; rewrite H7 in H6;
+	exact (H0 _ _ _ _ H5 (H6 N0) _ _ H3). elim H7; intros; elim H8; intros; rewrite H9 in H3.
+	exact (H _ _ _ _ H4 (H6 N0) _ _ H3). exact (H0 _ _ _ _ H5 (H6 N0) _ _ H3). simpl in H3. 
+	inversion H3. simpl in H3. exact (H _ _ _ _ H4 (H6 N0) _ _ H3). unfold preDTA_ref_ok_distinct in |- *.
+	intros. simpl in H6. elim (bool_is_true_or_false (Neqb a1 a2)); intros; rewrite H7 in H6;
   inversion H6. rewrite <- H9. apply (H2 a s).
-	simpl in |- *. rewrite (ad_eq_correct a). reflexivity.
+	simpl in |- *. rewrite (Neqb_correct a). reflexivity.
 Qed.
 
 Lemma preDTA_produit_r_ref_ok :
@@ -508,21 +509,21 @@ Lemma preDTA_produit_r_ref_ok :
 Proof.
 	unfold preDTA_ref_ok_distinct in |- *. simple induction d.
 	intros. inversion H1. intros. simpl in H1.
-	elim (bool_is_true_or_false (ad_eq (iad_conv a a1) a2)); intros;
+	elim (bool_is_true_or_false (Neqb (iad_conv a a1) a2)); intros;
   rewrite H2 in H1; inversion H1.
-	apply (s_produit_ref_ok a0 s d0 d1). apply (H a a0). simpl in |- *. rewrite (ad_eq_correct a). reflexivity.
-	apply (H0 a1 s). simpl in |- *. rewrite (ad_eq_correct a1).
+	apply (s_produit_ref_ok a0 s d0 d1). apply (H a a0). simpl in |- *. rewrite (Neqb_correct a). reflexivity.
+	apply (H0 a1 s). simpl in |- *. rewrite (Neqb_correct a1).
 	reflexivity. intros. elim (preDTA_ref_ok_distinct_dest _ _ _ H1). intros. cut (forall a : ad, preDTA_ref_ok_distinct (M1 state a s) d1). intro. induction  a as [| p]. simpl in H3.
-	induction  a0 as [| p]. exact (H _ _ _ _ H4 (H6 ad_z) _ _ H3).
+	induction  a0 as [| p]. exact (H _ _ _ _ H4 (H6 N0) _ _ H3).
 	elim (positive_sum p); intros. rewrite H7 in H3.
-	exact (H0 _ _ _ _ H5 (H6 ad_z) _ _ H3).
+	exact (H0 _ _ _ _ H5 (H6 N0) _ _ H3).
 	elim H7; intros; elim H8; intros; rewrite H9 in H3.
 	elim (positive_sum x); intros. rewrite H10 in H3.
-	inversion H3. elim H10; intros; elim H11; intros; rewrite H12 in H3. exact (H _ _ _ _ H4 (H6 ad_z) _ _ H3). inversion H3. elim (positive_sum x); intros.
-	rewrite H10 in H3. inversion H3. elim H10; intros; elim H11; intros; rewrite H12 in H3. exact (H0 _ _ _ _ H5 (H6 ad_z) _ _ H3). inversion H3. induction  p as [p Hrecp| p Hrecp| ]; simpl in H3. induction  a0 as [| p0]. inversion H3. elim (positive_sum p0); intros. rewrite H7 in H3.
+	inversion H3. elim H10; intros; elim H11; intros; rewrite H12 in H3. exact (H _ _ _ _ H4 (H6 N0) _ _ H3). inversion H3. elim (positive_sum x); intros.
+	rewrite H10 in H3. inversion H3. elim H10; intros; elim H11; intros; rewrite H12 in H3. exact (H0 _ _ _ _ H5 (H6 N0) _ _ H3). inversion H3. induction  p as [p Hrecp| p Hrecp| ]; simpl in H3. induction  a0 as [| p0]. inversion H3. elim (positive_sum p0); intros. rewrite H7 in H3.
 	inversion H3. elim H7; intros; elim H8; intros; rewrite H9 in H3. elim (positive_sum p); intros.
 	rewrite H10 in H3. elim (positive_sum x); intros.
-	rewrite H11 in H3. exact (H _ _ _ _ H4 (H6 (ad_x 1)) _ _ H3). elim H11; intros; elim H12; intros; rewrite H13 in H3. inversion H3. exact (H _ _ _ _ H4 (H6 (ad_x 1)) _ _ H3). elim H10; intros; elim H11; intros; rewrite H12 in H3. elim (positive_sum x); intros. rewrite H13 in H3. exact (H _ _ _ _ H4 (H6 _) _ _ H3). elim H13; intros; elim H14; intros; rewrite H15 in H3. inversion H3. exact (H _ _ _ _ H4 (H6 _) _ _ H3). elim (positive_sum x); intros. rewrite H13 in H3. exact (H _ _ _ _ H4 (H6 _) _ _ H3). elim H13; intros; elim H14; intros; rewrite H15 in H3. inversion H3.
+	rewrite H11 in H3. exact (H _ _ _ _ H4 (H6 (Npos 1)) _ _ H3). elim H11; intros; elim H12; intros; rewrite H13 in H3. inversion H3. exact (H _ _ _ _ H4 (H6 (Npos 1)) _ _ H3). elim H10; intros; elim H11; intros; rewrite H12 in H3. elim (positive_sum x); intros. rewrite H13 in H3. exact (H _ _ _ _ H4 (H6 _) _ _ H3). elim H13; intros; elim H14; intros; rewrite H15 in H3. inversion H3. exact (H _ _ _ _ H4 (H6 _) _ _ H3). elim (positive_sum x); intros. rewrite H13 in H3. exact (H _ _ _ _ H4 (H6 _) _ _ H3). elim H13; intros; elim H14; intros; rewrite H15 in H3. inversion H3.
 	exact (H _ _ _ _ H4 (H6 _) _ _ H3). elim (positive_sum x); intros. rewrite H10 in H3.
 	exact (H0 _ _ _ _ H5 (H6 _) _ _ H3). elim H10; intros; elim H11; intros; rewrite H12 in H3.
 	inversion H3. exact (H0 _ _ _ _ H5 (H6 _) _ _ H3).
@@ -536,9 +537,9 @@ Proof.
 	inversion H3. elim H7; intros; elim H8; intros; rewrite H9 in H3. elim (positive_sum x); intros.
 	rewrite H10 in H3. exact (H _ _ _ _ H4 (H6 _) _ _ H3). elim H10; intros; elim H11; intros; rewrite H12 in H3. inversion H3. exact (H _ _ _ _ H4 (H6 _) _ _ H3). elim (positive_sum x); intros.
 	rewrite H10 in H3. exact (H0 _ _ _ _ H5 (H6 _) _ _ H3). elim H10; intros; elim H11; intros; rewrite H12 in H3. inversion H3. exact (H0 _ _ _ _ H5 (H6 _) _ _ H3). unfold preDTA_ref_ok_distinct in |- *.
-	intros. simpl in H6. elim (bool_is_true_or_false (ad_eq a1 a2)); intros; rewrite H7 in H6;
+	intros. simpl in H6. elim (bool_is_true_or_false (Neqb a1 a2)); intros; rewrite H7 in H6;
   inversion H6. rewrite <- H9. apply (H2 a s). simpl in |- *.
-	rewrite (ad_eq_correct a). reflexivity.
+	rewrite (Neqb_correct a). reflexivity.
 Qed.
 
 Lemma preDTA_produit_ref_okd :

@@ -15,6 +15,7 @@
 
 
 Require Import Arith.
+Require Import NArith Ndec.
 Require Import ZArith.
 Require Import Bool.
 Require Import Allmaps.
@@ -24,7 +25,7 @@ Require Import semantics.
 Require Import pl_path.
 Require Import signature.
 
-(* définition des adresses d'états produits *)
+(* dÃ©finition des adresses d'Ã©tats produits *)
 
 Fixpoint iad_conv_aux_0 (p : positive) : positive :=
   match p with
@@ -55,10 +56,10 @@ Fixpoint iad_conv_aux_2 (p0 p1 : positive) {struct p1} : positive :=
 
 Definition iad_conv (a0 a1 : ad) : ad :=
   match a0, a1 with
-  | ad_z, ad_z => ad_z
-  | ad_z, ad_x p1 => ad_x (iad_conv_aux_0 p1)
-  | ad_x p0, ad_z => ad_x (iad_conv_aux_1 p0)
-  | ad_x p0, ad_x p1 => ad_x (iad_conv_aux_2 p0 p1)
+  | N0, N0 => N0
+  | N0, Npos p1 => Npos (iad_conv_aux_0 p1)
+  | Npos p0, N0 => Npos (iad_conv_aux_1 p0)
+  | Npos p0, Npos p1 => Npos (iad_conv_aux_2 p0 p1)
   end.
 
 Lemma iad_conv_aux_0_inj :
@@ -206,7 +207,7 @@ Proof.
 	intros. rewrite H0. rewrite H2. split; trivial.
 Qed.
 
-(* surjectivité de iad_conv *)
+(* surjectivitÃ© de iad_conv *)
 
 Definition iad_conv_prop (p : positive) : Prop :=
   (exists q : positive, p = iad_conv_aux_0 q) \/
@@ -278,61 +279,61 @@ Qed.
 Lemma iad_conv_surj :
  forall a : ad, exists b : ad, (exists c : ad, a = iad_conv b c).
 Proof.
-	simple induction a. split with ad_z. split with ad_z. reflexivity.
+	simple induction a. split with N0. split with N0. reflexivity.
 	intro. elim (iad_conv_surj_5 p). intros. elim H. intros.
-	split with ad_z. split with (ad_x x). simpl in |- *. rewrite H0.
-	trivial. intros. elim H. intros. elim H0. intros. split with (ad_x x). split with ad_z. simpl in |- *. rewrite H1. trivial. intros.
-	elim H0. intros. elim H1. intros. split with (ad_x x). split with (ad_x x0). simpl in |- *. rewrite H2. trivial.
+	split with N0. split with (Npos x). simpl in |- *. rewrite H0.
+	trivial. intros. elim H. intros. elim H0. intros. split with (Npos x). split with N0. simpl in |- *. rewrite H1. trivial. intros.
+	elim H0. intros. elim H1. intros. split with (Npos x). split with (Npos x0). simpl in |- *. rewrite H2. trivial.
 Qed.
 
-(* fonctions réciproques gauche et droite de iad_conv *)
+(* fonctions rÃ©ciproques gauche et droite de iad_conv *)
 
 Inductive ad_couple : Set :=
     cpla : ad -> ad -> ad_couple.
 
 Fixpoint iad_conv_inv_0 (p : positive) : ad_couple :=
   match p with
-  | xH => cpla (ad_x 1) ad_z
-  | xO xH => cpla ad_z (ad_x 1)
-  | xI xH => cpla (ad_x 1) (ad_x 1)
+  | xH => cpla (Npos 1) N0
+  | xO xH => cpla N0 (Npos 1)
+  | xI xH => cpla (Npos 1) (Npos 1)
   | xO (xO p') =>
       match iad_conv_inv_0 p' with
-      | cpla ad_z ad_z => cpla ad_z ad_z
-      | cpla ad_z (ad_x p1) => cpla ad_z (ad_x (xO p1))
-      | cpla (ad_x p0) ad_z => cpla (ad_x (xO p0)) ad_z
-      | cpla (ad_x p0) (ad_x p1) => cpla (ad_x (xO p0)) (ad_x (xO p1))
+      | cpla N0 N0 => cpla N0 N0
+      | cpla N0 (Npos p1) => cpla N0 (Npos (xO p1))
+      | cpla (Npos p0) N0 => cpla (Npos (xO p0)) N0
+      | cpla (Npos p0) (Npos p1) => cpla (Npos (xO p0)) (Npos (xO p1))
       end
   | xO (xI p') =>
       match iad_conv_inv_0 p' with
-      | cpla ad_z ad_z => cpla ad_z (ad_x 1)
-      | cpla ad_z (ad_x p1) => cpla ad_z (ad_x (xI p1))
-      | cpla (ad_x p0) ad_z => cpla (ad_x (xO p0)) (ad_x 1)
-      | cpla (ad_x p0) (ad_x p1) => cpla (ad_x (xO p0)) (ad_x (xI p1))
+      | cpla N0 N0 => cpla N0 (Npos 1)
+      | cpla N0 (Npos p1) => cpla N0 (Npos (xI p1))
+      | cpla (Npos p0) N0 => cpla (Npos (xO p0)) (Npos 1)
+      | cpla (Npos p0) (Npos p1) => cpla (Npos (xO p0)) (Npos (xI p1))
       end
   | xI (xO p') =>
       match iad_conv_inv_0 p' with
-      | cpla ad_z ad_z => cpla (ad_x 1) ad_z
-      | cpla ad_z (ad_x p1) => cpla (ad_x 1) (ad_x (xO p1))
-      | cpla (ad_x p0) ad_z => cpla (ad_x (xI p0)) ad_z
-      | cpla (ad_x p0) (ad_x p1) => cpla (ad_x (xI p0)) (ad_x (xO p1))
+      | cpla N0 N0 => cpla (Npos 1) N0
+      | cpla N0 (Npos p1) => cpla (Npos 1) (Npos (xO p1))
+      | cpla (Npos p0) N0 => cpla (Npos (xI p0)) N0
+      | cpla (Npos p0) (Npos p1) => cpla (Npos (xI p0)) (Npos (xO p1))
       end
   | xI (xI p') =>
       match iad_conv_inv_0 p' with
-      | cpla ad_z ad_z => cpla (ad_x 1) (ad_x 1)
-      | cpla ad_z (ad_x p1) => cpla (ad_x 1) (ad_x (xI p1))
-      | cpla (ad_x p0) ad_z => cpla (ad_x (xI p0)) (ad_x 1)
-      | cpla (ad_x p0) (ad_x p1) => cpla (ad_x (xI p0)) (ad_x (xI p1))
+      | cpla N0 N0 => cpla (Npos 1) (Npos 1)
+      | cpla N0 (Npos p1) => cpla (Npos 1) (Npos (xI p1))
+      | cpla (Npos p0) N0 => cpla (Npos (xI p0)) (Npos 1)
+      | cpla (Npos p0) (Npos p1) => cpla (Npos (xI p0)) (Npos (xI p1))
       end
   end.
 
 Definition iad_conv_inv (a : ad) : ad_couple :=
   match a with
-  | ad_z => cpla ad_z ad_z
-  | ad_x p => iad_conv_inv_0 p
+  | N0 => cpla N0 N0
+  | Npos p => iad_conv_inv_0 p
   end.
 
 Lemma iad_inv_0 :
- forall p : positive, iad_conv_inv_0 (iad_conv_aux_0 p) = cpla ad_z (ad_x p).
+ forall p : positive, iad_conv_inv_0 (iad_conv_aux_0 p) = cpla N0 (Npos p).
 Proof.
 	intros. induction  p as [p Hrecp| p Hrecp| ]. unfold iad_conv_aux_0 in |- *. simpl in |- *.
 	unfold iad_conv_aux_0 in Hrecp. rewrite Hrecp. reflexivity.
@@ -341,7 +342,7 @@ Proof.
 Qed.
 
 Lemma iad_inv_1 :
- forall p : positive, iad_conv_inv_0 (iad_conv_aux_1 p) = cpla (ad_x p) ad_z.
+ forall p : positive, iad_conv_inv_0 (iad_conv_aux_1 p) = cpla (Npos p) N0.
 Proof.
 	simple induction p. intros. unfold iad_conv_aux_1 in |- *. unfold iad_conv_aux_1 in H.
 	simpl in |- *. rewrite H. reflexivity. intros. unfold iad_conv_aux_1 in H.
@@ -351,7 +352,7 @@ Qed.
 
 Lemma iad_inv_2 :
  forall p0 p1 : positive,
- iad_conv_inv_0 (iad_conv_aux_2 p0 p1) = cpla (ad_x p0) (ad_x p1).
+ iad_conv_inv_0 (iad_conv_aux_2 p0 p1) = cpla (Npos p0) (Npos p1).
 Proof.
 	simple induction p0. simple induction p1. intros. simpl in |- *. rewrite (H p2). reflexivity. 
 	intros. simpl in |- *. rewrite (H p2). reflexivity. simpl in |- *. rewrite (iad_inv_1 p).
@@ -378,7 +379,7 @@ Proof.
 	rewrite H3 in H1. rewrite H4 in H1. rewrite H1. reflexivity.
 Qed.
 
-(* algorithme de calcul d'intersection : calcul de l'état produit *)
+(* algorithme de calcul d'intersection : calcul de l'Ã©tat produit *)
 
 (* calcul d'une prec_list produit *)
 
@@ -418,7 +419,7 @@ Fixpoint pl_card (pl : prec_list) : nat :=
   | prec_cons a la ls => S (pl_card la + pl_card ls)
   end.
 
-(* terminaison des fonctions précédantes *)
+(* terminaison des fonctions prÃ©cÃ©dantes *)
 
 Definition pl_essence (pl0 pl1 : prec_list) : nat :=
   pl_card pl0 + pl_card pl1.
@@ -507,7 +508,7 @@ Proof.
      (pl_card_0 pl1)).
 Qed.
 
-(* invariance du résultat de pl_produit lorsqu'on augmente la quantité d'essence *)
+(* invariance du rÃ©sultat de pl_produit lorsqu'on augmente la quantitÃ© d'essence *)
 
 Fixpoint pl_prof (pl : prec_list) : nat :=
   match pl with
@@ -749,7 +750,7 @@ Proof.
 	induction  pl as [a0 pl1 Hrecpl1 pl0 Hrecpl0| ]. simpl in H0. inversion H0. reflexivity.
 Qed.
 
-(* passage au produit de la propriété pl_tl_length *)
+(* passage au produit de la propriÃ©tÃ© pl_tl_length *)
 
 Definition pl_tl_length_prod_def_0 (pl0 pl1 : prec_list) : Prop :=
   forall (l : prec_list) (a : ad) (n m : nat),
@@ -1341,31 +1342,31 @@ Proof.
      (le_n_n _)).
 Qed.
 
-(* calcul de l'état produit *)
+(* calcul de l'Ã©tat produit *)
 
 Fixpoint s_produit_l (a : ad) (p : prec_list) (s : state) {struct s} :
  state :=
   match s with
   | M0 => M0 prec_list
   | M1 a' p' =>
-      if ad_eq a a' then M1 prec_list a (pl_produit p p') else M0 prec_list
+      if Neqb a a' then M1 prec_list a (pl_produit p p') else M0 prec_list
   | M2 s0 s1 =>
       match a with
-      | ad_z => M2 prec_list (s_produit_l ad_z p s0) (M0 prec_list)
-      | ad_x q =>
+      | N0 => M2 prec_list (s_produit_l N0 p s0) (M0 prec_list)
+      | Npos q =>
           match q with
-          | xH => M2 prec_list (M0 prec_list) (s_produit_l ad_z p s1)
-          | xO q' => M2 prec_list (s_produit_l (ad_x q') p s0) (M0 prec_list)
-          | xI q' => M2 prec_list (M0 prec_list) (s_produit_l (ad_x q') p s1)
+          | xH => M2 prec_list (M0 prec_list) (s_produit_l N0 p s1)
+          | xO q' => M2 prec_list (s_produit_l (Npos q') p s0) (M0 prec_list)
+          | xI q' => M2 prec_list (M0 prec_list) (s_produit_l (Npos q') p s1)
           end
       end
   end.
 
 Definition sproductl_0_def (s : state) : Prop :=
   forall (a : ad) (p : prec_list) (c : ad) (r0 r1 : prec_list),
-  MapGet prec_list (M1 prec_list a p) c = SOME prec_list r0 ->
-  MapGet prec_list s c = SOME prec_list r1 ->
-  MapGet prec_list (s_produit_l a p s) c = SOME prec_list (pl_produit r0 r1).
+  MapGet prec_list (M1 prec_list a p) c = Some r0 ->
+  MapGet prec_list s c = Some r1 ->
+  MapGet prec_list (s_produit_l a p s) c = Some (pl_produit r0 r1).
 
 Lemma sproductl_0_0 : sproductl_0_def (M0 prec_list).
 Proof.
@@ -1376,11 +1377,11 @@ Lemma sproductl_0_1 :
  forall (a : ad) (a0 : prec_list), sproductl_0_def (M1 prec_list a a0).
 Proof.
 	unfold sproductl_0_def in |- *. intros. simpl in H. simpl in H0.
-	elim (bool_is_true_or_false (ad_eq a1 c)); intro; rewrite H1 in H.
-	elim (bool_is_true_or_false (ad_eq a c)); intro; rewrite H2 in H0.
-	inversion H. inversion H0. rewrite (ad_eq_complete _ _ H1).
-	rewrite (ad_eq_complete _ _ H2). simpl in |- *. rewrite (ad_eq_correct c).
-	simpl in |- *. rewrite (ad_eq_correct c). trivial. inversion H0. inversion H.
+	elim (bool_is_true_or_false (Neqb a1 c)); intro; rewrite H1 in H.
+	elim (bool_is_true_or_false (Neqb a c)); intro; rewrite H2 in H0.
+	inversion H. inversion H0. rewrite (Neqb_complete _ _ H1).
+	rewrite (Neqb_complete _ _ H2). simpl in |- *. rewrite (Neqb_correct c).
+	simpl in |- *. rewrite (Neqb_correct c). trivial. inversion H0. inversion H.
 Qed.
 
 Lemma sproductl_0_2 :
@@ -1389,12 +1390,12 @@ Lemma sproductl_0_2 :
  forall m0 : state, sproductl_0_def m0 -> sproductl_0_def (M2 prec_list m m0).
 Proof.
 	unfold sproductl_0_def in |- *.
-	intros. simpl in H1. elim (bool_is_true_or_false (ad_eq a c)); intro.
-	rewrite H3 in H1. inversion H1. rewrite (ad_eq_complete _ _ H3). 
-	induction  c as [| p0]. simpl in |- *. elim (H ad_z r0 ad_z r0 r1). reflexivity. reflexivity.
-	simpl in H2. exact H2.  induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H0 (ad_x p0) r0 (ad_x p0) r0 r1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p0).
-	reflexivity. simpl in H2. exact H2. simpl in |- *. elim (H (ad_x p0) r0 (ad_x p0) r0 r1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p0). reflexivity.
-	simpl in H2. exact H2. simpl in |- *. elim (H0 ad_z r0 ad_z r0 r1). reflexivity.
+	intros. simpl in H1. elim (bool_is_true_or_false (Neqb a c)); intro.
+	rewrite H3 in H1. inversion H1. rewrite (Neqb_complete _ _ H3). 
+	induction  c as [| p0]. simpl in |- *. elim (H N0 r0 N0 r0 r1). reflexivity. reflexivity.
+	simpl in H2. exact H2.  induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H0 (Npos p0) r0 (Npos p0) r0 r1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p0).
+	reflexivity. simpl in H2. exact H2. simpl in |- *. elim (H (Npos p0) r0 (Npos p0) r0 r1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p0). reflexivity.
+	simpl in H2. exact H2. simpl in |- *. elim (H0 N0 r0 N0 r0 r1). reflexivity.
 	reflexivity. simpl in H2. exact H2. rewrite H3 in H1. inversion H1.
 Qed.
 
@@ -1407,9 +1408,9 @@ Qed.
 
 Lemma sproductl_0 :
  forall (s : state) (a : ad) (p : prec_list) (c : ad) (r0 r1 : prec_list),
- MapGet prec_list (M1 prec_list a p) c = SOME prec_list r0 ->
- MapGet prec_list s c = SOME prec_list r1 ->
- MapGet prec_list (s_produit_l a p s) c = SOME prec_list (pl_produit r0 r1).
+ MapGet prec_list (M1 prec_list a p) c = Some r0 ->
+ MapGet prec_list s c = Some r1 ->
+ MapGet prec_list (s_produit_l a p s) c = Some (pl_produit r0 r1).
 Proof.
 	exact
   (Map_ind prec_list sproductl_0_def sproductl_0_0 sproductl_0_1
@@ -1418,11 +1419,11 @@ Qed.
 
 Definition sproductl_1_def (s : state) : Prop :=
   forall (a : ad) (p : prec_list) (c : ad) (r : prec_list),
-  MapGet prec_list (s_produit_l a p s) c = SOME prec_list r ->
+  MapGet prec_list (s_produit_l a p s) c = Some r ->
   exists r0 : prec_list,
     (exists r1 : prec_list,
-       MapGet prec_list (M1 prec_list a p) c = SOME prec_list r0 /\
-       MapGet prec_list s c = SOME prec_list r1).
+       MapGet prec_list (M1 prec_list a p) c = Some r0 /\
+       MapGet prec_list s c = Some r1).
 
 Lemma sproductl_1_0 : sproductl_1_def (M0 prec_list).
 Proof.
@@ -1432,8 +1433,8 @@ Qed.
 Lemma sproductl_1_1 :
  forall (a : ad) (a0 : prec_list), sproductl_1_def (M1 prec_list a a0).
 Proof.
-	unfold sproductl_1_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (ad_eq a1 a)); intro; rewrite H0 in H. simpl in H. elim (bool_is_true_or_false (ad_eq a1 c)); intro; rewrite H1 in H. split with p. split with a0. simpl in |- *.
-	split. rewrite H1. reflexivity. rewrite <- (ad_eq_complete _ _ H0).
+	unfold sproductl_1_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (Neqb a1 a)); intro; rewrite H0 in H. simpl in H. elim (bool_is_true_or_false (Neqb a1 c)); intro; rewrite H1 in H. split with p. split with a0. simpl in |- *.
+	split. rewrite H1. reflexivity. rewrite <- (Neqb_complete _ _ H0).
 	rewrite H1. reflexivity. inversion H. inversion H.
 Qed.
 
@@ -1443,23 +1444,23 @@ Lemma sproductl_1_2 :
  forall m0 : state, sproductl_1_def m0 -> sproductl_1_def (M2 prec_list m m0).
 Proof.
 	unfold sproductl_1_def in |- *. intros. induction  a as [| p0]. induction  c as [| p0]. simpl in H1.
-	elim (H ad_z p ad_z r H1). intros. elim H2. intros. elim H3. intros.
+	elim (H N0 p N0 r H1). intros. elim H2. intros. elim H3. intros.
 	split with x. split with x0. split. exact H4. simpl in |- *. exact H5. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ].
-	simpl in H1. inversion H1. simpl in H1. elim (H ad_z p (ad_x p0) r H1).
+	simpl in H1. inversion H1. simpl in H1. elim (H N0 p (Npos p0) r H1).
 	intros. elim H2. intros. elim H3. intros. split with x. split with x0.
 	split. exact H4. simpl in |- *. exact H5. simpl in H1. inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ].
 	induction  c as [| p1]. simpl in H1. inversion H1. simpl in H1. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ].
-	elim (H0 (ad_x p0) p (ad_x p1) r H1). intros. elim H2. intros. elim H3.
+	elim (H0 (Npos p0) p (Npos p1) r H1). intros. elim H2. intros. elim H3.
 	intros. intros. split with x. split with x0. split. exact H4. simpl in |- *.
-	exact H5. inversion H1. elim (H0 (ad_x p0) p ad_z r H1). intros. elim H2.
-	intros. elim H3. intros. split with x. split with x0. simpl in |- *. split. simpl in H4. exact H4. exact H5. induction  c as [| p1]. simpl in H1. elim (H (ad_x p0) p ad_z r H1). intros. elim H2. intros. elim H3. intros. split with x.
+	exact H5. inversion H1. elim (H0 (Npos p0) p N0 r H1). intros. elim H2.
+	intros. elim H3. intros. split with x. split with x0. simpl in |- *. split. simpl in H4. exact H4. exact H5. induction  c as [| p1]. simpl in H1. elim (H (Npos p0) p N0 r H1). intros. elim H2. intros. elim H3. intros. split with x.
 	split with x0. simpl in |- *. split. simpl in H4. exact H4. exact H5. simpl in H1.
-	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. inversion H1. elim (H (ad_x p0) p (ad_x p1) r H1). intros.
+	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. inversion H1. elim (H (Npos p0) p (Npos p1) r H1). intros.
 	elim H2. intros. elim H3. intros. split with x. split with x0. simpl in |- *.
 	split. simpl in H4. exact H4. exact H5. inversion H1. induction  c as [| p0]. simpl in H1.
-	inversion H1. simpl in H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. elim (H0 ad_z p (ad_x p0) r H1).
+	inversion H1. simpl in H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. elim (H0 N0 p (Npos p0) r H1).
 	intros. elim H2. intros. elim H3. intros. split with x. split with x0.
-	simpl in |- *. simpl in H4. split. exact H4. exact H5. inversion H1. elim (H0 ad_z p ad_z r H1). intros. elim H2. intros. elim H3. intros. split with x.
+	simpl in |- *. simpl in H4. split. exact H4. exact H5. inversion H1. elim (H0 N0 p N0 r H1). intros. elim H2. intros. elim H3. intros. split with x.
 	split with x0. simpl in |- *. split. simpl in H4. exact H4. exact H5.
 Qed.
 
@@ -1472,11 +1473,11 @@ Qed.
 
 Lemma sproductl_1 :
  forall (s : state) (a : ad) (p : prec_list) (c : ad) (r : prec_list),
- MapGet prec_list (s_produit_l a p s) c = SOME prec_list r ->
+ MapGet prec_list (s_produit_l a p s) c = Some r ->
  exists r0 : prec_list,
    (exists r1 : prec_list,
-      MapGet prec_list (M1 prec_list a p) c = SOME prec_list r0 /\
-      MapGet prec_list s c = SOME prec_list r1).
+      MapGet prec_list (M1 prec_list a p) c = Some r0 /\
+      MapGet prec_list s c = Some r1).
 Proof.
 	exact
   (Map_ind prec_list sproductl_1_def sproductl_1_0 sproductl_1_1
@@ -1488,24 +1489,24 @@ Fixpoint s_produit_r (a : ad) (p : prec_list) (s : state) {struct s} :
   match s with
   | M0 => M0 prec_list
   | M1 a' p' =>
-      if ad_eq a a' then M1 prec_list a (pl_produit p' p) else M0 prec_list
+      if Neqb a a' then M1 prec_list a (pl_produit p' p) else M0 prec_list
   | M2 s0 s1 =>
       match a with
-      | ad_z => M2 prec_list (s_produit_r ad_z p s0) (M0 prec_list)
-      | ad_x q =>
+      | N0 => M2 prec_list (s_produit_r N0 p s0) (M0 prec_list)
+      | Npos q =>
           match q with
-          | xH => M2 prec_list (M0 prec_list) (s_produit_r ad_z p s1)
-          | xO q' => M2 prec_list (s_produit_r (ad_x q') p s0) (M0 prec_list)
-          | xI q' => M2 prec_list (M0 prec_list) (s_produit_r (ad_x q') p s1)
+          | xH => M2 prec_list (M0 prec_list) (s_produit_r N0 p s1)
+          | xO q' => M2 prec_list (s_produit_r (Npos q') p s0) (M0 prec_list)
+          | xI q' => M2 prec_list (M0 prec_list) (s_produit_r (Npos q') p s1)
           end
       end
   end.
 
 Definition sproductr_0_def (s : state) : Prop :=
   forall (a : ad) (p : prec_list) (c : ad) (r0 r1 : prec_list),
-  MapGet prec_list (M1 prec_list a p) c = SOME prec_list r0 ->
-  MapGet prec_list s c = SOME prec_list r1 ->
-  MapGet prec_list (s_produit_r a p s) c = SOME prec_list (pl_produit r1 r0).
+  MapGet prec_list (M1 prec_list a p) c = Some r0 ->
+  MapGet prec_list s c = Some r1 ->
+  MapGet prec_list (s_produit_r a p s) c = Some (pl_produit r1 r0).
 
 Lemma sproductr_0_0 : sproductr_0_def (M0 prec_list).
 Proof.
@@ -1516,11 +1517,11 @@ Lemma sproductr_0_1 :
  forall (a : ad) (a0 : prec_list), sproductr_0_def (M1 prec_list a a0).
 Proof.
 	unfold sproductr_0_def in |- *. intros. simpl in H. simpl in H0.
-	elim (bool_is_true_or_false (ad_eq a1 c)); intro; rewrite H1 in H.
-	elim (bool_is_true_or_false (ad_eq a c)); intro; rewrite H2 in H0.
-	inversion H. inversion H0. rewrite (ad_eq_complete _ _ H1).
-	rewrite (ad_eq_complete _ _ H2). simpl in |- *. rewrite (ad_eq_correct c).
-	simpl in |- *. rewrite (ad_eq_correct c). trivial. inversion H0. inversion H.
+	elim (bool_is_true_or_false (Neqb a1 c)); intro; rewrite H1 in H.
+	elim (bool_is_true_or_false (Neqb a c)); intro; rewrite H2 in H0.
+	inversion H. inversion H0. rewrite (Neqb_complete _ _ H1).
+	rewrite (Neqb_complete _ _ H2). simpl in |- *. rewrite (Neqb_correct c).
+	simpl in |- *. rewrite (Neqb_correct c). trivial. inversion H0. inversion H.
 Qed.
 
 Lemma sproductr_0_2 :
@@ -1529,12 +1530,12 @@ Lemma sproductr_0_2 :
  forall m0 : state, sproductr_0_def m0 -> sproductr_0_def (M2 prec_list m m0).
 Proof.
 	unfold sproductr_0_def in |- *.
-	intros. simpl in H1. elim (bool_is_true_or_false (ad_eq a c)); intro; rewrite H3 in H1. inversion H1. rewrite (ad_eq_complete _ _ H3).
-	induction  c as [| p0]. simpl in |- *. elim (H ad_z r0 ad_z r0 r1). reflexivity. reflexivity.
-	simpl in H2. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H0 (ad_x p0) r0 (ad_x p0) r0 r1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p0). reflexivity.
-	simpl in H2. exact H2. simpl in |- *. elim (H (ad_x p0) r0 (ad_x p0) r0 r1).
-	reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p0). reflexivity.
-	simpl in H2. exact H2. simpl in |- *. elim (H0 ad_z r0 ad_z r0 r1). reflexivity.
+	intros. simpl in H1. elim (bool_is_true_or_false (Neqb a c)); intro; rewrite H3 in H1. inversion H1. rewrite (Neqb_complete _ _ H3).
+	induction  c as [| p0]. simpl in |- *. elim (H N0 r0 N0 r0 r1). reflexivity. reflexivity.
+	simpl in H2. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H0 (Npos p0) r0 (Npos p0) r0 r1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p0). reflexivity.
+	simpl in H2. exact H2. simpl in |- *. elim (H (Npos p0) r0 (Npos p0) r0 r1).
+	reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p0). reflexivity.
+	simpl in H2. exact H2. simpl in |- *. elim (H0 N0 r0 N0 r0 r1). reflexivity.
 	reflexivity. simpl in H2. exact H2. inversion H1.
 Qed.
 
@@ -1547,9 +1548,9 @@ Qed.
 
 Lemma sproductr_0 :
  forall (s : state) (a : ad) (p : prec_list) (c : ad) (r0 r1 : prec_list),
- MapGet prec_list (M1 prec_list a p) c = SOME prec_list r0 ->
- MapGet prec_list s c = SOME prec_list r1 ->
- MapGet prec_list (s_produit_r a p s) c = SOME prec_list (pl_produit r1 r0).
+ MapGet prec_list (M1 prec_list a p) c = Some r0 ->
+ MapGet prec_list s c = Some r1 ->
+ MapGet prec_list (s_produit_r a p s) c = Some (pl_produit r1 r0).
 Proof.
 	exact
   (Map_ind prec_list sproductr_0_def sproductr_0_0 sproductr_0_1
@@ -1558,11 +1559,11 @@ Qed.
 
 Definition sproductr_1_def (s : state) : Prop :=
   forall (a : ad) (p : prec_list) (c : ad) (r : prec_list),
-  MapGet prec_list (s_produit_r a p s) c = SOME prec_list r ->
+  MapGet prec_list (s_produit_r a p s) c = Some r ->
   exists r0 : prec_list,
     (exists r1 : prec_list,
-       MapGet prec_list (M1 prec_list a p) c = SOME prec_list r0 /\
-       MapGet prec_list s c = SOME prec_list r1).
+       MapGet prec_list (M1 prec_list a p) c = Some r0 /\
+       MapGet prec_list s c = Some r1).
 
 Lemma sproductr_1_0 : sproductr_1_def (M0 prec_list).
 Proof.
@@ -1573,8 +1574,8 @@ Lemma sproductr_1_1 :
  forall (a : ad) (a0 : prec_list), sproductr_1_def (M1 prec_list a a0).
 Proof.
 	unfold sproductr_1_def in |- *.
-	intros. simpl in H. elim (bool_is_true_or_false (ad_eq a1 a)); intro; rewrite H0 in H. simpl in H. elim (bool_is_true_or_false (ad_eq a1 c)); intro; rewrite H1 in H. split with p. split with a0. simpl in |- *. split. rewrite H1.
-	reflexivity. rewrite <- (ad_eq_complete _ _ H0). rewrite H1. reflexivity.
+	intros. simpl in H. elim (bool_is_true_or_false (Neqb a1 a)); intro; rewrite H0 in H. simpl in H. elim (bool_is_true_or_false (Neqb a1 c)); intro; rewrite H1 in H. split with p. split with a0. simpl in |- *. split. rewrite H1.
+	reflexivity. rewrite <- (Neqb_complete _ _ H0). rewrite H1. reflexivity.
 	inversion H. inversion H.
 Qed.
 
@@ -1584,27 +1585,27 @@ Lemma sproductr_1_2 :
  forall m0 : state, sproductr_1_def m0 -> sproductr_1_def (M2 prec_list m m0).
 Proof.
 	unfold sproductr_1_def in |- *.
-	intros. induction  a as [| p0]. induction  c as [| p0]. simpl in H1. elim (H ad_z p ad_z r H1).
+	intros. induction  a as [| p0]. induction  c as [| p0]. simpl in H1. elim (H N0 p N0 r H1).
 	intros. elim H2. intros. elim H3. intros. elim H4. intros. split with x.
 	split with x0. simpl in |- *. split. simpl in H4. exact H4. exact H5. simpl in H1.
-	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. inversion H1. simpl in H1. elim (H ad_z p (ad_x p0) r H1).
+	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. inversion H1. simpl in H1. elim (H N0 p (Npos p0) r H1).
 	intros. elim H2. intros. elim H3. intros. elim H4. intros. split with x.
 	split with x0. simpl in |- *. split. simpl in H4. exact H4. exact H5. inversion H1.
 	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. induction  c as [| p1]. simpl in H1. inversion H1. simpl in H1.
-	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. elim (H0 (ad_x p0) p (ad_x p1) r H1). intros. elim H2.
+	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. elim (H0 (Npos p0) p (Npos p1) r H1). intros. elim H2.
 	intros. elim H3. intros. elim H4. intros. split with x. split with x0.
 	simpl in |- *. split. simpl in H4. exact H4. exact H5. inversion H1.
-	elim (H0 (ad_x p0) p ad_z r H1). intros. elim H2. intros. elim H3. intros.
+	elim (H0 (Npos p0) p N0 r H1). intros. elim H2. intros. elim H3. intros.
 	elim H4. intros. split with x. split with x0. simpl in |- *. split. simpl in H4.
-	exact H4. exact H5. induction  c as [| p1]. simpl in H1. elim (H (ad_x p0) p ad_z r H1).
+	exact H4. exact H5. induction  c as [| p1]. simpl in H1. elim (H (Npos p0) p N0 r H1).
 	intros. elim H2. intros. elim H3. intros. elim H4. intros. split with x.
 	split with x0. simpl in |- *. split. simpl in H4. exact H4. exact H5. simpl in H1.
-	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. inversion H1. elim (H (ad_x p0) p (ad_x p1) r H1). intros.
+	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. inversion H1. elim (H (Npos p0) p (Npos p1) r H1). intros.
 	elim H2. intros. elim H3. intros. elim H4. intros. split with x. split with x0. simpl in |- *. split. simpl in H4. exact H4. exact H5. inversion H1. induction  c as [| p0].
 	simpl in H1. inversion H1. simpl in H. simpl in H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ].
-	elim (H0 ad_z p (ad_x p0) r H1). intros. elim H2. intros. elim H3. intros.
+	elim (H0 N0 p (Npos p0) r H1). intros. elim H2. intros. elim H3. intros.
 	elim H4. intros. split with x. split with x0. simpl in |- *. split. simpl in H4.
-	exact H4. exact H5. inversion H1. elim (H0 ad_z p ad_z r H1). intros.
+	exact H4. exact H5. inversion H1. elim (H0 N0 p N0 r H1). intros.
 	elim H2. intros. elim H3. intros. elim H4. intros. split with x. split with x0. simpl in |- *. split. simpl in H4. exact H4.  exact H5.
 Qed.
 
@@ -1617,11 +1618,11 @@ Qed.
 
 Lemma sproductr_1 :
  forall (s : state) (a : ad) (p : prec_list) (c : ad) (r : prec_list),
- MapGet prec_list (s_produit_r a p s) c = SOME prec_list r ->
+ MapGet prec_list (s_produit_r a p s) c = Some r ->
  exists r0 : prec_list,
    (exists r1 : prec_list,
-      MapGet prec_list (M1 prec_list a p) c = SOME prec_list r0 /\
-      MapGet prec_list s c = SOME prec_list r1).
+      MapGet prec_list (M1 prec_list a p) c = Some r0 /\
+      MapGet prec_list s c = Some r1).
 Proof.
 	exact
   (Map_ind prec_list sproductr_1_def sproductr_1_0 sproductr_1_1
@@ -1644,27 +1645,27 @@ Fixpoint s_produit (s0 s1 : state) {struct s1} : state :=
 
 Lemma s_produit_0 :
  forall (s0 s1 : state) (c : ad) (p0 p1 : prec_list),
- MapGet prec_list s0 c = SOME prec_list p0 ->
- MapGet prec_list s1 c = SOME prec_list p1 ->
- MapGet prec_list (s_produit s0 s1) c = SOME prec_list (pl_produit p0 p1).
+ MapGet prec_list s0 c = Some p0 ->
+ MapGet prec_list s1 c = Some p1 ->
+ MapGet prec_list (s_produit s0 s1) c = Some (pl_produit p0 p1).
 Proof.
 	simple induction s0. intros. inversion H. intros. induction  s1 as [| a1 a2| s1_1 Hrecs1_1 s1_0 Hrecs1_0]. inversion H0.
 	unfold s_produit in |- *. exact (sproductl_0 (M1 prec_list a1 a2) a a0 c p0 p1 H H0).
 	unfold s_produit in |- *. exact (sproductl_0 (M2 prec_list s1_1 s1_0) a a0 c p0 p1 H H0).
 	intros. induction  s1 as [| a a0| s1_1 Hrecs1_1 s1_0 Hrecs1_0]. inversion H2. unfold s_produit in |- *. exact (sproductr_0 (M2 prec_list m m0) a a0 c p1 p0 H2 H1). induction  c as [| p]. simpl in |- *.
-	simpl in H1. simpl in H2. exact (H s1_1 ad_z p0 p1 H1 H2). induction  p as [p Hrecp| p Hrecp| ].
-	simpl in |- *. simpl in H1. simpl in H2. exact (H0 s1_0 (ad_x p) p0 p1 H1 H2).
-	simpl in H1. simpl in H2. simpl in |- *. exact (H s1_1 (ad_x p) p0 p1 H1 H2).
-	simpl in |- *. simpl in H1. simpl in H2. exact (H0 s1_0 ad_z p0 p1 H1 H2).
+	simpl in H1. simpl in H2. exact (H s1_1 N0 p0 p1 H1 H2). induction  p as [p Hrecp| p Hrecp| ].
+	simpl in |- *. simpl in H1. simpl in H2. exact (H0 s1_0 (Npos p) p0 p1 H1 H2).
+	simpl in H1. simpl in H2. simpl in |- *. exact (H s1_1 (Npos p) p0 p1 H1 H2).
+	simpl in |- *. simpl in H1. simpl in H2. exact (H0 s1_0 N0 p0 p1 H1 H2).
 Qed.
 
 Lemma s_produit_1 :
  forall (s0 s1 : state) (c : ad) (p : prec_list),
- MapGet prec_list (s_produit s0 s1) c = SOME prec_list p ->
+ MapGet prec_list (s_produit s0 s1) c = Some p ->
  exists p0 : prec_list,
    (exists p1 : prec_list,
-      MapGet prec_list s0 c = SOME prec_list p0 /\
-      MapGet prec_list s1 c = SOME prec_list p1).
+      MapGet prec_list s0 c = Some p0 /\
+      MapGet prec_list s1 c = Some p1).
 Proof.
 	simple induction s0. simple induction s1. intros. simpl in H. inversion H. intros.
 	simpl in H. inversion H. intros. simpl in H1. inversion H1. simple induction s1.
@@ -1673,13 +1674,13 @@ Proof.
 	unfold s_produit in H1. exact (sproductl_1 (M2 prec_list m m0) a a0 c p H1).
 	simple induction s1; intros. inversion H1. unfold s_produit in H1. elim (sproductr_1 (M2 prec_list m m0) a a0 c p H1). intros. elim H2. intros. elim H3. intros.
 	split with x0. split with x. split. exact H5. exact H4. induction  c as [| p0]. 
-	simpl in H3. elim (H m1 ad_z p H3). intros. elim H4. intros. elim H5. intros.
+	simpl in H3. elim (H m1 N0 p H3). intros. elim H4. intros. elim H5. intros.
 	split with x. split with x0. split. simpl in |- *. exact H6. simpl in |- *. exact H7.
-	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H3. elim (H0 m2 (ad_x p0) p H3). intros. elim H4.
+	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H3. elim (H0 m2 (Npos p0) p H3). intros. elim H4.
 	intros. elim H5. intros. split with x. split with x0. simpl in |- *. split. 
-	exact H6. exact H7. simpl in H3. elim (H m1 (ad_x p0) p H3). intros.
+	exact H6. exact H7. simpl in H3. elim (H m1 (Npos p0) p H3). intros.
 	elim H4. intros. elim H5. intros. split with x. split with x0. simpl in |- *.
-	split. exact H6. exact H7. simpl in H3. elim (H0 m2 ad_z p H3). intros.
+	split. exact H6. exact H7. simpl in H3. elim (H0 m2 N0 p H3). intros.
 	elim H4. intros. elim H5. intros. split with x. split with x0. simpl in |- *.
 	split. exact H6. exact H7.
 Qed.
@@ -1693,25 +1694,25 @@ Fixpoint preDTA_produit_l (a : ad) (s : state) (d : preDTA) {struct d} :
   | M1 a' s' => M1 state (iad_conv a a') (s_produit s s')
   | M2 s0 s1 =>
       match a with
-      | ad_z =>
+      | N0 =>
           M2 state
-            (M2 state (preDTA_produit_l ad_z s s0)
-               (preDTA_produit_l ad_z s s1)) (M0 state)
-      | ad_x p =>
+            (M2 state (preDTA_produit_l N0 s s0)
+               (preDTA_produit_l N0 s s1)) (M0 state)
+      | Npos p =>
           match p with
           | xH =>
               M2 state (M0 state)
-                (M2 state (preDTA_produit_l ad_z s s0)
-                   (preDTA_produit_l ad_z s s1))
+                (M2 state (preDTA_produit_l N0 s s0)
+                   (preDTA_produit_l N0 s s1))
           | xO p' =>
               M2 state
-                (M2 state (preDTA_produit_l (ad_x p') s s0)
-                   (preDTA_produit_l (ad_x p') s s1)) 
+                (M2 state (preDTA_produit_l (Npos p') s s0)
+                   (preDTA_produit_l (Npos p') s s1)) 
                 (M0 state)
           | xI p' =>
               M2 state (M0 state)
-                (M2 state (preDTA_produit_l (ad_x p') s s0)
-                   (preDTA_produit_l (ad_x p') s s1))
+                (M2 state (preDTA_produit_l (Npos p') s s0)
+                   (preDTA_produit_l (Npos p') s s1))
           end
       end
   end.
@@ -1723,22 +1724,22 @@ Fixpoint preDTA_produit_r (a : ad) (s : state) (d : preDTA) {struct d} :
   | M1 a' s' => M1 state (iad_conv a' a) (s_produit s' s)
   | M2 s0 s1 =>
       match a with
-      | ad_z =>
-          M2 state (M2 state (preDTA_produit_r ad_z s s0) (M0 state))
-            (M2 state (preDTA_produit_r ad_z s s1) (M0 state))
-      | ad_x p =>
+      | N0 =>
+          M2 state (M2 state (preDTA_produit_r N0 s s0) (M0 state))
+            (M2 state (preDTA_produit_r N0 s s1) (M0 state))
+      | Npos p =>
           match p with
           | xH =>
-              M2 state (M2 state (M0 state) (preDTA_produit_r ad_z s s0))
-                (M2 state (M0 state) (preDTA_produit_r ad_z s s1))
+              M2 state (M2 state (M0 state) (preDTA_produit_r N0 s s0))
+                (M2 state (M0 state) (preDTA_produit_r N0 s s1))
           | xO p' =>
               M2 state
-                (M2 state (preDTA_produit_r (ad_x p') s s0) (M0 state))
-                (M2 state (preDTA_produit_r (ad_x p') s s1) (M0 state))
+                (M2 state (preDTA_produit_r (Npos p') s s0) (M0 state))
+                (M2 state (preDTA_produit_r (Npos p') s s1) (M0 state))
           | xI p' =>
               M2 state
-                (M2 state (M0 state) (preDTA_produit_r (ad_x p') s s0))
-                (M2 state (M0 state) (preDTA_produit_r (ad_x p') s s1))
+                (M2 state (M0 state) (preDTA_produit_r (Npos p') s s0))
+                (M2 state (M0 state) (preDTA_produit_r (Npos p') s s1))
           end
       end
   end.
@@ -1762,10 +1763,10 @@ Fixpoint preDTA_produit (d0 d1 : preDTA) {struct d1} : preDTA :=
 
 Definition predta_produit_0d_def (d : preDTA) : Prop :=
   forall (a : ad) (s : state) (a0 a1 : ad) (s0 s1 : state),
-  MapGet state (M1 state a s) a0 = SOME state s0 ->
-  MapGet state d a1 = SOME state s1 ->
+  MapGet state (M1 state a s) a0 = Some s0 ->
+  MapGet state d a1 = Some s1 ->
   MapGet state (preDTA_produit_l a s d) (iad_conv a0 a1) =
-  SOME state (s_produit s0 s1).
+  Some (s_produit s0 s1).
 
 Lemma predta_produit_0_0 : predta_produit_0d_def (M0 state).
 Proof.
@@ -1776,9 +1777,9 @@ Lemma predta_produit_0_1 :
  forall (a : ad) (a0 : state), predta_produit_0d_def (M1 state a a0).
 Proof.
 	unfold predta_produit_0d_def in |- *. intros. simpl in H. simpl in H0.
-	elim (bool_is_true_or_false (ad_eq a1 a2)); intro; rewrite H1 in H.
-	rewrite (ad_eq_complete a1 a2 H1). elim (bool_is_true_or_false (ad_eq a a3)); intro; rewrite H2 in H0. rewrite (ad_eq_complete a a3 H2). inversion H.
-	inversion H0. simpl in |- *. rewrite (ad_eq_correct (iad_conv a2 a3)). trivial.
+	elim (bool_is_true_or_false (Neqb a1 a2)); intro; rewrite H1 in H.
+	rewrite (Neqb_complete a1 a2 H1). elim (bool_is_true_or_false (Neqb a a3)); intro; rewrite H2 in H0. rewrite (Neqb_complete a a3 H2). inversion H.
+	inversion H0. simpl in |- *. rewrite (Neqb_correct (iad_conv a2 a3)). trivial.
 	inversion H0. inversion H.
 Qed.
 
@@ -1789,34 +1790,34 @@ Lemma predta_produit_0_2 :
  predta_produit_0d_def m0 -> predta_produit_0d_def (M2 state m m0).
 Proof.
 	unfold predta_produit_0d_def in |- *. intros. simpl in H1.
-	elim (bool_is_true_or_false (ad_eq a a0)); intro; rewrite H3 in H1.
-	inversion H1. induction  a1 as [| p]. induction  a0 as [| p]. rewrite (ad_eq_complete a ad_z H3). simpl in |- *. elim (H ad_z s0 ad_z ad_z s0 s1). simpl in |- *. trivial.
-	simpl in |- *. trivial. simpl in H2. exact H2. induction  p as [p Hrecp| p Hrecp| ]. rewrite (ad_eq_complete _ _ H3). simpl in |- *. elim (H (ad_x p) s0 (ad_x p) ad_z s0 s1). simpl in |- *. trivial.
-	simpl in |- *. rewrite (aux_ad_eq_1_0 p). trivial. simpl in H2. assumption.
-	rewrite (ad_eq_complete _ _ H3). simpl in |- *. elim (H (ad_x p) s0 (ad_x p) ad_z s0 s1). simpl in |- *. trivial. simpl in |- *. rewrite (aux_ad_eq_1_0 p). trivial.
-	simpl in H2. trivial. rewrite (ad_eq_complete _ _ H3). simpl in |- *.
-	elim (H ad_z s0 ad_z ad_z s0 s1). simpl in |- *. trivial. simpl in |- *. trivial.
-	simpl in H2. trivial. induction  p as [p Hrecp| p Hrecp| ]. rewrite (ad_eq_complete _ _ H3).
-	induction  a0 as [| p0]. simpl in |- *. elim (H0 ad_z s0 ad_z (ad_x p) s0 s1). simpl in |- *.
+	elim (bool_is_true_or_false (Neqb a a0)); intro; rewrite H3 in H1.
+	inversion H1. induction  a1 as [| p]. induction  a0 as [| p]. rewrite (Neqb_complete a N0 H3). simpl in |- *. elim (H N0 s0 N0 N0 s0 s1). simpl in |- *. trivial.
+	simpl in |- *. trivial. simpl in H2. exact H2. induction  p as [p Hrecp| p Hrecp| ]. rewrite (Neqb_complete _ _ H3). simpl in |- *. elim (H (Npos p) s0 (Npos p) N0 s0 s1). simpl in |- *. trivial.
+	simpl in |- *. rewrite (aux_Neqb_1_0 p). trivial. simpl in H2. assumption.
+	rewrite (Neqb_complete _ _ H3). simpl in |- *. elim (H (Npos p) s0 (Npos p) N0 s0 s1). simpl in |- *. trivial. simpl in |- *. rewrite (aux_Neqb_1_0 p). trivial.
+	simpl in H2. trivial. rewrite (Neqb_complete _ _ H3). simpl in |- *.
+	elim (H N0 s0 N0 N0 s0 s1). simpl in |- *. trivial. simpl in |- *. trivial.
+	simpl in H2. trivial. induction  p as [p Hrecp| p Hrecp| ]. rewrite (Neqb_complete _ _ H3).
+	induction  a0 as [| p0]. simpl in |- *. elim (H0 N0 s0 N0 (Npos p) s0 s1). simpl in |- *.
 	trivial. reflexivity. simpl in H2. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *.
-	simpl in H2. elim (H0 (ad_x p0) s0 (ad_x p0) (ad_x p) s0 s1). simpl in |- *.
-	trivial. simpl in |- *. rewrite (aux_ad_eq_1_0 p0). trivial. exact H2. simpl in |- *.
-	elim (H0 (ad_x p0) s0 (ad_x p0) (ad_x p) s0 s1). simpl in |- *. trivial. simpl in |- *.
-	rewrite (aux_ad_eq_1_0 p0). trivial. simpl in H2. exact H2. simpl in |- *.
-	elim (H0 ad_z s0 ad_z (ad_x p) s0 s1). simpl in |- *. reflexivity. reflexivity.
-	simpl in H2. exact H2. rewrite (ad_eq_complete _ _ H3). induction  a0 as [| p0].
-	simpl in |- *. elim (H ad_z s0 ad_z (ad_x p) s0 s1). reflexivity. reflexivity.
-	simpl in H2. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H (ad_x p0) s0 (ad_x p0) (ad_x p) s0 s1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p0). reflexivity.
-	simpl in H2. exact H2. simpl in |- *. elim (H (ad_x p0) s0 (ad_x p0) (ad_x p) s0 s1).
-	reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p0). trivial. simpl in H2.
-	exact H2. simpl in |- *. elim (H ad_z s0 ad_z (ad_x p) s0 s1). reflexivity.
-	reflexivity. simpl in H2. exact H2. rewrite (ad_eq_complete _ _ H3).
-	induction  a0 as [| p]. simpl in |- *. elim (H0 ad_z s0 ad_z ad_z s0 s1). reflexivity.
+	simpl in H2. elim (H0 (Npos p0) s0 (Npos p0) (Npos p) s0 s1). simpl in |- *.
+	trivial. simpl in |- *. rewrite (aux_Neqb_1_0 p0). trivial. exact H2. simpl in |- *.
+	elim (H0 (Npos p0) s0 (Npos p0) (Npos p) s0 s1). simpl in |- *. trivial. simpl in |- *.
+	rewrite (aux_Neqb_1_0 p0). trivial. simpl in H2. exact H2. simpl in |- *.
+	elim (H0 N0 s0 N0 (Npos p) s0 s1). simpl in |- *. reflexivity. reflexivity.
+	simpl in H2. exact H2. rewrite (Neqb_complete _ _ H3). induction  a0 as [| p0].
+	simpl in |- *. elim (H N0 s0 N0 (Npos p) s0 s1). reflexivity. reflexivity.
+	simpl in H2. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H (Npos p0) s0 (Npos p0) (Npos p) s0 s1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p0). reflexivity.
+	simpl in H2. exact H2. simpl in |- *. elim (H (Npos p0) s0 (Npos p0) (Npos p) s0 s1).
+	reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p0). trivial. simpl in H2.
+	exact H2. simpl in |- *. elim (H N0 s0 N0 (Npos p) s0 s1). reflexivity.
+	reflexivity. simpl in H2. exact H2. rewrite (Neqb_complete _ _ H3).
+	induction  a0 as [| p]. simpl in |- *. elim (H0 N0 s0 N0 N0 s0 s1). reflexivity.
 	reflexivity. simpl in H2. exact H2. induction  p as [p Hrecp| p Hrecp| ]. simpl in |- *.
-	elim (H0 (ad_x p) s0 (ad_x p) ad_z s0 s1). reflexivity. simpl in |- *.
-	rewrite (aux_ad_eq_1_0 p). trivial. simpl in H2. exact H2. simpl in |- *.
-	elim (H0 (ad_x p) s0 (ad_x p) ad_z s0 s1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p). reflexivity. simpl in H2. exact H2. simpl in |- *.
-	elim (H0 ad_z s0 ad_z ad_z s0 s1). reflexivity. reflexivity. simpl in H2.
+	elim (H0 (Npos p) s0 (Npos p) N0 s0 s1). reflexivity. simpl in |- *.
+	rewrite (aux_Neqb_1_0 p). trivial. simpl in H2. exact H2. simpl in |- *.
+	elim (H0 (Npos p) s0 (Npos p) N0 s0 s1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p). reflexivity. simpl in H2. exact H2. simpl in |- *.
+	elim (H0 N0 s0 N0 N0 s0 s1). reflexivity. reflexivity. simpl in H2.
 	exact H2. inversion H1.
 Qed.
 
@@ -1829,20 +1830,20 @@ Qed.
 
 Lemma predta_produit_0 :
  forall (a : ad) (s : state) (d : preDTA) (a0 a1 : ad) (s0 s1 : state),
- MapGet state (M1 state a s) a0 = SOME state s0 ->
- MapGet state d a1 = SOME state s1 ->
+ MapGet state (M1 state a s) a0 = Some s0 ->
+ MapGet state d a1 = Some s1 ->
  MapGet state (preDTA_produit_l a s d) (iad_conv a0 a1) =
- SOME state (s_produit s0 s1).
+ Some (s_produit s0 s1).
 Proof.
 	intros. exact (predta_produit_0_3 d a s a0 a1 s0 s1 H H0).
 Qed.
 
 Definition predta_produit_1_def (d : preDTA) : Prop :=
   forall (a : ad) (s : state) (a0 a1 : ad) (s0 s1 : state),
-  MapGet state (M1 state a s) a0 = SOME state s0 ->
-  MapGet state d a1 = SOME state s1 ->
+  MapGet state (M1 state a s) a0 = Some s0 ->
+  MapGet state d a1 = Some s1 ->
   MapGet state (preDTA_produit_r a s d) (iad_conv a1 a0) =
-  SOME state (s_produit s1 s0).
+  Some (s_produit s1 s0).
 
 Lemma predta_produit_1_0 : predta_produit_1_def (M0 state).
 Proof.
@@ -1853,10 +1854,10 @@ Lemma predta_produit_1_1 :
  forall (a : ad) (a0 : state), predta_produit_1_def (M1 state a a0).
 Proof.
 	unfold predta_produit_1_def in |- *. intros. simpl in H. simpl in H0.
-	elim (bool_is_true_or_false (ad_eq a1 a2)); intro; rewrite H1 in H.
-	elim (bool_is_true_or_false (ad_eq a a3)); intro; rewrite H2 in H0.
-	inversion H. inversion H0. rewrite (ad_eq_complete _ _ H1).
-	rewrite (ad_eq_complete _ _ H2). simpl in |- *. rewrite (ad_eq_correct (iad_conv a3 a2)). trivial. inversion H0. inversion H.
+	elim (bool_is_true_or_false (Neqb a1 a2)); intro; rewrite H1 in H.
+	elim (bool_is_true_or_false (Neqb a a3)); intro; rewrite H2 in H0.
+	inversion H. inversion H0. rewrite (Neqb_complete _ _ H1).
+	rewrite (Neqb_complete _ _ H2). simpl in |- *. rewrite (Neqb_correct (iad_conv a3 a2)). trivial. inversion H0. inversion H.
 Qed.
 
 Lemma predta_produit_1_2 :
@@ -1866,27 +1867,27 @@ Lemma predta_produit_1_2 :
  predta_produit_1_def m0 -> predta_produit_1_def (M2 state m m0).
 Proof.
 	unfold predta_produit_1_def in |- *. intros. simpl in H1. 
-	elim (bool_is_true_or_false (ad_eq a a0)); intro; rewrite H3 in H1.
-	rewrite (ad_eq_complete _ _ H3). inversion H1. induction  a0 as [| p]. induction  a1 as [| p].
-	simpl in |- *. elim (H ad_z s0 ad_z ad_z s0 s1). reflexivity. reflexivity.
-	simpl in H2. exact H2. induction  p as [p Hrecp| p Hrecp| ]. simpl in |- *. elim (H0 ad_z s0 ad_z (ad_x p) s0 s1). reflexivity. reflexivity. simpl in H2. exact H2. simpl in |- *.
-	elim (H ad_z s0 ad_z (ad_x p) s0 s1). reflexivity. reflexivity.
-	simpl in H2. exact H2. simpl in |- *. elim (H0 ad_z s0 ad_z ad_z s0 s1).
+	elim (bool_is_true_or_false (Neqb a a0)); intro; rewrite H3 in H1.
+	rewrite (Neqb_complete _ _ H3). inversion H1. induction  a0 as [| p]. induction  a1 as [| p].
+	simpl in |- *. elim (H N0 s0 N0 N0 s0 s1). reflexivity. reflexivity.
+	simpl in H2. exact H2. induction  p as [p Hrecp| p Hrecp| ]. simpl in |- *. elim (H0 N0 s0 N0 (Npos p) s0 s1). reflexivity. reflexivity. simpl in H2. exact H2. simpl in |- *.
+	elim (H N0 s0 N0 (Npos p) s0 s1). reflexivity. reflexivity.
+	simpl in H2. exact H2. simpl in |- *. elim (H0 N0 s0 N0 N0 s0 s1).
 	reflexivity. reflexivity. simpl in H2. exact H2. induction  p as [p Hrecp| p Hrecp| ].
-	induction  a1 as [| p0]. simpl in |- *. elim (H (ad_x p) s0 (ad_x p) ad_z s0 s1).
-	reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p). reflexivity.
-	simpl in H2. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H0 (ad_x p) s0 (ad_x p) (ad_x p0) s0 s1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p).
-	reflexivity. simpl in H2. exact H2. simpl in |- *. elim (H (ad_x p) s0 (ad_x p) (ad_x p0) s0 s1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p).
-	reflexivity. simpl in H2. exact H2. simpl in |- *. elim (H0 (ad_x p) s0 (ad_x p) ad_z s0 s1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p). reflexivity.
-	simpl in H2. exact H2. induction  a1 as [| p0]. simpl in |- *. elim (H (ad_x p) s0 (ad_x p) ad_z s0 s1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p). reflexivity.
-	simpl in H2. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H0 (ad_x p) s0 (ad_x p) (ad_x p0) s0 s1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p).
-	reflexivity. simpl in H2. exact H2. simpl in |- *. elim (H (ad_x p) s0 (ad_x p) (ad_x p0) s0 s1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p).
-	reflexivity. simpl in H2. exact H2. simpl in |- *. elim (H0 (ad_x p) s0 (ad_x p) ad_z s0 s1). reflexivity. simpl in |- *. rewrite (aux_ad_eq_1_0 p). reflexivity.
-	simpl in H2. exact H2. induction  a1 as [| p]. simpl in |- *. elim (H ad_z s0 ad_z ad_z s0 s1). reflexivity. reflexivity. simpl in H2. exact H2. induction  p as [p Hrecp| p Hrecp| ].
-	simpl in |- *. elim (H0 ad_z s0 ad_z (ad_x p) s0 s1). reflexivity. reflexivity.
-	simpl in H2. exact H2. simpl in |- *. elim (H ad_z s0 ad_z (ad_x p) s0 s1).
+	induction  a1 as [| p0]. simpl in |- *. elim (H (Npos p) s0 (Npos p) N0 s0 s1).
+	reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p). reflexivity.
+	simpl in H2. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H0 (Npos p) s0 (Npos p) (Npos p0) s0 s1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p).
+	reflexivity. simpl in H2. exact H2. simpl in |- *. elim (H (Npos p) s0 (Npos p) (Npos p0) s0 s1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p).
+	reflexivity. simpl in H2. exact H2. simpl in |- *. elim (H0 (Npos p) s0 (Npos p) N0 s0 s1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p). reflexivity.
+	simpl in H2. exact H2. induction  a1 as [| p0]. simpl in |- *. elim (H (Npos p) s0 (Npos p) N0 s0 s1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p). reflexivity.
+	simpl in H2. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H0 (Npos p) s0 (Npos p) (Npos p0) s0 s1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p).
+	reflexivity. simpl in H2. exact H2. simpl in |- *. elim (H (Npos p) s0 (Npos p) (Npos p0) s0 s1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p).
+	reflexivity. simpl in H2. exact H2. simpl in |- *. elim (H0 (Npos p) s0 (Npos p) N0 s0 s1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p). reflexivity.
+	simpl in H2. exact H2. induction  a1 as [| p]. simpl in |- *. elim (H N0 s0 N0 N0 s0 s1). reflexivity. reflexivity. simpl in H2. exact H2. induction  p as [p Hrecp| p Hrecp| ].
+	simpl in |- *. elim (H0 N0 s0 N0 (Npos p) s0 s1). reflexivity. reflexivity.
+	simpl in H2. exact H2. simpl in |- *. elim (H N0 s0 N0 (Npos p) s0 s1).
 	reflexivity. reflexivity. simpl in H2. exact H2. simpl in |- *.
-	elim (H0 ad_z s0 ad_z ad_z s0 s1). reflexivity. reflexivity.
+	elim (H0 N0 s0 N0 N0 s0 s1). reflexivity. reflexivity.
 	simpl in H2. exact H2. inversion H1.
 Qed.
 
@@ -1899,48 +1900,48 @@ Qed.
 
 Lemma predta_produit_1 :
  forall (a : ad) (s : state) (d : preDTA) (a0 a1 : ad) (s0 s1 : state),
- MapGet state (M1 state a s) a0 = SOME state s0 ->
- MapGet state d a1 = SOME state s1 ->
+ MapGet state (M1 state a s) a0 = Some s0 ->
+ MapGet state d a1 = Some s1 ->
  MapGet state (preDTA_produit_r a s d) (iad_conv a1 a0) =
- SOME state (s_produit s1 s0).
+ Some (s_produit s1 s0).
 Proof.
 	intros. exact (predta_produit_1_3 d a s a0 a1 s0 s1 H H0).
 Qed.
 
 Lemma predta_produit_2 :
  forall (d0 d1 : preDTA) (a0 a1 : ad) (s0 s1 : state),
- MapGet state d0 a0 = SOME state s0 ->
- MapGet state d1 a1 = SOME state s1 ->
+ MapGet state d0 a0 = Some s0 ->
+ MapGet state d1 a1 = Some s1 ->
  MapGet state (preDTA_produit d0 d1) (iad_conv a0 a1) =
- SOME state (s_produit s0 s1).
+ Some (s_produit s0 s1).
 Proof.
 	simple induction d0. intros. inversion H. intros. induction  d1 as [| a3 a4| d1_1 Hrecd1_1 d1_0 Hrecd1_0];
   unfold preDTA_produit in |- *. inversion H0. exact (predta_produit_0 a a0 (M1 state a3 a4) a1 a2 s0 s1 H H0). exact (predta_produit_0 a a0 (M2 state d1_1 d1_0) a1 a2 s0 s1 H H0). intros. induction  d1 as [| a a2| d1_1 Hrecd1_1 d1_0 Hrecd1_0].
 	inversion H2. unfold preDTA_produit in |- *. exact (predta_produit_1 a a2 (M2 state m m0) a1 a0 s1 s0 H2 H1). induction  a0 as [| p]. induction  a1 as [| p]. simpl in |- *.
-	simpl in H1. simpl in H2. exact (H d1_1 ad_z ad_z s0 s1 H1 H2).
-	induction  p as [p Hrecp| p Hrecp| ]. simpl in |- *. simpl in H1. simpl in H2. exact (H d1_0 ad_z (ad_x p) s0 s1 H1 H2). simpl in |- *. simpl in H1. simpl in H2. exact (H d1_1 ad_z (ad_x p) s0 s1 H1 H2). simpl in |- *. exact (H d1_0 ad_z ad_z s0 s1 H1 H2). simpl in H1.
-	induction  p as [p Hrecp| p Hrecp| ]. induction  a1 as [| p0]. simpl in H2. simpl in |- *. exact (H0 d1_1 (ad_x p) ad_z s0 s1 H1 H2). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. simpl in H2. exact (H0 d1_0 (ad_x p) (ad_x p0) s0 s1 H1 H2). simpl in |- *. exact (H0 d1_1 (ad_x p) (ad_x p0) s0 s1 H1 H2).
-	simpl in H2. simpl in |- *. exact (H0 d1_0 (ad_x p) ad_z s0 s1 H1 H2). induction  a1 as [| p0].
-	simpl in H2. simpl in |- *. exact (H d1_1 (ad_x p) ad_z s0 s1 H1 H2). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ].
-	simpl in |- *. simpl in H2. simpl in H1. exact (H d1_0 (ad_x p) (ad_x p0) s0 s1 H1 H2).
-	simpl in |- *. simpl in H2. exact (H d1_1 (ad_x p) (ad_x p0) s0 s1 H1 H2). 
-	simpl in H2. simpl in |- *. exact (H d1_0 (ad_x p) ad_z s0 s1 H1 H2). induction  a1 as [| p].
-	simpl in H2. simpl in |- *. exact (H0 d1_1 ad_z ad_z s0 s1 H1 H2). induction  p as [p Hrecp| p Hrecp| ].
-	simpl in H2. simpl in |- *. exact (H0 d1_0 ad_z (ad_x p) s0 s1 H1 H2). simpl in H2.
-	simpl in |- *. exact (H0 d1_1 ad_z (ad_x p) s0 s1 H1 H2). simpl in H2. simpl in |- *.
-	exact (H0 d1_0 ad_z ad_z s0 s1 H1 H2).
+	simpl in H1. simpl in H2. exact (H d1_1 N0 N0 s0 s1 H1 H2).
+	induction  p as [p Hrecp| p Hrecp| ]. simpl in |- *. simpl in H1. simpl in H2. exact (H d1_0 N0 (Npos p) s0 s1 H1 H2). simpl in |- *. simpl in H1. simpl in H2. exact (H d1_1 N0 (Npos p) s0 s1 H1 H2). simpl in |- *. exact (H d1_0 N0 N0 s0 s1 H1 H2). simpl in H1.
+	induction  p as [p Hrecp| p Hrecp| ]. induction  a1 as [| p0]. simpl in H2. simpl in |- *. exact (H0 d1_1 (Npos p) N0 s0 s1 H1 H2). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. simpl in H2. exact (H0 d1_0 (Npos p) (Npos p0) s0 s1 H1 H2). simpl in |- *. exact (H0 d1_1 (Npos p) (Npos p0) s0 s1 H1 H2).
+	simpl in H2. simpl in |- *. exact (H0 d1_0 (Npos p) N0 s0 s1 H1 H2). induction  a1 as [| p0].
+	simpl in H2. simpl in |- *. exact (H d1_1 (Npos p) N0 s0 s1 H1 H2). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ].
+	simpl in |- *. simpl in H2. simpl in H1. exact (H d1_0 (Npos p) (Npos p0) s0 s1 H1 H2).
+	simpl in |- *. simpl in H2. exact (H d1_1 (Npos p) (Npos p0) s0 s1 H1 H2). 
+	simpl in H2. simpl in |- *. exact (H d1_0 (Npos p) N0 s0 s1 H1 H2). induction  a1 as [| p].
+	simpl in H2. simpl in |- *. exact (H0 d1_1 N0 N0 s0 s1 H1 H2). induction  p as [p Hrecp| p Hrecp| ].
+	simpl in H2. simpl in |- *. exact (H0 d1_0 N0 (Npos p) s0 s1 H1 H2). simpl in H2.
+	simpl in |- *. exact (H0 d1_1 N0 (Npos p) s0 s1 H1 H2). simpl in H2. simpl in |- *.
+	exact (H0 d1_0 N0 N0 s0 s1 H1 H2).
 Qed.
 
 Definition predta_produit_3_def (d0 : preDTA) : Prop :=
   forall (a a0 : ad) (s s0 : state),
-  MapGet state (preDTA_produit_l a0 s0 d0) a = SOME state s ->
+  MapGet state (preDTA_produit_l a0 s0 d0) a = Some s ->
   exists a1 : ad,
     (exists a2 : ad,
        (exists s1 : state,
           (exists s2 : state,
              a = iad_conv a1 a2 /\
-             MapGet state (M1 state a0 s0) a1 = SOME state s1 /\
-             MapGet state d0 a2 = SOME state s2))).
+             MapGet state (M1 state a0 s0) a1 = Some s1 /\
+             MapGet state d0 a2 = Some s2))).
 
 Lemma predta_produit_3_0 : predta_produit_3_def (M0 state).
 Proof.
@@ -1951,9 +1952,9 @@ Lemma predta_produit_3_1 :
  forall (a : ad) (a0 : state), predta_produit_3_def (M1 state a a0).
 Proof.
 	unfold predta_produit_3_def in |- *. intros. simpl in H. split with a2.
-	split with a. split with s0. split with a0. elim (bool_is_true_or_false (ad_eq (iad_conv a2 a) a1)); intro. rewrite (ad_eq_complete _ _ H0).
-	split. reflexivity. split. simpl in |- *. rewrite (ad_eq_correct a2). reflexivity.
-	simpl in |- *. rewrite (ad_eq_correct a). reflexivity. rewrite H0 in H.
+	split with a. split with s0. split with a0. elim (bool_is_true_or_false (Neqb (iad_conv a2 a) a1)); intro. rewrite (Neqb_complete _ _ H0).
+	split. reflexivity. split. simpl in |- *. rewrite (Neqb_correct a2). reflexivity.
+	simpl in |- *. rewrite (Neqb_correct a). reflexivity. rewrite H0 in H.
 	inversion H.
 Qed.
 
@@ -1965,154 +1966,154 @@ Lemma predta_produit_3_2 :
 Proof.
 	unfold predta_produit_3_def in |- *. intros. elim (iad_conv_surj a). intros. elim H2.
 	intros. rewrite H3 in H1. rewrite H3. induction  a0 as [| p]. induction  x as [| p]. induction  x0 as [| p].
-	simpl in H1. elim (H ad_z ad_z s s0 H1). intros. elim H4. intros. elim H5.
-	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with ad_z.
-	split with ad_z. split with x1. split with x2. split. reflexivity.
-	elim (iad_conv_inj ad_z ad_z x x0 H8). intros. rewrite <- H12 in H10.
+	simpl in H1. elim (H N0 N0 s s0 H1). intros. elim H4. intros. elim H5.
+	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with N0.
+	split with N0. split with x1. split with x2. split. reflexivity.
+	elim (iad_conv_inj N0 N0 x x0 H8). intros. rewrite <- H12 in H10.
 	rewrite <- H13 in H11. split. exact H10. exact H11. induction  p as [p Hrecp| p Hrecp| ]. simpl in H1.
-	elim (H0 (ad_x (iad_conv_aux_0 p)) ad_z s s0 H1). intros. elim H4. intros.
+	elim (H0 (Npos (iad_conv_aux_0 p)) N0 s s0 H1). intros. elim H4. intros.
 	elim H5. intros. elim H6. intros. elim H7. intros. elim H9. intros.
-	split with ad_z. split with (ad_x (xI p)). split with x1. split with x2.
-	split. reflexivity. elim (iad_conv_inj ad_z (ad_x p) x x0 H8). intros.
+	split with N0. split with (Npos (xI p)). split with x1. split with x2.
+	split. reflexivity. elim (iad_conv_inj N0 (Npos p) x x0 H8). intros.
 	intros. rewrite <- H12 in H10. rewrite <- H13 in H11. split. exact H10.
-	exact H11. simpl in H1. elim (H (ad_x (iad_conv_aux_0 p)) ad_z s s0 H1).
+	exact H11. simpl in H1. elim (H (Npos (iad_conv_aux_0 p)) N0 s s0 H1).
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros.
-	elim H9. intros. split with ad_z. split with (ad_x (xO p)). split with x1.
-	split with x2. elim (iad_conv_inj ad_z (ad_x p) x x0 H8). intros. split.
+	elim H9. intros. split with N0. split with (Npos (xO p)). split with x1.
+	split with x2. elim (iad_conv_inj N0 (Npos p) x x0 H8). intros. split.
 	reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11. split.
-	exact H10. exact H11. simpl in H1. elim (H0 ad_z ad_z s s0 H1). intros.
+	exact H10. exact H11. simpl in H1. elim (H0 N0 N0 s s0 H1). intros.
 	elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H9.
-	intros. split with ad_z. split with (ad_x 1). split with x1. split with x2.
-	elim (iad_conv_inj ad_z ad_z x x0 H8). intros. split. reflexivity. intros.
+	intros. split with N0. split with (Npos 1). split with x1. split with x2.
+	elim (iad_conv_inj N0 N0 x x0 H8). intros. split. reflexivity. intros.
 	rewrite <- H12 in H10. rewrite <- H13 in H11. split. exact H10. exact H11.
 	induction  p as [p Hrecp| p Hrecp| ]. induction  x0 as [| p0]. simpl in H1. inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ].
 	simpl in H1. inversion H1. simpl in H1. inversion H1. simpl in H1. 
-	inversion H1. induction  x0 as [| p0]. simpl in H1. elim (H (ad_x (iad_conv_aux_1 p)) ad_z s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
-	elim H7. intros. elim H9. intros. split with (ad_x (xO p)). split with ad_z.
-	split with x1. split with x2. elim (iad_conv_inj (ad_x p) ad_z x x0 H8). intros.
+	inversion H1. induction  x0 as [| p0]. simpl in H1. elim (H (Npos (iad_conv_aux_1 p)) N0 s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
+	elim H7. intros. elim H9. intros. split with (Npos (xO p)). split with N0.
+	split with x1. split with x2. elim (iad_conv_inj (Npos p) N0 x x0 H8). intros.
 	split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11. split.
 	exact H10. exact H11. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. clear Hrecp0. clear Hrecp. simpl in H1.
-	elim (H0 (ad_x (iad_conv_aux_2 p p0)) ad_z s s0 H1). intros. elim H4. intros. elim H5.
-	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x (xO p)).
-	split with (ad_x (xI p0)). split with x1. split with x2. elim (iad_conv_inj (ad_x p) (ad_x p0) x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10.
+	elim (H0 (Npos (iad_conv_aux_2 p p0)) N0 s s0 H1). intros. elim H4. intros. elim H5.
+	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos (xO p)).
+	split with (Npos (xI p0)). split with x1. split with x2. elim (iad_conv_inj (Npos p) (Npos p0) x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10.
 	rewrite <- H13 in H11. split. exact H10. exact H11. clear Hrecp0. simpl in H1.
-	elim (H (ad_x (iad_conv_aux_2 p p0)) ad_z s s0 H1). intros. elim H4. intros. elim H5.
-	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x (xO p)).
-	split with (ad_x (xO p0)). split with x1. split with x2. elim (iad_conv_inj (ad_x p) (ad_x p0) x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10.
-	rewrite <- H13 in H11. split. exact H10. exact H11. simpl in H1. elim (H0 (ad_x (iad_conv_aux_1 p)) ad_z s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
-	intros. elim H7. intros. elim H9. intros. split with (ad_x (xO p)). split with (ad_x 1).
-	split with x1. split with x2. elim (iad_conv_inj (ad_x p) ad_z x x0 H8). intros. split.
+	elim (H (Npos (iad_conv_aux_2 p p0)) N0 s s0 H1). intros. elim H4. intros. elim H5.
+	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos (xO p)).
+	split with (Npos (xO p0)). split with x1. split with x2. elim (iad_conv_inj (Npos p) (Npos p0) x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10.
+	rewrite <- H13 in H11. split. exact H10. exact H11. simpl in H1. elim (H0 (Npos (iad_conv_aux_1 p)) N0 s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
+	intros. elim H7. intros. elim H9. intros. split with (Npos (xO p)). split with (Npos 1).
+	split with x1. split with x2. elim (iad_conv_inj (Npos p) N0 x x0 H8). intros. split.
 	reflexivity.  intros. rewrite <- H12 in H10. rewrite <- H13 in H11. split. exact H10.
 	exact H11. induction  x0 as [| p]. simpl in H1. inversion H1. induction  p as [p Hrecp| p Hrecp| ]. simpl in H1.
 	inversion H1. simpl in H1. inversion H1. simpl in H1. inversion H1. induction  p as [p Hrecp| p Hrecp| ].
 	induction  x as [| p0]. induction  x0 as [| p0]. simpl in H1. inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1.
 	inversion H1. simpl in H1. inversion H1. simpl in H1. inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ].
-	induction  x0 as [| p1]. simpl in H1. elim (H (ad_x (iad_conv_aux_1 p0)) (ad_x p) s s0 H1).
+	induction  x0 as [| p1]. simpl in H1. elim (H (Npos (iad_conv_aux_1 p0)) (Npos p) s s0 H1).
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H9.
-	intros. split with (ad_x (xI p0)). split with ad_z. split with x1. split with x2.
-	elim (iad_conv_inj (ad_x p0) ad_z x x0 H8). intros. split. reflexivity. intros.
+	intros. split with (Npos (xI p0)). split with N0. split with x1. split with x2.
+	elim (iad_conv_inj (Npos p0) N0 x x0 H8). intros. split. reflexivity. intros.
 	rewrite <- H12 in H10. rewrite <- H13 in H11. split. exact H10. exact H11.
-	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. clear Hrecp1. clear Hrecp0. simpl in H1. elim (H0 (ad_x (iad_conv_aux_2 p0 p1)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
-	elim H7. intros. elim H9. intros. split with (ad_x (xI p0)). split with (ad_x (xI p1)).
-	split with x1. split with x2. elim (iad_conv_inj (ad_x p0) (ad_x p1) x x0 H8). intros.
+	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. clear Hrecp1. clear Hrecp0. simpl in H1. elim (H0 (Npos (iad_conv_aux_2 p0 p1)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
+	elim H7. intros. elim H9. intros. split with (Npos (xI p0)). split with (Npos (xI p1)).
+	split with x1. split with x2. elim (iad_conv_inj (Npos p0) (Npos p1) x x0 H8). intros.
 	split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11. split.
-	exact H10. exact H11. clear Hrecp1. clear Hrecp0. simpl in H1. elim (H (ad_x (iad_conv_aux_2 p0 p1)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros.
-	elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x (xI p0)).
-	split with (ad_x (xO p1)). split with x1. split with x2. elim (iad_conv_inj (ad_x p0) (ad_x p1) x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10.
+	exact H10. exact H11. clear Hrecp1. clear Hrecp0. simpl in H1. elim (H (Npos (iad_conv_aux_2 p0 p1)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros.
+	elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos (xI p0)).
+	split with (Npos (xO p1)). split with x1. split with x2. elim (iad_conv_inj (Npos p0) (Npos p1) x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10.
 	rewrite <- H13 in H11. split. exact H10. exact H11. clear Hrecp0. simpl in H1.
-	elim (H0 (ad_x (iad_conv_aux_1 p0)) (ad_x p) s s0 H1). intros. elim H4. intros.
+	elim (H0 (Npos (iad_conv_aux_1 p0)) (Npos p) s s0 H1). intros. elim H4. intros.
 	elim H5. intros. elim H6. intros. elim H7. intros. elim H9. intros.
-	split with (ad_x (xI p0)). split with (ad_x 1). split with x1. split with x2.
-	elim (iad_conv_inj (ad_x p0) ad_z x x0 H8). intros. split. reflexivity. intros.
+	split with (Npos (xI p0)). split with (Npos 1). split with x1. split with x2.
+	elim (iad_conv_inj (Npos p0) N0 x x0 H8). intros. split. reflexivity. intros.
 	rewrite <- H12 in H10. rewrite <- H13 in H11. split. exact H10. exact H11.
 	induction  x0 as [| p1]. simpl in H1. inversion H1. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. simpl in H1. inversion H1.
 	simpl in H1. inversion H1. simpl in H1. inversion H1. induction  x0 as [| p0]. simpl in H1.
-	elim (H ad_z (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
-	intros. elim H7. intros. elim H9. intros. split with (ad_x 1). split with ad_z.
-	split with x1. split with x2. elim (iad_conv_inj ad_z ad_z x x0 H8). intros.
+	elim (H N0 (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
+	intros. elim H7. intros. elim H9. intros. split with (Npos 1). split with N0.
+	split with x1. split with x2. elim (iad_conv_inj N0 N0 x x0 H8). intros.
 	split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11.
-	split. exact H10. exact H11. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H0 (ad_x (iad_conv_aux_0 p0)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
-	elim H7. intros. elim H9. intros. split with (ad_x 1). split with (ad_x (xI p0)).
-	split with x1. split with x2. elim (iad_conv_inj ad_z (ad_x p0) x x0 H8). intros.
+	split. exact H10. exact H11. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H0 (Npos (iad_conv_aux_0 p0)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
+	elim H7. intros. elim H9. intros. split with (Npos 1). split with (Npos (xI p0)).
+	split with x1. split with x2. elim (iad_conv_inj N0 (Npos p0) x x0 H8). intros.
 	split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11. split.
-	exact H10. exact H11. simpl in H1. elim (H (ad_x (iad_conv_aux_0 p0)) (ad_x p) s s0 H1).
+	exact H10. exact H11. simpl in H1. elim (H (Npos (iad_conv_aux_0 p0)) (Npos p) s s0 H1).
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H9.
-	intros. split with (ad_x 1). split with (ad_x (xO p0)). split with x1. split with x2.
-	elim (iad_conv_inj ad_z (ad_x p0) x x0 H8). intros. split. reflexivity. intros.
+	intros. split with (Npos 1). split with (Npos (xO p0)). split with x1. split with x2.
+	elim (iad_conv_inj N0 (Npos p0) x x0 H8). intros. split. reflexivity. intros.
 	rewrite <- H12 in H10. rewrite <- H13 in H11. split. exact H10. exact H11.
-	simpl in H1. elim (H0 ad_z (ad_x p) s s0 H1). intros. elim H4. intros. elim H5.
-	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x 1).
-	split with (ad_x 1). split with x1. split with x2. elim (iad_conv_inj ad_z ad_z x x0 H8).
+	simpl in H1. elim (H0 N0 (Npos p) s s0 H1). intros. elim H4. intros. elim H5.
+	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos 1).
+	split with (Npos 1). split with x1. split with x2. elim (iad_conv_inj N0 N0 x x0 H8).
 	intros. split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11.
 	split. exact H10. exact H11. induction  x as [| p0]. induction  x0 as [| p0]. simpl in H1. 
-	elim (H ad_z (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
-	intros. elim H7. intros. elim H9. intros. split with ad_z. split with ad_z.
-	split with x1. split with x2. elim (iad_conv_inj ad_z ad_z x x0). intros. split.
+	elim (H N0 (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
+	intros. elim H7. intros. elim H9. intros. split with N0. split with N0.
+	split with x1. split with x2. elim (iad_conv_inj N0 N0 x x0). intros. split.
 	reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11. split.
-	exact H10. exact H11. simpl in |- *. exact H8. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H0 (ad_x (iad_conv_aux_0 p0)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros.
-	elim H6. intros. elim H7. intros. elim H9. intros. split with ad_z. split with (ad_x (xI p0)). split with x1. split with x2. elim (iad_conv_inj ad_z (ad_x p0) x x0 H8).
+	exact H10. exact H11. simpl in |- *. exact H8. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H0 (Npos (iad_conv_aux_0 p0)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros.
+	elim H6. intros. elim H7. intros. elim H9. intros. split with N0. split with (Npos (xI p0)). split with x1. split with x2. elim (iad_conv_inj N0 (Npos p0) x x0 H8).
 	intros. split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11.
-	split. exact H10. exact H11. simpl in H1. elim (H (ad_x (iad_conv_aux_0 p0)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros.
-	elim H9. intros. split with ad_z. split with (ad_x (xO p0)). split with x1.
-	split with x2. elim (iad_conv_inj ad_z (ad_x p0) x x0 H8). intros. split. reflexivity.
+	split. exact H10. exact H11. simpl in H1. elim (H (Npos (iad_conv_aux_0 p0)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros.
+	elim H9. intros. split with N0. split with (Npos (xO p0)). split with x1.
+	split with x2. elim (iad_conv_inj N0 (Npos p0) x x0 H8). intros. split. reflexivity.
 	intros. rewrite <- H12 in H10. rewrite <- H13 in H11. split. exact H10. exact H11.
-	simpl in H1. elim (H0 ad_z (ad_x p) s s0 H1). intros. elim H4. intros. elim H5.
-	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with ad_z.
-	split with (ad_x 1). split with x1. split with x2. elim (iad_conv_inj ad_z ad_z x x0 H8).
+	simpl in H1. elim (H0 N0 (Npos p) s s0 H1). intros. elim H4. intros. elim H5.
+	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with N0.
+	split with (Npos 1). split with x1. split with x2. elim (iad_conv_inj N0 N0 x x0 H8).
 	intros. split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11. split.
 	exact H10. exact H11. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. induction  x0 as [| p1]. simpl in H1. inversion H1.
 	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. simpl in H1. inversion H1. simpl in H1. inversion H1. simpl in H1.
-	inversion H1. induction  x0 as [| p1]. simpl in H1. elim (H (ad_x (iad_conv_aux_1 p0)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros.
-	elim H9. intros. split with (ad_x (xO p0)). split with ad_z. split with x1.
-	split with x2. elim (iad_conv_inj (ad_x p0) ad_z x x0 H8). intros. split. reflexivity.
+	inversion H1. induction  x0 as [| p1]. simpl in H1. elim (H (Npos (iad_conv_aux_1 p0)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros.
+	elim H9. intros. split with (Npos (xO p0)). split with N0. split with x1.
+	split with x2. elim (iad_conv_inj (Npos p0) N0 x x0 H8). intros. split. reflexivity.
 	intros. rewrite <- H12 in H10. rewrite <- H13 in H11. split. exact H10. exact H11.
-	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. clear Hrecp1. clear Hrecp0. simpl in H1. elim (H0 (ad_x (iad_conv_aux_2 p0 p1)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
-	elim H7. intros. elim H9. intros. split with (ad_x (xO p0)). split with (ad_x (xI p1)).
-	split with x1. split with x2. elim (iad_conv_inj (ad_x p0) (ad_x p1) x x0 H8). intros.
+	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. clear Hrecp1. clear Hrecp0. simpl in H1. elim (H0 (Npos (iad_conv_aux_2 p0 p1)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
+	elim H7. intros. elim H9. intros. split with (Npos (xO p0)). split with (Npos (xI p1)).
+	split with x1. split with x2. elim (iad_conv_inj (Npos p0) (Npos p1) x x0 H8). intros.
 	split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11. split.
-	exact H10. exact H11. clear Hrecp1. clear Hrecp0. simpl in H1. elim (H (ad_x (iad_conv_aux_2 p0 p1)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
-	elim H7. intros. elim H9. intros. split with (ad_x (xO p0)). split with (ad_x (xO p1)).
-	split with x1. elim (iad_conv_inj (ad_x p0) (ad_x p1) x x0 H8). intros. intros.
+	exact H10. exact H11. clear Hrecp1. clear Hrecp0. simpl in H1. elim (H (Npos (iad_conv_aux_2 p0 p1)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
+	elim H7. intros. elim H9. intros. split with (Npos (xO p0)). split with (Npos (xO p1)).
+	split with x1. elim (iad_conv_inj (Npos p0) (Npos p1) x x0 H8). intros. intros.
 	rewrite <- H12 in H10. split with x2. split. reflexivity. rewrite <- H13 in H11.
-	split. simpl in |- *. simpl in H10. exact H10. exact H11. simpl in H1. elim (H0 (ad_x (iad_conv_aux_1 p0)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros.
-	elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x (xO p0)).
-	split with (ad_x 1). split with x1. split with x2. elim (iad_conv_inj (ad_x p0) ad_z x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11.
+	split. simpl in |- *. simpl in H10. exact H10. exact H11. simpl in H1. elim (H0 (Npos (iad_conv_aux_1 p0)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros.
+	elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos (xO p0)).
+	split with (Npos 1). split with x1. split with x2. elim (iad_conv_inj (Npos p0) N0 x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11.
 	split. exact H10. exact H11. induction  x0 as [| p0]. simpl in H1. inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ].
 	simpl in H1. inversion H1. simpl in H1. inversion H1. simpl in H1. inversion H1.
 	induction  x as [| p]. induction  x0 as [| p]. simpl in H1. inversion H1. induction  p as [p Hrecp| p Hrecp| ]. simpl in H1.
 	inversion H1. simpl in H1. inversion H1. simpl in H1. inversion H1. induction  p as [p Hrecp| p Hrecp| ].
-	induction  x0 as [| p0]. simpl in H1. elim (H (ad_x (iad_conv_aux_1 p)) ad_z s s0 H1).
+	induction  x0 as [| p0]. simpl in H1. elim (H (Npos (iad_conv_aux_1 p)) N0 s s0 H1).
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H9.
-	intros. split with (ad_x (xI p)). split with ad_z. split with x1. split with x2.
-	elim (iad_conv_inj (ad_x p) ad_z x x0 H8). intros. split. reflexivity. intros.
+	intros. split with (Npos (xI p)). split with N0. split with x1. split with x2.
+	elim (iad_conv_inj (Npos p) N0 x x0 H8). intros. split. reflexivity. intros.
 	rewrite <- H12 in H10. rewrite <- H13 in H11. split. exact H10. exact H11.
-	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H0 (ad_x (iad_conv_aux_2 p p0)) ad_z s s0 H1).
+	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H0 (Npos (iad_conv_aux_2 p p0)) N0 s s0 H1).
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H9.
-	intros. split with (ad_x (xI p)). split with (ad_x (xI p0)). split with x1. split with x2.
-	elim (iad_conv_inj (ad_x p) (ad_x p0) x x0 H8). intros. split. reflexivity. intros.
+	intros. split with (Npos (xI p)). split with (Npos (xI p0)). split with x1. split with x2.
+	elim (iad_conv_inj (Npos p) (Npos p0) x x0 H8). intros. split. reflexivity. intros.
 	rewrite <- H12 in H10. rewrite <- H13 in H11. split. exact H10. exact H11. simpl in H1.
-	elim (H (ad_x (iad_conv_aux_2 p p0)) ad_z s s0 H1). intros. elim H4. intros. elim H5.
-	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x (xI p)).
-	split with (ad_x (xO p0)). split with x1. split with x2. elim (iad_conv_inj (ad_x p) (ad_x p0) x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10. 
-	rewrite <- H13 in H11. split. exact H10. exact H11. simpl in H1. elim (H0 (ad_x (iad_conv_aux_1 p)) ad_z s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
-	intros. elim H7. intros. elim H9. intros. split with (ad_x (xI p)). split with (ad_x 1).
-	split with x1. split with x2. elim (iad_conv_inj (ad_x p) ad_z x x0 H8). intros.
+	elim (H (Npos (iad_conv_aux_2 p p0)) N0 s s0 H1). intros. elim H4. intros. elim H5.
+	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos (xI p)).
+	split with (Npos (xO p0)). split with x1. split with x2. elim (iad_conv_inj (Npos p) (Npos p0) x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10. 
+	rewrite <- H13 in H11. split. exact H10. exact H11. simpl in H1. elim (H0 (Npos (iad_conv_aux_1 p)) N0 s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
+	intros. elim H7. intros. elim H9. intros. split with (Npos (xI p)). split with (Npos 1).
+	split with x1. split with x2. elim (iad_conv_inj (Npos p) N0 x x0 H8). intros.
 	intros. split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11.
 	split. exact H10. exact H11. induction  x0 as [| p0]. simpl in H1. inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ].
 	simpl in H1. inversion H1. simpl in H1. inversion H1. simpl in H1. inversion H1.
-	induction  x0 as [| p]. simpl in H1. elim (H ad_z ad_z s s0 H1). intros. elim H4. intros.
-	elim H5. intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x 1). split with ad_z. split with x1. split with x2. elim (iad_conv_inj ad_z ad_z x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10.
+	induction  x0 as [| p]. simpl in H1. elim (H N0 N0 s s0 H1). intros. elim H4. intros.
+	elim H5. intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos 1). split with N0. split with x1. split with x2. elim (iad_conv_inj N0 N0 x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10.
 	rewrite <- H13 in H11. split. exact H10. exact H11. induction  p as [p Hrecp| p Hrecp| ]. simpl in H1.
-	elim (H0 (ad_x (iad_conv_aux_0 p)) ad_z s s0 H1). intros. elim H4. intros. elim H5. 
-	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x 1).
-	split with (ad_x (xI p)). split with x1. split with x2. elim (iad_conv_inj ad_z (ad_x p) x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10.
-	rewrite <- H13 in H11. split. exact H10. exact H11. simpl in H1. elim (H (ad_x (iad_conv_aux_0 p)) ad_z s s0 H1). intros. elim H4. intros. elim H5. intros.
-	elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x 1). split with (ad_x (xO p)). split with x1. split with x2. elim (iad_conv_inj ad_z (ad_x p) x x0 H8).
+	elim (H0 (Npos (iad_conv_aux_0 p)) N0 s s0 H1). intros. elim H4. intros. elim H5. 
+	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos 1).
+	split with (Npos (xI p)). split with x1. split with x2. elim (iad_conv_inj N0 (Npos p) x x0 H8). intros. split. reflexivity. intros. rewrite <- H12 in H10.
+	rewrite <- H13 in H11. split. exact H10. exact H11. simpl in H1. elim (H (Npos (iad_conv_aux_0 p)) N0 s s0 H1). intros. elim H4. intros. elim H5. intros.
+	elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos 1). split with (Npos (xO p)). split with x1. split with x2. elim (iad_conv_inj N0 (Npos p) x x0 H8).
 	intros. split. reflexivity. intros. rewrite <- H12 in H10. rewrite <- H13 in H11.
-	split. exact H10. exact H11. simpl in H1. elim (H0 ad_z ad_z s s0 H1). intros.
+	split. exact H10. exact H11. simpl in H1. elim (H0 N0 N0 s s0 H1). intros.
 	elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H9.
-	intros. split with (ad_x 1). split with (ad_x 1). split with x1. split with x2.
-	elim (iad_conv_inj ad_z ad_z x x0 H8). intros. split. reflexivity. intros. 
+	intros. split with (Npos 1). split with (Npos 1). split with x1. split with x2.
+	elim (iad_conv_inj N0 N0 x x0 H8). intros. split. reflexivity. intros. 
 	rewrite <- H12 in H10. rewrite <- H13 in H11. split. exact H10. exact H11.
 Qed.
 
@@ -2125,14 +2126,14 @@ Qed.
 
 Lemma predta_produit_3 :
  forall (d0 : preDTA) (a a0 : ad) (s s0 : state),
- MapGet state (preDTA_produit_l a0 s0 d0) a = SOME state s ->
+ MapGet state (preDTA_produit_l a0 s0 d0) a = Some s ->
  exists a1 : ad,
    (exists a2 : ad,
       (exists s1 : state,
          (exists s2 : state,
             a = iad_conv a1 a2 /\
-            MapGet state (M1 state a0 s0) a1 = SOME state s1 /\
-            MapGet state d0 a2 = SOME state s2))).
+            MapGet state (M1 state a0 s0) a1 = Some s1 /\
+            MapGet state d0 a2 = Some s2))).
 Proof.
 	exact
   (Map_ind state predta_produit_3_def predta_produit_3_0 predta_produit_3_1
@@ -2141,14 +2142,14 @@ Qed.
 
 Definition predta_produit_4_def (d0 : preDTA) : Prop :=
   forall (a a0 : ad) (s s0 : state),
-  MapGet state (preDTA_produit_r a0 s0 d0) a = SOME state s ->
+  MapGet state (preDTA_produit_r a0 s0 d0) a = Some s ->
   exists a1 : ad,
     (exists a2 : ad,
        (exists s1 : state,
           (exists s2 : state,
              a = iad_conv a1 a2 /\
-             MapGet state (M1 state a0 s0) a2 = SOME state s1 /\
-             MapGet state d0 a1 = SOME state s2))).
+             MapGet state (M1 state a0 s0) a2 = Some s1 /\
+             MapGet state d0 a1 = Some s2))).
 
 Lemma predta_produit_4_0 : predta_produit_4_def (M0 state).
 Proof.
@@ -2158,10 +2159,10 @@ Qed.
 Lemma predta_produit_4_1 :
  forall (a : ad) (a0 : state), predta_produit_4_def (M1 state a a0).
 Proof.
-	unfold predta_produit_4_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (ad_eq (iad_conv a a2) a1)). intro. rewrite H0 in H. inversion H. split with a.
+	unfold predta_produit_4_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (Neqb (iad_conv a a2) a1)). intro. rewrite H0 in H. inversion H. split with a.
 	split with a2. split with s0. split with a0. split. symmetry  in |- *. 
-	exact (ad_eq_complete _ _ H0). split. simpl in |- *. rewrite (ad_eq_correct a2).
-	reflexivity. simpl in |- *. rewrite (ad_eq_correct a). reflexivity. intro.
+	exact (Neqb_complete _ _ H0). split. simpl in |- *. rewrite (Neqb_correct a2).
+	reflexivity. simpl in |- *. rewrite (Neqb_correct a). reflexivity. intro.
 	rewrite H0 in H. inversion H.
 Qed.
 
@@ -2172,153 +2173,153 @@ Lemma predta_produit_4_2 :
  predta_produit_4_def m0 -> predta_produit_4_def (M2 state m m0).
 Proof.
 	unfold predta_produit_4_def in |- *. intros. elim (iad_conv_surj a). intros.
-	elim H2. intros. rewrite H3 in H1. induction  a0 as [| p]. induction  x as [| p]. induction  x0 as [| p]. simpl in H1. elim (H ad_z ad_z s s0 H1). intros. elim H4. intros.
+	elim H2. intros. rewrite H3 in H1. induction  a0 as [| p]. induction  x as [| p]. induction  x0 as [| p]. simpl in H1. elim (H N0 N0 s s0 H1). intros. elim H4. intros.
 	elim H5. intros. elim H6. intros. elim H7. intros. elim H9. intros.
 	split with x. split with x0. split with x1. split with x2.
-	elim (iad_conv_inj ad_z ad_z _ _ H8). intros. split. rewrite H3.
+	elim (iad_conv_inj N0 N0 _ _ H8). intros. split. rewrite H3.
 	simpl in |- *. assumption. split. assumption. rewrite <- H12. simpl in |- *.
 	rewrite <- H12 in H11. assumption. induction  p as [p Hrecp| p Hrecp| ]. simpl in H1.
-	inversion H1. simpl in H1. elim (H (ad_x (iad_conv_aux_0 p)) ad_z s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
-	elim H7. intros. elim H9. intros. split with ad_z. split with (ad_x (xO p)). split with x1. split with x2. simpl in H3. split.
-	simpl in |- *. exact H3. elim (iad_conv_inj ad_z (ad_x p) _ _ H8). intros.
+	inversion H1. simpl in H1. elim (H (Npos (iad_conv_aux_0 p)) N0 s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
+	elim H7. intros. elim H9. intros. split with N0. split with (Npos (xO p)). split with x1. split with x2. simpl in H3. split.
+	simpl in |- *. exact H3. elim (iad_conv_inj N0 (Npos p) _ _ H8). intros.
 	rewrite <- H12 in H11. rewrite <- H13 in H10. split; simpl in |- *; assumption.
 	simpl in H1. inversion H1. induction  p as [p Hrecp| p Hrecp| ]. induction  x0 as [| p0]. simpl in H1.
-	elim (H0 (ad_x (iad_conv_aux_1 p)) ad_z s s0 H1). intros. elim H4.
+	elim (H0 (Npos (iad_conv_aux_1 p)) N0 s s0 H1). intros. elim H4.
 	intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H9.
-	intros. split with (ad_x (xI p)). split with ad_z. split with x1.
-	split with x2. split. assumption. elim (iad_conv_inj (ad_x p) ad_z _ _ H8). intros. rewrite <- H12 in H11. rewrite <- H13 in H10.
+	intros. split with (Npos (xI p)). split with N0. split with x1.
+	split with x2. split. assumption. elim (iad_conv_inj (Npos p) N0 _ _ H8). intros. rewrite <- H12 in H11. rewrite <- H13 in H10.
 	split; simpl in |- *; assumption. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. inversion H1.
-	simpl in H1. elim (H0 (ad_x (iad_conv_aux_2 p p0)) ad_z s s0 H1).
+	simpl in H1. elim (H0 (Npos (iad_conv_aux_2 p p0)) N0 s s0 H1).
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7.
-	intros. elim H9. intros. split with (ad_x (xI p)). split with (ad_x (xO p0)). split with x1. split with x2. split. assumption.
-	elim (iad_conv_inj (ad_x p) (ad_x p0) _ _ H8). intros. rewrite <- H12 in H11. rewrite <- H13 in H10. split; simpl in |- *; assumption.
-	simpl in H1. inversion H1. induction  x0 as [| p0]. simpl in H1. elim (H (ad_x (iad_conv_aux_1 p)) ad_z s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H9. intros.
-	split with (ad_x (xO p)). split with ad_z. split with x1. split with x2.
-	elim (iad_conv_inj (ad_x p) ad_z _ _ H8). intros. split. assumption.
+	intros. elim H9. intros. split with (Npos (xI p)). split with (Npos (xO p0)). split with x1. split with x2. split. assumption.
+	elim (iad_conv_inj (Npos p) (Npos p0) _ _ H8). intros. rewrite <- H12 in H11. rewrite <- H13 in H10. split; simpl in |- *; assumption.
+	simpl in H1. inversion H1. induction  x0 as [| p0]. simpl in H1. elim (H (Npos (iad_conv_aux_1 p)) N0 s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H9. intros.
+	split with (Npos (xO p)). split with N0. split with x1. split with x2.
+	elim (iad_conv_inj (Npos p) N0 _ _ H8). intros. split. assumption.
 	rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption.
-	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. inversion H1. simpl in H1. elim (H (ad_x (iad_conv_aux_2 p p0)) ad_z s s0 H1). intros. elim H4. intros. elim H5.
-	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x (xO p)). split with (ad_x (xO p0)). split with x1. split with x2.
-	elim (iad_conv_inj (ad_x p) (ad_x p0) _ _ H8). intros. split. 
-	assumption. rewrite <- H12 in H11. rewrite <- H13 in H10. split; simpl in |- *; assumption. inversion H1. induction  x0 as [| p]. simpl in H1. elim (H0 ad_z ad_z s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
-	elim H7. intros. elim H9. intros. split with (ad_x 1). split with ad_z.
-	split with x1. split with x2. elim (iad_conv_inj ad_z ad_z _ _ H8).
+	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. inversion H1. simpl in H1. elim (H (Npos (iad_conv_aux_2 p p0)) N0 s s0 H1). intros. elim H4. intros. elim H5.
+	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos (xO p)). split with (Npos (xO p0)). split with x1. split with x2.
+	elim (iad_conv_inj (Npos p) (Npos p0) _ _ H8). intros. split. 
+	assumption. rewrite <- H12 in H11. rewrite <- H13 in H10. split; simpl in |- *; assumption. inversion H1. induction  x0 as [| p]. simpl in H1. elim (H0 N0 N0 s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
+	elim H7. intros. elim H9. intros. split with (Npos 1). split with N0.
+	split with x1. split with x2. elim (iad_conv_inj N0 N0 _ _ H8).
 	intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11.
 	split; simpl in |- *; assumption. induction  p as [p Hrecp| p Hrecp| ]. simpl in H1. inversion H1.
-	simpl in H1. elim (H0 (ad_x (iad_conv_aux_0 p)) ad_z s s0 H1). intros.
+	simpl in H1. elim (H0 (Npos (iad_conv_aux_0 p)) N0 s s0 H1). intros.
 	elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros.
-	elim H9. intros. split with (ad_x 1). split with (ad_x (xO p)).
-	split with x1. split with x2. elim (iad_conv_inj ad_z (ad_x p) _ _ H8).
+	elim H9. intros. split with (Npos 1). split with (Npos (xO p)).
+	split with x1. split with x2. elim (iad_conv_inj N0 (Npos p) _ _ H8).
 	intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11.
 	split; simpl in |- *; assumption. simpl in H1. inversion H1. induction  p as [p Hrecp| p Hrecp| ].
 	clear Hrecp. induction  x as [| p0]. induction  x0 as [| p0]. simpl in H1. inversion H1.
-	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H (ad_x (iad_conv_aux_0 p0)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
-	intros. elim H7. intros. elim H9. intros. split with ad_z. split with (ad_x (xI p0)). split with x1. split with x2. elim (iad_conv_inj ad_z (ad_x p0) _ _ H8). intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. simpl in H1.
-	inversion H1. simpl in H1. elim (H ad_z (ad_x p) s s0 H1). intros.
+	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H (Npos (iad_conv_aux_0 p0)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
+	intros. elim H7. intros. elim H9. intros. split with N0. split with (Npos (xI p0)). split with x1. split with x2. elim (iad_conv_inj N0 (Npos p0) _ _ H8). intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. simpl in H1.
+	inversion H1. simpl in H1. elim (H N0 (Npos p) s s0 H1). intros.
 	elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros.
-	elim H9. intros. split with ad_z. split with (ad_x 1). 
-	split with x1. split with x2. elim (iad_conv_inj ad_z ad_z _ _ H8).
+	elim H9. intros. split with N0. split with (Npos 1). 
+	split with x1. split with x2. elim (iad_conv_inj N0 N0 _ _ H8).
 	intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. induction  x0 as [| p1].
 	simpl in H1. inversion H1. clear Hrecp0. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. simpl in H1.
-	elim (H0 (ad_x (iad_conv_aux_2 p0 p1)) (ad_x p) s s0 H1). intros.
+	elim (H0 (Npos (iad_conv_aux_2 p0 p1)) (Npos p) s s0 H1). intros.
 	elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros.
-	elim H9. intros. split with (ad_x (xI p0)). split with (ad_x (xI p1)). split with x1. split with x2. elim (iad_conv_inj (ad_x p0) (ad_x p1) _ _ H8). intros. split. assumption. rewrite <- H13 in H10.
+	elim H9. intros. split with (Npos (xI p0)). split with (Npos (xI p1)). split with x1. split with x2. elim (iad_conv_inj (Npos p0) (Npos p1) _ _ H8). intros. split. assumption. rewrite <- H13 in H10.
 	rewrite <- H12 in H11. split; simpl in |- *; assumption. simpl in H1.
-	inversion H1. simpl in H1. elim (H0 (ad_x (iad_conv_aux_1 p0)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
-	intros. elim H7. intros. elim H9. intros. split with (ad_x (xI p0)).
-	split with (ad_x 1). split with x1. split with x2. elim (iad_conv_inj (ad_x p0) ad_z _ _ H8). intros. split. assumption.
+	inversion H1. simpl in H1. elim (H0 (Npos (iad_conv_aux_1 p0)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
+	intros. elim H7. intros. elim H9. intros. split with (Npos (xI p0)).
+	split with (Npos 1). split with x1. split with x2. elim (iad_conv_inj (Npos p0) N0 _ _ H8). intros. split. assumption.
 	rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. induction  x0 as [| p1]. simpl in H1. inversion H1. clear Hrecp0.
-	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. simpl in H1. elim (H (ad_x (iad_conv_aux_2 p0 p1)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros.
-	elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x (xO p0)). split with (ad_x (xI p1)). split with x1. split with x2. elim (iad_conv_inj (ad_x p0) (ad_x p1) _ _ H8). intros.
+	induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. simpl in H1. elim (H (Npos (iad_conv_aux_2 p0 p1)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros.
+	elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos (xO p0)). split with (Npos (xI p1)). split with x1. split with x2. elim (iad_conv_inj (Npos p0) (Npos p1) _ _ H8). intros.
 	split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11.
 	split; simpl in |- *; assumption. simpl in H1. inversion H1. simpl in H1.
-	elim (H (ad_x (iad_conv_aux_1 p0)) (ad_x p) s s0 H1). intros. 
+	elim (H (Npos (iad_conv_aux_1 p0)) (Npos p) s s0 H1). intros. 
 	elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros.
-	elim H9. intros. split with (ad_x (xO p0)). split with (ad_x 1).
-	split with x1. split with x2. elim (iad_conv_inj (ad_x p0) ad_z _ _ H8).  intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. induction  x0 as [| p0]. simpl in H1.
-	inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H0 (ad_x (iad_conv_aux_0 p0)) (ad_x p) s s0 H1). intros. elim H4. intros.
+	elim H9. intros. split with (Npos (xO p0)). split with (Npos 1).
+	split with x1. split with x2. elim (iad_conv_inj (Npos p0) N0 _ _ H8).  intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. induction  x0 as [| p0]. simpl in H1.
+	inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H0 (Npos (iad_conv_aux_0 p0)) (Npos p) s s0 H1). intros. elim H4. intros.
 	elim H5. intros. elim H6. intros. elim H7. intros. elim H9. intros.
-	split with (ad_x 1). split with (ad_x (xI p0)). split with x1.
-	split with x2. elim (iad_conv_inj ad_z (ad_x p0) _ _ H8). intros.
+	split with (Npos 1). split with (Npos (xI p0)). split with x1.
+	split with x2. elim (iad_conv_inj N0 (Npos p0) _ _ H8). intros.
 	split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11.
 	split; simpl in |- *; assumption. simpl in H1. inversion H1. simpl in H1.
-	elim (H0 ad_z (ad_x p) s s0 H1). intros. elim H4. intros. elim H5.
+	elim (H0 N0 (Npos p) s s0 H1). intros. elim H4. intros. elim H5.
 	intros. elim H6. intros. elim H7. intros. elim H9. intros.
-	split with (ad_x 1). split with (ad_x 1). split with x1. split with x2. elim (iad_conv_inj ad_z ad_z _ _ H8). intros. split.
+	split with (Npos 1). split with (Npos 1). split with x1. split with x2. elim (iad_conv_inj N0 N0 _ _ H8). intros. split.
 	assumption. rewrite <- H13 in H10. rewrite <- H12 in H11.
 	split; simpl in |- *; assumption. clear Hrecp. induction  x as [| p0]. induction  x0 as [| p0].
-	simpl in H1. elim (H ad_z (ad_x p) s s0 H1). intros. elim H4.
+	simpl in H1. elim (H N0 (Npos p) s s0 H1). intros. elim H4.
 	intros. elim H5. intros. elim H6. intros. elim H7. intros.
-	elim H9. intros. split with ad_z. split with ad_z. split with x1.
-	split with x2. elim (iad_conv_inj ad_z ad_z _ _ H8). intros.
+	elim H9. intros. split with N0. split with N0. split with x1.
+	split with x2. elim (iad_conv_inj N0 N0 _ _ H8). intros.
 	split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11.
 	split; simpl in |- *; assumption. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. inversion H1.
-	simpl in H1. elim (H (ad_x (iad_conv_aux_0 p0)) (ad_x p) s s0 H1).
+	simpl in H1. elim (H (Npos (iad_conv_aux_0 p0)) (Npos p) s s0 H1).
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7.
-	intros. elim H9. intros. split with ad_z. split with (ad_x (xO p0)).
-	split with x1. split with x2. elim (iad_conv_inj ad_z (ad_x p0) _ _ H8). intros. split. assumption. rewrite <- H13 in H10.
+	intros. elim H9. intros. split with N0. split with (Npos (xO p0)).
+	split with x1. split with x2. elim (iad_conv_inj N0 (Npos p0) _ _ H8). intros. split. assumption. rewrite <- H13 in H10.
 	rewrite <- H12 in H11. split; simpl in |- *; assumption. simpl in H1.
 	inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. clear Hrecp0. induction  x0 as [| p1].
-	simpl in H1. elim (H0 (ad_x (iad_conv_aux_1 p0)) (ad_x p) s s0 H1).
+	simpl in H1. elim (H0 (Npos (iad_conv_aux_1 p0)) (Npos p) s s0 H1).
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7.
-	intros. elim H9. intros. split with (ad_x (xI p0)). split with ad_z.
-	split with x1. split with x2. elim (iad_conv_inj (ad_x p0) ad_z _ _ H8). intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. simpl in H1.
-	inversion H1. simpl in H1. elim (H0 (ad_x (iad_conv_aux_2 p0 p1)) (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
-	intros. elim H7. intros. elim H9. intros. split with (ad_x (xI p0)).
-	split with (ad_x (xO p1)). split with x1. split with x2. elim (iad_conv_inj (ad_x p0) (ad_x p1) _ _ H8). intros. split. assumption.
+	intros. elim H9. intros. split with (Npos (xI p0)). split with N0.
+	split with x1. split with x2. elim (iad_conv_inj (Npos p0) N0 _ _ H8). intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. simpl in H1.
+	inversion H1. simpl in H1. elim (H0 (Npos (iad_conv_aux_2 p0 p1)) (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
+	intros. elim H7. intros. elim H9. intros. split with (Npos (xI p0)).
+	split with (Npos (xO p1)). split with x1. split with x2. elim (iad_conv_inj (Npos p0) (Npos p1) _ _ H8). intros. split. assumption.
 	rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption.
 	simpl in H1. inversion H1. clear Hrecp0. induction  x0 as [| p1]. simpl in H1.
-	elim (H (ad_x (iad_conv_aux_1 p0)) (ad_x p) s s0 H1). intros. elim H4.
+	elim (H (Npos (iad_conv_aux_1 p0)) (Npos p) s s0 H1). intros. elim H4.
 	intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H9.
-	intros. split with (ad_x (xO p0)). split with ad_z. split with x1.
-	split with x2. elim (iad_conv_inj (ad_x p0) ad_z _ _ H8). intros.
+	intros. split with (Npos (xO p0)). split with N0. split with x1.
+	split with x2. elim (iad_conv_inj (Npos p0) N0 _ _ H8). intros.
 	split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11.
 	split; simpl in |- *; assumption. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. simpl in H1. inversion H1.
-	simpl in H1. elim (H (ad_x (iad_conv_aux_2 p0 p1)) (ad_x p) s s0 H1).
+	simpl in H1. elim (H (Npos (iad_conv_aux_2 p0 p1)) (Npos p) s s0 H1).
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7.
-	intros. elim H9. intros. split with (ad_x (xO p0)). split with (ad_x (xO p1)). split with x1. split with x2. elim (iad_conv_inj (ad_x p0) (ad_x p1) _ _ H8). intros. split. assumption. rewrite <- H13 in H10.
+	intros. elim H9. intros. split with (Npos (xO p0)). split with (Npos (xO p1)). split with x1. split with x2. elim (iad_conv_inj (Npos p0) (Npos p1) _ _ H8). intros. split. assumption. rewrite <- H13 in H10.
 	rewrite <- H12 in H11. split; simpl in |- *; assumption. simpl in H1.
-	inversion H1. induction  x0 as [| p0]. simpl in H1. elim (H0 ad_z (ad_x p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
-	elim H7. intros. elim H9. intros. split with (ad_x 1). split with ad_z. split with x1. split with x2. elim (iad_conv_inj ad_z ad_z _ _ H8). intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. inversion H1. simpl in H1. elim (H0 (ad_x (iad_conv_aux_0 p0)) (ad_x p) s s0 H1).
+	inversion H1. induction  x0 as [| p0]. simpl in H1. elim (H0 N0 (Npos p) s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6. intros.
+	elim H7. intros. elim H9. intros. split with (Npos 1). split with N0. split with x1. split with x2. elim (iad_conv_inj N0 N0 _ _ H8). intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. inversion H1. simpl in H1. elim (H0 (Npos (iad_conv_aux_0 p0)) (Npos p) s s0 H1).
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7.
-	intros. elim H9. intros. split with (ad_x 1). split with (ad_x (xO p0)). split with x1. split with x2. elim (iad_conv_inj ad_z (ad_x p0) _ _ H8). intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. simpl in H1. inversion H1.
+	intros. elim H9. intros. split with (Npos 1). split with (Npos (xO p0)). split with x1. split with x2. elim (iad_conv_inj N0 (Npos p0) _ _ H8). intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. simpl in H1. inversion H1.
 	induction  x as [| p]. induction  x0 as [| p]. simpl in H1. inversion H1. induction  p as [p Hrecp| p Hrecp| ].
-	simpl in H1. elim (H (ad_x (iad_conv_aux_0 p)) ad_z s s0 H1). 
+	simpl in H1. elim (H (Npos (iad_conv_aux_0 p)) N0 s s0 H1). 
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7.
-	intros. elim H9. intros. split with ad_z. split with (ad_x (xI p)).
-	split with x1. split with x2. elim (iad_conv_inj ad_z (ad_x p) _ _ H8).  intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. simpl in H1. inversion H1.
-	simpl in H1. elim (H ad_z ad_z s s0 H1). intros. elim H4. intros.
+	intros. elim H9. intros. split with N0. split with (Npos (xI p)).
+	split with x1. split with x2. elim (iad_conv_inj N0 (Npos p) _ _ H8).  intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. simpl in H1. inversion H1.
+	simpl in H1. elim (H N0 N0 s s0 H1). intros. elim H4. intros.
 	elim H5. intros. elim H6. intros. elim H7. intros. elim H9. intros.
-	split with ad_z. split with (ad_x 1). split with x1. split with x2.
-	elim (iad_conv_inj ad_z ad_z _ _ H8). intros. split. assumption.
+	split with N0. split with (Npos 1). split with x1. split with x2.
+	elim (iad_conv_inj N0 N0 _ _ H8). intros. split. assumption.
 	rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption. induction  p as [p Hrecp| p Hrecp| ]. clear Hrecp. induction  x0 as [| p0]. simpl in H1.
-	inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H0 (ad_x (iad_conv_aux_2 p p0)) ad_z s s0 H1). intros. elim H4. intros.
+	inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H0 (Npos (iad_conv_aux_2 p p0)) N0 s s0 H1). intros. elim H4. intros.
 	elim H5. intros. elim H6. intros. elim H7. intros. elim H9. intros.
-	split with (ad_x (xI p)). split with (ad_x (xI p0)). split with x1.
-	split with x2. elim (iad_conv_inj (ad_x p) (ad_x p0) _ _ H8). intros.
+	split with (Npos (xI p)). split with (Npos (xI p0)). split with x1.
+	split with x2. elim (iad_conv_inj (Npos p) (Npos p0) _ _ H8). intros.
 	split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11.
 	split; simpl in |- *; assumption. simpl in H1. inversion H1. simpl in H1.
-	elim (H0 (ad_x (iad_conv_aux_1 p)) ad_z s s0 H1). intros. elim H4.
+	elim (H0 (Npos (iad_conv_aux_1 p)) N0 s s0 H1). intros. elim H4.
 	intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H9.
-	intros. split with (ad_x (xI p)). split with (ad_x 1). 
-	split with x1. split with x2. elim (iad_conv_inj (ad_x p) ad_z _ _ H8).
+	intros. split with (Npos (xI p)). split with (Npos 1). 
+	split with x1. split with x2. elim (iad_conv_inj (Npos p) N0 _ _ H8).
 	intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11.
 	split; simpl in |- *; assumption. induction  x0 as [| p0]. simpl in H1. inversion H1.
-	clear Hrecp. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H (ad_x (iad_conv_aux_2 p p0)) ad_z s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
-	intros. elim H7. intros. elim H9. intros. split with (ad_x (xO p)).
-	split with (ad_x (xI p0)). split with x1. split with x2. elim (iad_conv_inj (ad_x p) (ad_x p0) _ _ H8). intros. split. assumption.
+	clear Hrecp. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H1. elim (H (Npos (iad_conv_aux_2 p p0)) N0 s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
+	intros. elim H7. intros. elim H9. intros. split with (Npos (xO p)).
+	split with (Npos (xI p0)). split with x1. split with x2. elim (iad_conv_inj (Npos p) (Npos p0) _ _ H8). intros. split. assumption.
 	rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption.
-	simpl in H1. inversion H1. simpl in H1. elim (H (ad_x (iad_conv_aux_1 p)) ad_z s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
-	intros. elim H7. intros. elim H9. intros. split with (ad_x (xO p)).
-	split with (ad_x 1). split with x1. split with x2. elim (iad_conv_inj (ad_x p) ad_z _ _ H8). intros. split. assumption. rewrite <- H13 in H10.
+	simpl in H1. inversion H1. simpl in H1. elim (H (Npos (iad_conv_aux_1 p)) N0 s s0 H1). intros. elim H4. intros. elim H5. intros. elim H6.
+	intros. elim H7. intros. elim H9. intros. split with (Npos (xO p)).
+	split with (Npos 1). split with x1. split with x2. elim (iad_conv_inj (Npos p) N0 _ _ H8). intros. split. assumption. rewrite <- H13 in H10.
 	rewrite <- H12 in H11. split; simpl in |- *; assumption. induction  x0 as [| p]. 
-	simpl in H1. inversion H1. induction  p as [p Hrecp| p Hrecp| ]. simpl in H1. elim (H0 (ad_x (iad_conv_aux_0 p)) ad_z s s0 H1). intros. elim H4. intros. elim H5.
-	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (ad_x 1). split with (ad_x (xI p)). split with x1. split with x2.
-	elim (iad_conv_inj ad_z (ad_x p) _ _ H8). intros. split. assumption.
+	simpl in H1. inversion H1. induction  p as [p Hrecp| p Hrecp| ]. simpl in H1. elim (H0 (Npos (iad_conv_aux_0 p)) N0 s s0 H1). intros. elim H4. intros. elim H5.
+	intros. elim H6. intros. elim H7. intros. elim H9. intros. split with (Npos 1). split with (Npos (xI p)). split with x1. split with x2.
+	elim (iad_conv_inj N0 (Npos p) _ _ H8). intros. split. assumption.
 	rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption.
-	simpl in H1. inversion H1. simpl in H1. elim (H0 ad_z ad_z s s0 H1).
+	simpl in H1. inversion H1. simpl in H1. elim (H0 N0 N0 s s0 H1).
 	intros. elim H4. intros. elim H5. intros. elim H6. intros. elim H7.
-	intros. elim H9. intros. split with (ad_x 1). split with (ad_x 1).
-	split with x1. split with x2. elim (iad_conv_inj ad_z ad_z _ _ H8).
+	intros. elim H9. intros. split with (Npos 1). split with (Npos 1).
+	split with x1. split with x2. elim (iad_conv_inj N0 N0 _ _ H8).
 	intros. split. assumption. rewrite <- H13 in H10. rewrite <- H12 in H11. split; simpl in |- *; assumption.
 Qed.
 
@@ -2331,14 +2332,14 @@ Qed.
 
 Lemma predta_produit_4 :
  forall (d0 : preDTA) (a a0 : ad) (s s0 : state),
- MapGet state (preDTA_produit_r a0 s0 d0) a = SOME state s ->
+ MapGet state (preDTA_produit_r a0 s0 d0) a = Some s ->
  exists a1 : ad,
    (exists a2 : ad,
       (exists s1 : state,
          (exists s2 : state,
             a = iad_conv a1 a2 /\
-            MapGet state (M1 state a0 s0) a2 = SOME state s1 /\
-            MapGet state d0 a1 = SOME state s2))).
+            MapGet state (M1 state a0 s0) a2 = Some s1 /\
+            MapGet state d0 a1 = Some s2))).
 Proof.
 	exact
   (Map_ind state predta_produit_4_def predta_produit_4_0 predta_produit_4_1
@@ -2347,14 +2348,14 @@ Qed.
 
 Lemma predta_produit_5 :
  forall (d0 d1 : preDTA) (a : ad) (s : state),
- MapGet state (preDTA_produit d0 d1) a = SOME state s ->
+ MapGet state (preDTA_produit d0 d1) a = Some s ->
  exists a0 : ad,
    (exists a1 : ad,
       (exists s0 : state,
          (exists s1 : state,
             a = iad_conv a0 a1 /\
-            MapGet state d0 a0 = SOME state s0 /\
-            MapGet state d1 a1 = SOME state s1))).
+            MapGet state d0 a0 = Some s0 /\
+            MapGet state d1 a1 = Some s1))).
 Proof.
 	simple induction d0. intros. induction  d1 as [| a0 a1| d1_1 Hrecd1_1 d1_0 Hrecd1_0]; inversion H. intros.
 	induction  d1 as [| a2 a3| d1_1 Hrecd1_1 d1_0 Hrecd1_0]. simpl in H. inversion H. cut
@@ -2368,56 +2369,56 @@ Proof.
    preDTA_produit_r a a0 (M2 state m m0)). intro. rewrite H2 in H1. elim (predta_produit_4 (M2 state m m0) a1 a s a0 H1). intros. elim H3. intros. elim H4. intros.
 	elim H5. intros. elim H6. intros. elim H8. intros. split with x.
 	split with x0. split with x2. split with x1. split. assumption. split; assumption. reflexivity. intros. clear H1. clear H2. induction  a as [| p]. simpl in H3.
-	elim (H m1 ad_z s H3). intros. elim H1. intros. elim H2. intros. elim H4.
-	intros. elim H5. intros. elim H7. intros. split with ad_z. split with ad_z.
-	simpl in |- *. split with x1. split with x2. elim (iad_conv_inj ad_z ad_z _ _ H6); intros. rewrite <- H10 in H8. rewrite <- H11 in H9. split. reflexivity.
+	elim (H m1 N0 s H3). intros. elim H1. intros. elim H2. intros. elim H4.
+	intros. elim H5. intros. elim H7. intros. split with N0. split with N0.
+	simpl in |- *. split with x1. split with x2. elim (iad_conv_inj N0 N0 _ _ H6); intros. rewrite <- H10 in H8. rewrite <- H11 in H9. split. reflexivity.
 	split. exact H8. exact H9. induction  p as [p Hrecp| p Hrecp| ]. clear Hrecp. induction  p as [p Hrecp| p Hrecp| ].
-	clear Hrecp. simpl in H3. elim (H0 m2 (ad_x p) s H3). intros. elim H1.
+	clear Hrecp. simpl in H3. elim (H0 m2 (Npos p) s H3). intros. elim H1.
 	intros. elim H2. intros. elim H4. intros. elim H5. intros. elim H7. intros.
-	induction  x as [| p0]. induction  x0 as [| p0]. inversion H6. split with (ad_x 1). split with (ad_x (xI p0)). split with x1. split with x2. split. simpl in |- *. simpl in H6.
+	induction  x as [| p0]. induction  x0 as [| p0]. inversion H6. split with (Npos 1). split with (Npos (xI p0)). split with x1. split with x2. split. simpl in |- *. simpl in H6.
 	inversion H6. reflexivity. simpl in |- *. split; assumption. induction  x0 as [| p1].
-	split with (ad_x (xI p0)). split with (ad_x 1). split with x1. split with x2.
+	split with (Npos (xI p0)). split with (Npos 1). split with x1. split with x2.
 	simpl in |- *. split. simpl in H6. inversion H6. reflexivity. split; assumption.
-	split with (ad_x (xI p0)). split with (ad_x (xI p1)). split with x1.
+	split with (Npos (xI p0)). split with (Npos (xI p1)). split with x1.
 	split with x2. simpl in |- *. simpl in H6. inversion H6. split. reflexivity.
-	split; assumption.  clear Hrecp. simpl in H3. elim (H0 m1 (ad_x p) s H3).
+	split; assumption.  clear Hrecp. simpl in H3. elim (H0 m1 (Npos p) s H3).
 	intros. elim H1. intros. elim H2. intros. elim H4. intros. elim H5. intros.
-	elim H7. intros. induction  x as [| p0]. induction  x0 as [| p0]. inversion H6. split with (ad_x 1). split with (ad_x (xO p0)). split with x1. split with x2. simpl in H6.
+	elim H7. intros. induction  x as [| p0]. induction  x0 as [| p0]. inversion H6. split with (Npos 1). split with (Npos (xO p0)). split with x1. split with x2. simpl in H6.
 	inversion H6. simpl in |- *. split. reflexivity. split; assumption. induction  x0 as [| p1].
-	split with (ad_x (xI p0)). split with ad_z. split with x1. split with x2.
+	split with (Npos (xI p0)). split with N0. split with x1. split with x2.
 	simpl in H6. inversion H6. simpl in |- *. split. reflexivity. split; assumption.
-	split with (ad_x (xI p0)). split with (ad_x (xO p1)). split with x1.
-	split with x2. simpl in H6. inversion H6. split. reflexivity. split; assumption. simpl in H3. elim (H0 m2 ad_z s H3). intros. elim H1. intros.
-	elim H2. intros. elim H4. intros. elim H5. intros. elim H7. intros. induction  x as [| p]. induction  x0 as [| p]. split with (ad_x 1). split with (ad_x 1). split with x1.
+	split with (Npos (xI p0)). split with (Npos (xO p1)). split with x1.
+	split with x2. simpl in H6. inversion H6. split. reflexivity. split; assumption. simpl in H3. elim (H0 m2 N0 s H3). intros. elim H1. intros.
+	elim H2. intros. elim H4. intros. elim H5. intros. elim H7. intros. induction  x as [| p]. induction  x0 as [| p]. split with (Npos 1). split with (Npos 1). split with x1.
 	split with x2. simpl in |- *. split. reflexivity. split; assumption. simpl in H6.
 	inversion H6. induction  x0 as [| p0]; simpl in H6; inversion H6. clear Hrecp.
-	induction  p as [p Hrecp| p Hrecp| ]. clear Hrecp. simpl in H3. elim (H m2 (ad_x p) s H3). intros.
+	induction  p as [p Hrecp| p Hrecp| ]. clear Hrecp. simpl in H3. elim (H m2 (Npos p) s H3). intros.
 	elim H1. intros. elim H2. intros. elim H4. intros. elim H5. intros. elim H7.
-	intros. induction  x as [| p0]. induction  x0 as [| p0]. simpl in H6. inversion H6. split with ad_z.
-	split with (ad_x (xI p0)). split with x1. split with x2. simpl in H6.
+	intros. induction  x as [| p0]. induction  x0 as [| p0]. simpl in H6. inversion H6. split with N0.
+	split with (Npos (xI p0)). split with x1. split with x2. simpl in H6.
 	inversion H6. simpl in |- *. split. reflexivity. split; assumption. induction  x0 as [| p1].
-	split with (ad_x (xO p0)). split with (ad_x 1). split with x1. split with x2.
+	split with (Npos (xO p0)). split with (Npos 1). split with x1. split with x2.
 	simpl in H6. inversion H6. simpl in |- *. split. reflexivity. split; assumption.
-	split with (ad_x (xO p0)). split with (ad_x (xI p1)). split with x1.
+	split with (Npos (xO p0)). split with (Npos (xI p1)). split with x1.
 	split with x2. simpl in H6. inversion H6. simpl in |- *. split. reflexivity.
-	split; assumption. clear Hrecp. simpl in H3. elim (H m1 (ad_x p) s H3).
+	split; assumption. clear Hrecp. simpl in H3. elim (H m1 (Npos p) s H3).
 	intros. elim H1. intros. elim H2. intros. elim H4. intros. elim H5. intros.
 	elim H7. intros. induction  x as [| p0]. induction  x0 as [| p0]. simpl in H6. inversion H6.
-	split with ad_z. split with (ad_x (xO p0)). split with x1. split with x2.
+	split with N0. split with (Npos (xO p0)). split with x1. split with x2.
 	simpl in H6. inversion H6. simpl in |- *. split. reflexivity. split; assumption.
-	induction  x0 as [| p1]. simpl in H6. split with (ad_x (xO p0)). split with ad_z.
+	induction  x0 as [| p1]. simpl in H6. split with (Npos (xO p0)). split with N0.
 	split with x1. split with x2. simpl in H6. inversion H6. split. reflexivity.
-	split; assumption. split with (ad_x (xO p0)). split with (ad_x (xO p1)).
+	split; assumption. split with (Npos (xO p0)). split with (Npos (xO p1)).
 	split with x1. split with x2. simpl in H6. inversion H6. simpl in |- *. split.
-	reflexivity. split; assumption. simpl in H3. elim (H m2 ad_z s H3). intros.
+	reflexivity. split; assumption. simpl in H3. elim (H m2 N0 s H3). intros.
 	elim H1. intros. elim H2. intros. elim H4. intros. elim H5. intros. elim H7.
-	intros. induction  x as [| p]. induction  x0 as [| p]. split with ad_z. split with (ad_x 1).
+	intros. induction  x as [| p]. induction  x0 as [| p]. split with N0. split with (Npos 1).
 	split with x1. split with x2. simpl in |- *. split. reflexivity. split; assumption.
 	simpl in H6. inversion H6. induction  x0 as [| p0]. simpl in H6. inversion H6.
-	simpl in H6. inversion H6. simpl in H3. elim (H0 m1 ad_z s H3). intros.
+	simpl in H6. inversion H6. simpl in H3. elim (H0 m1 N0 s H3). intros.
 	elim H1. intros. elim H2. intros. elim H4. intros. elim H5. intros. elim H7.
-	intros. split with (ad_x 1). split with ad_z. split with x1. split with x2.
-	simpl in |- *. split. reflexivity. elim (iad_conv_inj ad_z ad_z _ _ H6). intros.
+	intros. split with (Npos 1). split with N0. split with x1. split with x2.
+	simpl in |- *. split. reflexivity. elim (iad_conv_inj N0 N0 _ _ H6). intros.
 	rewrite <- H10 in H8. rewrite <- H11 in H9. split; assumption.
 Qed.
 

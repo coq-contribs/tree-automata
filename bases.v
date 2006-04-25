@@ -17,6 +17,8 @@
 Require Import Bool.
 Require Import Arith.
 Require Import ZArith.
+Require Import NArith.
+Require Import Ndec.
 Require Import Allmaps.
 Require Import EqNat.
 Require Export Max.
@@ -87,7 +89,7 @@ Proof.
 	intros. elim (max_le_Sr_0 n m). intros. exact H.
 Qed.
 
-(* lemmes arithmétiques *)
+(* lemmes arithmÃ©tiques *)
 
 Lemma plus_O_r : forall n : nat, n + 0 = n.
 Proof.
@@ -173,7 +175,7 @@ Proof.
 	inversion H1. reflexivity.
 Qed.
 
-(* lemmes sur les booléens *)
+(* lemmes sur les boolÃ©ens *)
 
 Lemma bool_dec_eq : forall a b : bool, {a = b} + {a <> b}.
 Proof.
@@ -196,56 +198,56 @@ Proof.
 Qed.
 
 Lemma in_M0_false :
- forall (A : Set) (a : A), ~ (exists e : ad, MapGet A (M0 A) e = SOME A a).
+ forall (A : Set) (a : A), ~ (exists e : ad, MapGet A (M0 A) e = Some a).
 Proof.
 	intros. intro. elim H. intros. inversion H0.
 Qed.
 
 Lemma in_M1_id :
  forall (A : Set) (a : A) (x : ad) (e : A),
- (exists c : ad, MapGet A (M1 A x e) c = SOME A a) -> a = e.
+ (exists c : ad, MapGet A (M1 A x e) c = Some a) -> a = e.
 Proof.
 	intros. elim H. intros. cut (x = x0). intro. rewrite H1 in H0.
-	cut (MapGet A (M1 A x0 e) x0 = SOME A e). intros. 
-	cut (SOME A e = SOME A a). intro. inversion H3. trivial.
+	cut (MapGet A (M1 A x0 e) x0 = Some e). intros. 
+	cut (Some e = Some a). intro. inversion H3. trivial.
 	transitivity (MapGet A (M1 A x0 e) x0).
 	symmetry  in |- *. assumption.
 	assumption.
 	exact (M1_semantics_1 A x0 e).
-	cut (ad_eq x x0 = false \/ ad_eq x x0 = true). intro. elim H1; intros.
-	cut (MapGet A (M1 A x e) x0 = NONE A). intro. cut (SOME A a = NONE A).
+	cut (Neqb x x0 = false \/ Neqb x x0 = true). intro. elim H1; intros.
+	cut (MapGet A (M1 A x e) x0 = None). intro. cut (Some a = None).
 	intro. inversion H4. transitivity (MapGet A (M1 A x e) x0). symmetry  in |- *.
 	assumption.
 	assumption.
 	exact (M1_semantics_2 A x x0 e H2).
-	exact (ad_eq_complete x x0 H2).
-	elim (bool_dec_eq (ad_eq x x0) true). intros. right. assumption.
-	intro y. left. exact (not_true_is_false (ad_eq x x0) y).
+	exact (Neqb_complete x x0 H2).
+	elim (bool_dec_eq (Neqb x x0) true). intros. right. assumption.
+	intro y. left. exact (not_true_is_false (Neqb x x0) y).
 Qed.
 
 Lemma in_M2_disj :
  forall (A : Set) (a : A) (m0 m1 : Map A),
- (exists c : ad, MapGet A (M2 A m0 m1) c = SOME A a) ->
- (exists c : ad, MapGet A m0 c = SOME A a) \/
- (exists c : ad, MapGet A m1 c = SOME A a).
+ (exists c : ad, MapGet A (M2 A m0 m1) c = Some a) ->
+ (exists c : ad, MapGet A m0 c = Some a) \/
+ (exists c : ad, MapGet A m1 c = Some a).
 Proof.
-	intros. elim H. simple induction x. simpl in |- *. intro. left. split with ad_z.
+	intros. elim H. simple induction x. simpl in |- *. intro. left. split with N0.
 	assumption.
-	simple induction p. intros. right. simpl in H1. split with (ad_x p0).
+	simple induction p. intros. right. simpl in H1. split with (Npos p0).
 	assumption.
-	intros. left. simpl in H1. split with (ad_x p0). assumption.
-	intros. right. simpl in H0. split with ad_z. assumption.
+	intros. left. simpl in H1. split with (Npos p0). assumption.
+	intros. right. simpl in H0. split with N0. assumption.
 Qed.
 
-(* équations auxilliaires sur ad_eq_1 *)
+(* Ã©quations auxilliaires sur Neqb_1 *)
 
-Lemma aux_ad_eq_1_0 : forall p : positive, ad_eq_1 p p = true.
+Lemma aux_Neqb_1_0 : forall p : positive, Peqb p p = true.
 Proof.
 	simple induction p. simpl in |- *. intros. trivial. simpl in |- *. intros.
 	trivial. trivial.
 Qed.
 
-Lemma aux_ad_eq_1_1 : forall p p0 : positive, ad_eq_1 p p0 = true -> p = p0.
+Lemma aux_Neqb_1_1 : forall p p0 : positive, Peqb p p0 = true -> p = p0.
 Proof.
 	simple induction p. intro. intro. simple induction p1. intros. simpl in H1.
 	cut (p0 = p2). intro. rewrite H2. trivial. exact (H p2 H1).
@@ -257,15 +259,15 @@ Proof.
 	intros. trivial.
 Qed.
 
-(* lemmes auxilliaires sur ad_eq *)
+(* lemmes auxilliaires sur Neqb *)
 
-Lemma aux_ad_eq_trans :
- forall a b c : ad, ad_eq a b = true -> ad_eq b c = true -> ad_eq a c = true.
+Lemma aux_Neqb_trans :
+ forall a b c : ad, Neqb a b = true -> Neqb b c = true -> Neqb a c = true.
 Proof.
-	intros. rewrite <- (ad_eq_complete b c H0). trivial.
+	intros. rewrite <- (Neqb_complete b c H0). trivial.
 Qed.
 
-(* récurrence bien fondée sur nat *)
+(* rÃ©currence bien fondÃ©e sur nat *)
 
 Lemma indprinciple_nat_gen :
  forall P : nat -> Prop,
@@ -277,7 +279,7 @@ Proof.
 	exact (H0 m0 (lt_n_Sm_le m0 n0 H3)).
 Qed.
 
-(* quelques lemmes arithmétiques *)
+(* quelques lemmes arithmÃ©tiques *)
 
 Lemma beq_nat_complete : forall n m : nat, beq_nat n m = true -> n = m.
 Proof.

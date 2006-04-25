@@ -15,6 +15,8 @@
 
 
 Require Import Bool.
+Require Import NArith.
+Require Import Ndec.
 Require Import ZArith.
 Require Import EqNat.
 Require Import Allmaps.
@@ -22,7 +24,7 @@ Require Import bases.
 Require Import defs.
 Require Import semantics.
 
-(* une relation de compatibilité entre automates *)
+(* une relation de compatibilitÃ© entre automates *)
 
 Definition pl_compat (pl0 pl1 : prec_list) : Prop :=
   pl0 = prec_empty /\ pl1 = prec_empty \/
@@ -30,25 +32,25 @@ Definition pl_compat (pl0 pl1 : prec_list) : Prop :=
 
 Definition mpl_compat (s0 s1 : state) : Prop :=
   forall (c : ad) (p0 p1 : prec_list),
-  MapGet prec_list s0 c = SOME prec_list p0 ->
-  MapGet prec_list s1 c = SOME prec_list p1 -> pl_compat p0 p1.
+  MapGet prec_list s0 c = Some p0 ->
+  MapGet prec_list s1 c = Some p1 -> pl_compat p0 p1.
 
 Definition dta_correct (d : preDTA) : Prop :=
   forall (s0 s1 : state) (a0 a1 : ad),
-  MapGet state d a0 = SOME state s0 ->
-  MapGet state d a1 = SOME state s1 -> mpl_compat s0 s1.
+  MapGet state d a0 = Some s0 ->
+  MapGet state d a1 = Some s1 -> mpl_compat s0 s1.
 
 Definition dta_compat (d0 d1 : preDTA) : Prop :=
   forall (s0 s1 : state) (a0 a1 : ad),
-  MapGet state d0 a0 = SOME state s0 ->
-  MapGet state d1 a1 = SOME state s1 -> mpl_compat s0 s1.
+  MapGet state d0 a0 = Some s0 ->
+  MapGet state d1 a1 = Some s1 -> mpl_compat s0 s1.
 
 Definition DTA_compat (d0 d1 : DTA) : Prop :=
   match d0, d1 with
   | dta p0 a0, dta p1 a1 => dta_compat p0 p1
   end.
 
-(* débuts des lemmes mpl_compat, suite dans le fichier union.v *)
+(* dÃ©buts des lemmes mpl_compat, suite dans le fichier union.v *)
 
 Lemma pl_compat_sym :
  forall pl0 pl1 : prec_list, pl_compat pl0 pl1 -> pl_compat pl1 pl0.
@@ -62,7 +64,7 @@ Lemma mpl_compat_0 :
  mpl_compat (M1 prec_list c pl0) (M1 prec_list c pl1) -> pl_compat pl0 pl1.
 Proof.
 	intros. unfold mpl_compat in H. apply (H c pl0 pl1). simpl in |- *.
-	rewrite (ad_eq_correct c). trivial. simpl in |- *. rewrite (ad_eq_correct c).
+	rewrite (Neqb_correct c). trivial. simpl in |- *. rewrite (Neqb_correct c).
 	trivial.
 Qed.
 
@@ -71,8 +73,8 @@ Lemma mpl_compat_1 :
  mpl_compat (M2 prec_list s0 s1) (M2 prec_list s2 s3) -> mpl_compat s0 s2.
 Proof.
 	intros. unfold mpl_compat in H. unfold mpl_compat in |- *. intros.
-	induction  c as [| p]. apply (H ad_z p0 p1). simpl in |- *. assumption. simpl in |- *.
-	assumption. apply (H (ad_x (xO p)) p0 p1). simpl in |- *. assumption.
+	induction  c as [| p]. apply (H N0 p0 p1). simpl in |- *. assumption. simpl in |- *.
+	assumption. apply (H (Npos (xO p)) p0 p1). simpl in |- *. assumption.
 	simpl in |- *. assumption.
 Qed.
 
@@ -81,61 +83,61 @@ Lemma mpl_compat_2 :
  mpl_compat (M2 prec_list s0 s1) (M2 prec_list s2 s3) -> mpl_compat s1 s3.
 Proof.
 	intros. unfold mpl_compat in H. unfold mpl_compat in |- *. intros.
-	induction  c as [| p]. apply (H (ad_x 1) p0 p1). simpl in |- *. assumption. simpl in |- *.
-	assumption. apply (H (ad_x (xI p)) p0 p1). simpl in |- *. assumption.
+	induction  c as [| p]. apply (H (Npos 1) p0 p1). simpl in |- *. assumption. simpl in |- *.
+	assumption. apply (H (Npos (xI p)) p0 p1). simpl in |- *. assumption.
 	simpl in |- *. assumption.
 Qed.
 
 Lemma mpl_compat_3 :
  forall (s0 s1 : state) (pl : prec_list),
- mpl_compat (M2 prec_list s0 s1) (M1 prec_list ad_z pl) ->
- mpl_compat s0 (M1 prec_list ad_z pl).
+ mpl_compat (M2 prec_list s0 s1) (M1 prec_list N0 pl) ->
+ mpl_compat s0 (M1 prec_list N0 pl).
 Proof.
 	intros. unfold mpl_compat in H. unfold mpl_compat in |- *. intros. unfold MapGet in H1.
-	elim (bool_is_true_or_false (ad_eq ad_z c)); intros. rewrite H2 in H1.
-	inversion H1. apply (H ad_z p0 p1). simpl in |- *. 
-	rewrite <- (ad_eq_complete ad_z c H2) in H0. assumption. simpl in |- *. rewrite H4.
+	elim (bool_is_true_or_false (Neqb N0 c)); intros. rewrite H2 in H1.
+	inversion H1. apply (H N0 p0 p1). simpl in |- *. 
+	rewrite <- (Neqb_complete N0 c H2) in H0. assumption. simpl in |- *. rewrite H4.
 	trivial. rewrite H2 in H1. inversion H1.
 Qed.
 
 Lemma mpl_compat_4 :
  forall (s0 s1 : state) (pl : prec_list),
- mpl_compat (M2 prec_list s0 s1) (M1 prec_list (ad_x 1) pl) ->
- mpl_compat s1 (M1 prec_list ad_z pl).
+ mpl_compat (M2 prec_list s0 s1) (M1 prec_list (Npos 1) pl) ->
+ mpl_compat s1 (M1 prec_list N0 pl).
 Proof.
 	intros. unfold mpl_compat in |- *. unfold mpl_compat in H. intros. unfold MapGet in H1.
-	elim (bool_is_true_or_false (ad_eq ad_z c)); intros; rewrite H2 in H1;
-  inversion H1. rewrite H4 in H. apply (H (ad_x 1) p0 p1). simpl in |- *.
-	rewrite <- (ad_eq_complete ad_z c H2) in H0. assumption. simpl in |- *. trivial.
+	elim (bool_is_true_or_false (Neqb N0 c)); intros; rewrite H2 in H1;
+  inversion H1. rewrite H4 in H. apply (H (Npos 1) p0 p1). simpl in |- *.
+	rewrite <- (Neqb_complete N0 c H2) in H0. assumption. simpl in |- *. trivial.
 Qed.
 
 Lemma mpl_compat_5 :
  forall (s0 s1 : state) (pl : prec_list) (p : positive),
- mpl_compat (M2 prec_list s0 s1) (M1 prec_list (ad_x (xO p)) pl) ->
- mpl_compat s0 (M1 prec_list (ad_x p) pl).
+ mpl_compat (M2 prec_list s0 s1) (M1 prec_list (Npos (xO p)) pl) ->
+ mpl_compat s0 (M1 prec_list (Npos p) pl).
 Proof.
 	unfold mpl_compat in |- *. intros. unfold MapGet in H1.
-	elim (bool_is_true_or_false (ad_eq (ad_x p) c)); intros; rewrite H2 in H1;
+	elim (bool_is_true_or_false (Neqb (Npos p) c)); intros; rewrite H2 in H1;
   inversion H1.
-	rewrite H4 in H. apply (H (ad_x (xO p)) p0 p1). simpl in |- *. 
-	rewrite <- (ad_eq_complete (ad_x p) c H2) in H0. assumption. simpl in |- *. rewrite (aux_ad_eq_1_0 p).
+	rewrite H4 in H. apply (H (Npos (xO p)) p0 p1). simpl in |- *. 
+	rewrite <- (Neqb_complete (Npos p) c H2) in H0. assumption. simpl in |- *. rewrite (aux_Neqb_1_0 p).
 	trivial.
 Qed.
 
 Lemma mpl_compat_6 :
  forall (s0 s1 : state) (pl : prec_list) (p : positive),
- mpl_compat (M2 prec_list s0 s1) (M1 prec_list (ad_x (xI p)) pl) ->
- mpl_compat s1 (M1 prec_list (ad_x p) pl).
+ mpl_compat (M2 prec_list s0 s1) (M1 prec_list (Npos (xI p)) pl) ->
+ mpl_compat s1 (M1 prec_list (Npos p) pl).
 Proof.
 	unfold mpl_compat in |- *. intros. unfold MapGet in H1.
-	elim (bool_is_true_or_false (ad_eq (ad_x p) c)); intros; rewrite H2 in H1;
+	elim (bool_is_true_or_false (Neqb (Npos p) c)); intros; rewrite H2 in H1;
   inversion H1.
-	rewrite H4 in H. apply (H (ad_x (xI p)) p0 p1). simpl in |- *. 
-	rewrite <- (ad_eq_complete (ad_x p) c H2) in H0. assumption. simpl in |- *. rewrite (aux_ad_eq_1_0 p).
+	rewrite H4 in H. apply (H (Npos (xI p)) p0 p1). simpl in |- *. 
+	rewrite <- (Neqb_complete (Npos p) c H2) in H0. assumption. simpl in |- *. rewrite (aux_Neqb_1_0 p).
 	trivial.
 Qed.
 
-(* relation de compatibilité symètrique... *)
+(* relation de compatibilitÃ© symÃ¨trique... *)
 
 Lemma mpl_compat_sym :
  forall s0 s1 : state, mpl_compat s0 s1 -> mpl_compat s1 s0.
@@ -143,7 +145,7 @@ Proof.
 	unfold mpl_compat in |- *. intros. apply (pl_compat_sym p1 p0). exact (H c p1 p0 H1 H0).
 Qed.
 
-(* longueur des termes pouvant etre reconnus par une prec_list donnée *)
+(* longueur des termes pouvant etre reconnus par une prec_list donnÃ©e *)
 
 Inductive pl_tl_length : prec_list -> nat -> Prop :=
   | pl_tl_O : pl_tl_length prec_empty 0
@@ -237,15 +239,15 @@ Proof.
      pl tl H H0).
 Qed.
 
-(* nouvelles définitions (plus stricte) de compatibilité entre automates, états... *)
+(* nouvelles dÃ©finitions (plus stricte) de compatibilitÃ© entre automates, Ã©tats... *)
 
 Definition pl_compatible (pl0 pl1 : prec_list) : Prop :=
   exists n : nat, pl_tl_length pl0 n /\ pl_tl_length pl1 n.
 
 Definition st_compatible (s0 s1 : state) : Prop :=
   forall (c : ad) (pl0 pl1 : prec_list),
-  MapGet prec_list s0 c = SOME prec_list pl0 ->
-  MapGet prec_list s1 c = SOME prec_list pl1 -> pl_compatible pl0 pl1.
+  MapGet prec_list s0 c = Some pl0 ->
+  MapGet prec_list s1 c = Some pl1 -> pl_compatible pl0 pl1.
 
 Definition predta_compatible (d0 d1 : preDTA) : Prop :=
   forall s0 s1 : state,
@@ -334,34 +336,34 @@ Lemma st_compatible_compat_2 :
 Proof.
 	unfold st_compatible_compat_def in |- *. unfold mpl_compat in |- *. intros.
 	induction  s1 as [| a a0| s1_1 Hrecs1_1 s1_0 Hrecs1_0]. inversion H3. induction  a as [| p]. induction  c as [| p].
-	simpl in H2. apply (H (M1 prec_list ad_z a0)) with (c := ad_z) (p0 := p0) (p1 := p1). unfold st_compatible in |- *. intros. unfold st_compatible in H1. apply (H1 ad_z pl0 pl1). simpl in |- *.
+	simpl in H2. apply (H (M1 prec_list N0 a0)) with (c := N0) (p0 := p0) (p1 := p1). unfold st_compatible in |- *. intros. unfold st_compatible in H1. apply (H1 N0 pl0 pl1). simpl in |- *.
 	induction  c as [| p]. exact H4. inversion H5. simpl in |- *. induction  c as [| p].
 	simpl in H5. exact H5. inversion H5. exact H2. exact H3.
-	inversion H3. induction  c as [| p2]. inversion H3. simpl in H3. elim (bool_is_true_or_false (ad_eq_1 p p2)); intro; rewrite H4 in H3;
+	inversion H3. induction  c as [| p2]. inversion H3. simpl in H3. elim (bool_is_true_or_false (Peqb p p2)); intro; rewrite H4 in H3;
   inversion H3. induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]. simpl in H2. apply
-  (H0 (M1 prec_list (ad_x p2) p1)) with (c := ad_x p2) (p0 := p0) (p3 := p1).
+  (H0 (M1 prec_list (Npos p2) p1)) with (c := Npos p2) (p0 := p0) (p3 := p1).
 	unfold st_compatible in H1. unfold st_compatible in |- *. intros.
-	simpl in H7. rewrite (aux_ad_eq_1_1 _ _ H4) in H1. apply (H1 (ad_x (xI p2)) pl0 pl1). simpl in |- *. elim (ad_sum c); intro y.
-	elim y. intros x y0. rewrite y0 in H7. elim (bool_is_true_or_false (ad_eq_1 p2 x)); intro; rewrite H8 in H7. rewrite <- (aux_ad_eq_1_1 _ _ H8) in y0. rewrite y0 in H5. exact H5.
-	inversion H7. rewrite y in H7. inversion H7. simpl in |- *. rewrite (aux_ad_eq_1_0 p2). inversion H3. induction  c as [| p3]. inversion H7.
-	elim (bool_is_true_or_false (ad_eq_1 p2 p3)); intro; rewrite H8 in H7. exact H7. inversion H7. exact H2. simpl in |- *.
-	rewrite (aux_ad_eq_1_0 p2). reflexivity. apply
-  (H (M1 prec_list (ad_x p2) a0)) with (c := ad_x p2) (p0 := p0) (p1 := p1).
+	simpl in H7. rewrite (aux_Neqb_1_1 _ _ H4) in H1. apply (H1 (Npos (xI p2)) pl0 pl1). simpl in |- *. elim (Ndiscr c); intro y.
+	elim y. intros x y0. rewrite y0 in H7. elim (bool_is_true_or_false (Peqb p2 x)); intro; rewrite H8 in H7. rewrite <- (aux_Neqb_1_1 _ _ H8) in y0. rewrite y0 in H5. exact H5.
+	inversion H7. rewrite y in H7. inversion H7. simpl in |- *. rewrite (aux_Neqb_1_0 p2). inversion H3. induction  c as [| p3]. inversion H7.
+	elim (bool_is_true_or_false (Peqb p2 p3)); intro; rewrite H8 in H7. exact H7. inversion H7. exact H2. simpl in |- *.
+	rewrite (aux_Neqb_1_0 p2). reflexivity. apply
+  (H (M1 prec_list (Npos p2) a0)) with (c := Npos p2) (p0 := p0) (p1 := p1).
 	unfold st_compatible in |- *. unfold st_compatible in H1. intros.
-	apply (H1 (ad_x (xO p2)) pl0 pl1). simpl in |- *. simpl in H2.
-	induction  c as [| p3]; simpl in H7. inversion H7. elim (bool_is_true_or_false (ad_eq_1 p2 p3)); intro; rewrite H8 in H7. rewrite <- (aux_ad_eq_1_1 _ _ H8) in H5.
-	exact H5. inversion H7. rewrite (aux_ad_eq_1_1 _ _ H4).
-	simpl in |- *. rewrite (aux_ad_eq_1_0 p2). simpl in H7. induction  c as [| p3]. inversion H7. elim (bool_is_true_or_false (ad_eq_1 p2 p3)); intro; rewrite H8 in H7. inversion H7. reflexivity.
-	inversion H7. simpl in H2. exact H2. simpl in |- *. rewrite (aux_ad_eq_1_0 p2). exact H3. apply (H0 (M1 prec_list ad_z a0)) with (c := ad_z) (p0 := p0) (p1 := p1). unfold st_compatible in |- *.
-	unfold st_compatible in H1. intros. induction  c as [| p2]. apply (H1 (ad_x 1) pl0 pl1). simpl in |- *. simpl in H2. exact H5. simpl in |- *.
-	rewrite (aux_ad_eq_1_1 _ _ H4). simpl in H7. exact H7.
+	apply (H1 (Npos (xO p2)) pl0 pl1). simpl in |- *. simpl in H2.
+	induction  c as [| p3]; simpl in H7. inversion H7. elim (bool_is_true_or_false (Peqb p2 p3)); intro; rewrite H8 in H7. rewrite <- (aux_Neqb_1_1 _ _ H8) in H5.
+	exact H5. inversion H7. rewrite (aux_Neqb_1_1 _ _ H4).
+	simpl in |- *. rewrite (aux_Neqb_1_0 p2). simpl in H7. induction  c as [| p3]. inversion H7. elim (bool_is_true_or_false (Peqb p2 p3)); intro; rewrite H8 in H7. inversion H7. reflexivity.
+	inversion H7. simpl in H2. exact H2. simpl in |- *. rewrite (aux_Neqb_1_0 p2). exact H3. apply (H0 (M1 prec_list N0 a0)) with (c := N0) (p0 := p0) (p1 := p1). unfold st_compatible in |- *.
+	unfold st_compatible in H1. intros. induction  c as [| p2]. apply (H1 (Npos 1) pl0 pl1). simpl in |- *. simpl in H2. exact H5. simpl in |- *.
+	rewrite (aux_Neqb_1_1 _ _ H4). simpl in H7. exact H7.
 	inversion H7. simpl in H2. exact H2. simpl in |- *. exact H3.
 	cut (st_compatible m s1_1). cut (st_compatible m0 s1_0).
 	intros. induction  c as [| p]; simpl in H2; simpl in H3. exact (H _ H5 _ _ _ H2 H3). induction  p as [p Hrecp| p Hrecp| ]. exact (H0 _ H4 _ _ _ H2 H3).
 	exact (H _ H5 _ _ _ H2 H3). exact (H0 _ H4 _ _ _ H2 H3).
 	unfold st_compatible in |- *. unfold st_compatible in H1. intros.
-	apply (H1 (ad_double_plus_un c0) pl0 pl1). induction  c0 as [| p]; simpl in |- *; exact H4. induction  c0 as [| p]; simpl in |- *; exact H5. unfold st_compatible in |- *. unfold st_compatible in H1. intros.
-	apply (H1 (ad_double c0) pl0 pl1). induction  c0 as [| p]; simpl in |- *; assumption. induction  c0 as [| p]; simpl in |- *; assumption.
+	apply (H1 (Ndouble_plus_one c0) pl0 pl1). induction  c0 as [| p]; simpl in |- *; exact H4. induction  c0 as [| p]; simpl in |- *; exact H5. unfold st_compatible in |- *. unfold st_compatible in H1. intros.
+	apply (H1 (Ndouble c0) pl0 pl1). induction  c0 as [| p]; simpl in |- *; assumption. induction  c0 as [| p]; simpl in |- *; assumption.
 Qed.
 
 Lemma st_compatible_compat :
@@ -400,10 +402,10 @@ Proof.
 	unfold predta_compatible_compat_def in |- *. unfold dta_compat in |- *.
 	unfold predta_compatible in |- *. intros. cut (predta_compatible m d1).
 	cut (predta_compatible m0 d1). unfold predta_compatible in |- *.
-	intros. induction  a0 as [| p]. apply (H d1) with (s0 := s0) (s1 := s1) (a0 := ad_z) (a1 := a1). intros. exact (H5 _ _ H6 H7). simpl in H2. assumption. exact H3. induction  p as [p Hrecp| p Hrecp| ]. apply (H0 d1) with (s0 := s0) (s1 := s1) (a0 := ad_x p) (a1 := a1). intros. exact (H4 _ _ H6 H7). simpl in H2. exact H2. exact H3. apply (H d1) with (s0 := s0) (s1 := s1) (a0 := ad_x p) (a1 := a1). intros. exact (H5 _ _ H6 H7). simpl in H2. exact H2. exact H3. apply (H0 d1) with (s0 := s0) (s1 := s1) (a0 := ad_z) (a1 := a1). exact H4. simpl in H2.
+	intros. induction  a0 as [| p]. apply (H d1) with (s0 := s0) (s1 := s1) (a0 := N0) (a1 := a1). intros. exact (H5 _ _ H6 H7). simpl in H2. assumption. exact H3. induction  p as [p Hrecp| p Hrecp| ]. apply (H0 d1) with (s0 := s0) (s1 := s1) (a0 := Npos p) (a1 := a1). intros. exact (H4 _ _ H6 H7). simpl in H2. exact H2. exact H3. apply (H d1) with (s0 := s0) (s1 := s1) (a0 := Npos p) (a1 := a1). intros. exact (H5 _ _ H6 H7). simpl in H2. exact H2. exact H3. apply (H0 d1) with (s0 := s0) (s1 := s1) (a0 := N0) (a1 := a1). exact H4. simpl in H2.
 	exact H2. exact H3. unfold predta_compatible in |- *. intros.
-	apply (H1 s2 s3). elim H4. intros. split with (ad_double_plus_un x). induction  x as [| p]; simpl in |- *; exact H6.
-	exact H5. unfold predta_compatible in |- *. intros. apply (H1 s2 s3). elim H4. intros. split with (ad_double x); intros.
+	apply (H1 s2 s3). elim H4. intros. split with (Ndouble_plus_one x). induction  x as [| p]; simpl in |- *; exact H6.
+	exact H5. unfold predta_compatible in |- *. intros. apply (H1 s2 s3). elim H4. intros. split with (Ndouble x); intros.
 	induction  x as [| p]; simpl in |- *; exact H6. exact H5.
 Qed.
 
@@ -421,21 +423,21 @@ Proof.
 	simple induction d0. simple induction d1. simpl in |- *. exact (fun (p0 : preDTA) (a : ad) => predta_compatible_compat p p0).
 Qed.
 
-(* correction par rapport à une signature : dernière version (forte) de compatibilité *)
+(* correction par rapport Ã  une signature : derniÃ¨re version (forte) de compatibilitÃ© *)
 
-(* définition des signatures *)
-(* la compatibilité avec signature assure la correction des prec_list (forme) *)
+(* dÃ©finition des signatures *)
+(* la compatibilitÃ© avec signature assure la correction des prec_list (forme) *)
 
 Definition signature : Set := Map nat.
 
 Definition state_correct_wrt_sign (s : state) (sigma : signature) : Prop :=
   forall (a : ad) (p : prec_list),
-  MapGet prec_list s a = SOME prec_list p ->
-  exists n : nat, MapGet nat sigma a = SOME nat n /\ pl_tl_length p n.
+  MapGet prec_list s a = Some p ->
+  exists n : nat, MapGet nat sigma a = Some n /\ pl_tl_length p n.
 
 Definition predta_correct_wrt_sign (d : preDTA) (sigma : signature) : Prop :=
   forall (a : ad) (s : state),
-  MapGet state d a = SOME state s -> state_correct_wrt_sign s sigma.
+  MapGet state d a = Some s -> state_correct_wrt_sign s sigma.
 
 Definition dta_correct_wrt_sign (d : DTA) (sigma : signature) : Prop :=
   match d with
@@ -471,31 +473,31 @@ Proof.
 	intros. induction  d as (p, a). induction  d' as (p0, a0). exact (predtas_correct_wrt_sign_compatibles _ _ _ H H0).
 Qed.
 
-(* procédure destinée à tester la propriété wrt *)
+(* procÃ©dure destinÃ©e Ã  tester la propriÃ©tÃ© wrt *)
 
 Fixpoint pl_compat_check (p : prec_list) : option nat :=
   match p with
-  | prec_empty => SOME nat 0
+  | prec_empty => Some 0
   | prec_cons a la ls =>
       match ls with
       | prec_empty =>
           match pl_compat_check la with
-          | NONE => NONE nat
-          | SOME n => SOME nat (S n)
+          | None => None
+          | Some n => Some (S n)
           end
       | prec_cons _ _ _ =>
           match pl_compat_check la, pl_compat_check ls with
-          | NONE, _ => NONE nat
-          | _, NONE => NONE nat
-          | SOME n, SOME m =>
-              if beq_nat (S n) m then SOME nat m else NONE nat
+          | None, _ => None
+          | _, None => None
+          | Some n, Some m =>
+              if beq_nat (S n) m then Some m else None
           end
       end
   end.
 
 Lemma pl_compat_check_correct :
  forall (p : prec_list) (n : nat),
- pl_tl_length p n -> pl_compat_check p = SOME nat n.
+ pl_tl_length p n -> pl_compat_check p = Some n.
 Proof.
 	simple induction p. intros. inversion H1. simpl in |- *. rewrite (H _ H6).
 	reflexivity. simpl in |- *. elim (pl_sum p1); intros. rewrite H8 in H7. inversion H7. elim H8. intros. elim H9. intros. elim H10.
@@ -506,7 +508,7 @@ Qed.
 
 Lemma pl_compat_check_complete :
  forall (p : prec_list) (n : nat),
- pl_compat_check p = SOME nat n -> pl_tl_length p n.
+ pl_compat_check p = Some n -> pl_tl_length p n.
 Proof.
 	simple induction p. intros. simpl in H1. elim (pl_sum p1). intros.
 	rewrite H2 in H1. elim (option_sum nat (pl_compat_check p0)).
@@ -531,8 +533,8 @@ Fixpoint pre_ad_concat (pa : pre_ad) : ad -> ad :=
   fun a : ad =>
   match pa with
   | pre_ad_empty => a
-  | pre_ad_O pa' => pre_ad_concat pa' (ad_double a)
-  | pre_ad_I pa' => pre_ad_concat pa' (ad_double_plus_un a)
+  | pre_ad_O pa' => pre_ad_concat pa' (Ndouble a)
+  | pre_ad_I pa' => pre_ad_concat pa' (Ndouble_plus_one a)
   end.
 
 Fixpoint st_compat_check_0 (pa : pre_ad) (sigma : signature) 
@@ -541,9 +543,9 @@ Fixpoint st_compat_check_0 (pa : pre_ad) (sigma : signature)
   | M0 => true
   | M1 a p =>
       match pl_compat_check p, MapGet nat sigma (pre_ad_concat pa a) with
-      | NONE, _ => false
-      | _, NONE => false
-      | SOME n, SOME m => beq_nat n m
+      | None, _ => false
+      | _, None => false
+      | Some n, Some m => beq_nat n m
       end
   | M2 x y =>
       st_compat_check_0 (pre_ad_O pa) sigma x &&
@@ -569,9 +571,9 @@ Definition dta_compat_check (d : DTA) (sigma : signature) : bool :=
 Definition state_correct_wrt_sign_with_offset (s : state) 
   (sigma : signature) (pa : pre_ad) : Prop :=
   forall (a : ad) (p : prec_list),
-  MapGet prec_list s a = SOME prec_list p ->
+  MapGet prec_list s a = Some p ->
   exists n : nat,
-    MapGet nat sigma (pre_ad_concat pa a) = SOME nat n /\ pl_tl_length p n.
+    MapGet nat sigma (pre_ad_concat pa a) = Some n /\ pl_tl_length p n.
 
 Lemma state_correct_wrt_sign_with_offset_M2 :
  forall (s0 s1 : state) (sigma : signature) (pa : pre_ad),
@@ -580,8 +582,8 @@ Lemma state_correct_wrt_sign_with_offset_M2 :
  state_correct_wrt_sign_with_offset s1 sigma (pre_ad_I pa).
 Proof.
 	unfold state_correct_wrt_sign_with_offset in |- *. intros. split.
-	intros. elim (H (ad_double a) p). intros. split with x.
-	induction  a as [| p0]; simpl in |- *; simpl in H1; exact H1. induction  a as [| p0]; simpl in |- *; exact H0. intros. elim (H (ad_double_plus_un a) p).
+	intros. elim (H (Ndouble a) p). intros. split with x.
+	induction  a as [| p0]; simpl in |- *; simpl in H1; exact H1. induction  a as [| p0]; simpl in |- *; exact H0. intros. elim (H (Ndouble_plus_one a) p).
 	intros. split with x. induction  a as [| p0]; simpl in |- *; simpl in H1; exact H1. induction  a as [| p0]; simpl in |- *; exact H0.
 Qed.
 
@@ -591,8 +593,8 @@ Lemma predta_correct_wrt_sign_M2 :
  predta_correct_wrt_sign d0 sigma /\ predta_correct_wrt_sign d1 sigma.
 Proof.
 	unfold predta_correct_wrt_sign in |- *. intros. split. intros.
-	apply (H (ad_double a) s). induction  a as [| p]; simpl in |- *; exact H0.
-	intros. apply (H (ad_double_plus_un a) s). induction  a as [| p]; simpl in |- *; exact H0.
+	apply (H (Ndouble a) s). induction  a as [| p]; simpl in |- *; exact H0.
+	intros. apply (H (Ndouble_plus_one a) s). induction  a as [| p]; simpl in |- *; exact H0.
 Qed.
 
 Lemma st_compat_check_0_correct :
@@ -603,9 +605,9 @@ Proof.
 	unfold state_correct_wrt_sign_with_offset in |- *. simple induction s.
 	intros. reflexivity. intros. simpl in |- *. elim (H a a0). intros.
 	elim H0. intros. rewrite (pl_compat_check_correct _ _ H2).
-	rewrite H1. exact (beq_nat_correct x). simpl in |- *. rewrite (ad_eq_correct a). reflexivity. intros. simpl in |- *. rewrite (H sigma (pre_ad_O pa)). rewrite (H0 sigma (pre_ad_I pa)).
-	reflexivity. intros. elim (H1 (ad_double_plus_un a) p).
-	intros. simpl in |- *. split with x. exact H3. induction  a as [| p0]; simpl in |- *; exact H2. intros. elim (H1 (ad_double a) p). intros. simpl in |- *.
+	rewrite H1. exact (beq_nat_correct x). simpl in |- *. rewrite (Neqb_correct a). reflexivity. intros. simpl in |- *. rewrite (H sigma (pre_ad_O pa)). rewrite (H0 sigma (pre_ad_I pa)).
+	reflexivity. intros. elim (H1 (Ndouble_plus_one a) p).
+	intros. simpl in |- *. split with x. exact H3. induction  a as [| p0]; simpl in |- *; exact H2. intros. elim (H1 (Ndouble a) p). intros. simpl in |- *.
 	split with x. exact H3. induction  a as [| p0]; simpl in |- *; exact H2.
 Qed.
 
@@ -616,17 +618,17 @@ Lemma st_compat_check_0_complete :
 Proof.
 	unfold state_correct_wrt_sign_with_offset in |- *. simple induction s.
 	intros. inversion H0. intros. simpl in H. elim (option_sum nat (pl_compat_check a0)); intro y. elim y. intros x y0. rewrite y0 in H. elim (option_sum nat (MapGet nat sigma (pre_ad_concat pa a))); intro y1. elim y1. intros x0 y2. rewrite y2 in H. simpl in H0.
-	elim (bool_is_true_or_false (ad_eq a a1)); intro; rewrite H1 in H0. inversion H0. split with x. rewrite (beq_nat_complete _ _ H). split. rewrite (ad_eq_complete _ _ H1) in y2. exact y2.
+	elim (bool_is_true_or_false (Neqb a a1)); intro; rewrite H1 in H0. inversion H0. split with x. rewrite (beq_nat_complete _ _ H). split. rewrite (Neqb_complete _ _ H1) in y2. exact y2.
 	rewrite (beq_nat_complete _ _ H) in y0. rewrite H3 in y0.
 	exact (pl_compat_check_complete p x0 y0). inversion H0.
 	rewrite y1 in H. inversion H. rewrite y in H. elim (option_sum nat (MapGet nat sigma (pre_ad_concat pa a))); intro y0. elim y0.
 	intros x y1. inversion H. 
 	inversion H. intros. simpl in H1. elim (bool_is_true_or_false (st_compat_check_0 (pre_ad_O pa) sigma m));
   intro; rewrite H3 in H1. elim (bool_is_true_or_false (st_compat_check_0 (pre_ad_I pa) sigma m0));
-  intros; rewrite H4 in H1. induction  a as [| p0]. simpl in H2. elim (H sigma (pre_ad_O pa) H3 ad_z p H2). intros. split with x. simpl in H5. exact H5. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H2.
-	elim (H0 sigma (pre_ad_I pa) H4 (ad_x p0) p H2). intros.
-	split with x. simpl in H5. exact H5. simpl in H2. elim (H sigma (pre_ad_O pa) H3 (ad_x p0) p H2). intros. split with x. 
-	simpl in H5. exact H5. simpl in H2. elim (H0 sigma (pre_ad_I pa) H4 ad_z p H2). intros. split with x. simpl in H5. exact H5.
+  intros; rewrite H4 in H1. induction  a as [| p0]. simpl in H2. elim (H sigma (pre_ad_O pa) H3 N0 p H2). intros. split with x. simpl in H5. exact H5. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H2.
+	elim (H0 sigma (pre_ad_I pa) H4 (Npos p0) p H2). intros.
+	split with x. simpl in H5. exact H5. simpl in H2. elim (H sigma (pre_ad_O pa) H3 (Npos p0) p H2). intros. split with x. 
+	simpl in H5. exact H5. simpl in H2. elim (H0 sigma (pre_ad_I pa) H4 N0 p H2). intros. split with x. simpl in H5. exact H5.
 	inversion H1. inversion H1.
 Qed.
 
@@ -652,10 +654,10 @@ Lemma predta_compat_check_correct :
  forall (d : preDTA) (sigma : signature),
  predta_correct_wrt_sign d sigma -> predta_compat_check d sigma = true.
 Proof.
-	simple induction d. intros. reflexivity. intros. simpl in |- *. unfold predta_correct_wrt_sign in H. apply (st_compat_check_correct a0 sigma). apply (H a a0). simpl in |- *.  rewrite (ad_eq_correct a).
-	reflexivity. intros. simpl in |- *. rewrite (H sigma). rewrite (H0 sigma). reflexivity. unfold predta_correct_wrt_sign in |- *. unfold predta_correct_wrt_sign in H1. intros. apply (H1 (ad_double_plus_un a) s). induction  a as [| p]; simpl in |- *; exact H2.
+	simple induction d. intros. reflexivity. intros. simpl in |- *. unfold predta_correct_wrt_sign in H. apply (st_compat_check_correct a0 sigma). apply (H a a0). simpl in |- *.  rewrite (Neqb_correct a).
+	reflexivity. intros. simpl in |- *. rewrite (H sigma). rewrite (H0 sigma). reflexivity. unfold predta_correct_wrt_sign in |- *. unfold predta_correct_wrt_sign in H1. intros. apply (H1 (Ndouble_plus_one a) s). induction  a as [| p]; simpl in |- *; exact H2.
 	unfold predta_correct_wrt_sign in H1. unfold predta_correct_wrt_sign in |- *.
-	intros. apply (H1 (ad_double a) s). induction  a as [| p]; simpl in |- *; exact H2.
+	intros. apply (H1 (Ndouble a) s). induction  a as [| p]; simpl in |- *; exact H2.
 Qed.
 
 Lemma predta_compat_check_complete :
@@ -664,7 +666,7 @@ Lemma predta_compat_check_complete :
 Proof.
 	simple induction d. intros. unfold predta_correct_wrt_sign in |- *. intros.
 	inversion H0. intros. simpl in H. unfold predta_correct_wrt_sign in |- *.
-	intros. simpl in H0. elim (bool_is_true_or_false (ad_eq a a1)); intros. rewrite H1 in H0. inversion H0. rewrite H3 in H. exact (st_compat_check_complete s sigma H). rewrite H1 in H0. inversion H0. intros. unfold predta_correct_wrt_sign in |- *. simpl in H1. elim (bool_is_true_or_false (predta_compat_check m sigma)); intros;
+	intros. simpl in H0. elim (bool_is_true_or_false (Neqb a a1)); intros. rewrite H1 in H0. inversion H0. rewrite H3 in H. exact (st_compat_check_complete s sigma H). rewrite H1 in H0. inversion H0. intros. unfold predta_correct_wrt_sign in |- *. simpl in H1. elim (bool_is_true_or_false (predta_compat_check m sigma)); intros;
   rewrite H2 in H1. elim (bool_is_true_or_false (predta_compat_check m0 sigma)); intros;
   rewrite H4 in H1. unfold predta_correct_wrt_sign in H. unfold predta_correct_wrt_sign in H0. induction  a as [| p]. simpl in H3.
 	exact (H sigma H2 _ _ H3). induction  p as [p Hrecp| p Hrecp| ]; simpl in H3. exact (H0 _ H4 _ _ H3). exact (H _ H2 _ _ H3). exact (H0 _ H4 _ _ H3).

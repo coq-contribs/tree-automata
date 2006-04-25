@@ -16,6 +16,8 @@
 
 Require Import Bool.
 Require Import Arith.
+Require Import NArith.
+Require Import Ndec.
 Require Import ZArith.
 Require Import Classical_Prop.
 Require Import Allmaps.
@@ -25,7 +27,7 @@ Require Import defs.
 Require Import semantics.
 Require Import pl_path.
 
-(* définition de la fonction dont on va calculer le point fixe *)
+(* dÃ©finition de la fonction dont on va calculer le point fixe *)
 
 Fixpoint pl_non_empty (m : Map bool) (p : prec_list) {struct p} : bool :=
   match p with
@@ -34,13 +36,13 @@ Fixpoint pl_non_empty (m : Map bool) (p : prec_list) {struct p} : bool :=
       match ls with
       | prec_empty =>
           match MapGet bool m a with
-          | SOME b => b && pl_non_empty m la
-          | NONE => false
+          | Some b => b && pl_non_empty m la
+          | None => false
           end
       | prec_cons _ _ _ =>
           match MapGet bool m a with
-          | SOME b => pl_non_empty m ls || b && pl_non_empty m la
-          | NONE => pl_non_empty m ls
+          | Some b => pl_non_empty m ls || b && pl_non_empty m la
+          | None => pl_non_empty m ls
           end
       end
   end.
@@ -58,7 +60,7 @@ Fixpoint dta_app_ne_aux (d : preDTA) (m r : Map bool) {struct r} :
   | M0, _ => M0 bool
   | M1 a s, M0 => M0 bool
   | M1 a s, M1 a' b =>
-      if ad_eq a a' then M1 bool a (b || st_non_empty m s) else M0 bool
+      if Neqb a a' then M1 bool a (b || st_non_empty m s) else M0 bool
   | M1 a s, M2 _ _ => M0 bool
   | M2 d0 d1, M0 => M0 bool
   | M2 d0 d1, M1 _ _ => M0 bool
@@ -97,7 +99,7 @@ Proof.
 	exact (equal_eqm_bool b).
 Qed.
 
-(* définition ok de dta_app_ne *)
+(* dÃ©finition ok de dta_app_ne *)
 
 Lemma dta_app_ne_aux_def_ok :
  forall (d : preDTA) (m : Map bool),
@@ -107,7 +109,7 @@ Proof.
 	simpl in |- *. unfold ensemble_base in |- *. exact I. unfold ensemble_base in |- *. simpl in |- *.
 	exact I. simpl in |- *. unfold ensemble_base in |- *. simpl in |- *. exact I. intros.
 	unfold def_ok_app in |- *. intros. unfold ensemble_base in |- *. unfold ensemble_base in H. induction  x as [| a1 a2| x1 Hrecx1 x0 Hrecx0]. simpl in H. inversion H. simpl in H. simpl in |- *. rewrite H.
-	rewrite (ad_eq_correct a1). simpl in |- *. reflexivity. simpl in H. inversion H.
+	rewrite (Neqb_correct a1). simpl in |- *. reflexivity. simpl in H. inversion H.
 	intros. unfold def_ok_app in |- *. unfold ensemble_base in |- *. intros. induction  x as [| a a0| x1 Hrecx1 x0 Hrecx0].
 	simpl in H1. inversion H1. simpl in H1. inversion H1. simpl in |- *. split.
 	unfold def_ok_app in H. unfold ensemble_base in H. simpl in H1.
@@ -179,7 +181,7 @@ Lemma dta_app_ne_inc_2 :
 Proof.
 	simple induction d. simple induction m. intros. simpl in |- *. exact I. intros.
 	simpl in |- *. exact I. intros. simpl in |- *. exact I. simple induction m. intros.
-	simpl in |- *. exact I. simpl in |- *. intros. elim (bool_is_true_or_false (ad_eq a a1)); intros; rewrite H0. simpl in |- *. rewrite (ad_eq_correct a). exact (orb_inc_r _ _ _ (dta_app_ne_inc_1 a0 m0 m1 H)).
+	simpl in |- *. exact I. simpl in |- *. intros. elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H0. simpl in |- *. rewrite (Neqb_correct a). exact (orb_inc_r _ _ _ (dta_app_ne_inc_1 a0 m0 m1 H)).
 	exact I. intros. simpl in |- *. exact I. simple induction m3. intros. simpl in |- *.
 	exact I. intros. simpl in |- *. exact I. intros. simpl in |- *. split.
 	exact (H _ _ _ H3). exact (H0 _ _ _ H3).
@@ -191,9 +193,9 @@ Lemma dta_app_ne_inc_3 :
 Proof.
 	simple induction m0. simple induction m1; intros. induction  d as [| a a0| d1 Hrecd1 d0 Hrecd0]; simpl in |- *; exact I.
 	inversion H. inversion H1. simple induction m1; intros. inversion H.
-	induction  d as [| a3 a4| d1 Hrecd1 d0 Hrecd0]; simpl in |- *. exact I. simpl in H. elim (bool_is_true_or_false (ad_eq a a1)); intro; rewrite H0 in H. rewrite (ad_eq_complete _ _ H0).
-	elim (bool_is_true_or_false (ad_eq a3 a1)); intro; rewrite H1. simpl in |- *.
-	rewrite (ad_eq_correct a3). exact (orb_inc_l _ _ _ H). exact I. elim H.
+	induction  d as [| a3 a4| d1 Hrecd1 d0 Hrecd0]; simpl in |- *. exact I. simpl in H. elim (bool_is_true_or_false (Neqb a a1)); intro; rewrite H0 in H. rewrite (Neqb_complete _ _ H0).
+	elim (bool_is_true_or_false (Neqb a3 a1)); intro; rewrite H1. simpl in |- *.
+	rewrite (Neqb_correct a3). exact (orb_inc_l _ _ _ H). exact I. elim H.
 	exact I. inversion H1. simple induction m2; intros. inversion H1. inversion H1.
 	elim H3; intros. induction  d as [| a a0| d1 Hrecd1 d0 Hrecd0]; simpl in |- *. exact I. exact I. split. exact (H _ _ _ H4). exact (H0 _ _ _ H5).
 Qed.
@@ -212,7 +214,7 @@ Inductive pl_path_true : pl_path -> Map bool -> Prop :=
   | plp_true_cons :
       forall (m : Map bool) (a : ad) (pl : pl_path),
       pl_path_true pl m ->
-      MapGet bool m a = SOME bool true -> pl_path_true (pl_path_cons a pl) m.
+      MapGet bool m a = Some true -> pl_path_true (pl_path_cons a pl) m.
 
 Definition pl_non_empty_path_true_def_0 (pl : pl_path) 
   (p : prec_list) : Prop :=
@@ -292,11 +294,11 @@ Qed.
 
 Lemma st_non_empty_0 :
  forall (m : Map bool) (s : state) (p : prec_list) (a : ad),
- MapGet prec_list s a = SOME prec_list p ->
+ MapGet prec_list s a = Some p ->
  pl_non_empty m p = true -> st_non_empty m s = true.
 Proof.
-	simple induction s; intros. inversion H. simpl in |- *. simpl in H. elim (bool_is_true_or_false (ad_eq a a1)); intro; rewrite H1 in H;
-  inversion H. exact H0. simpl in |- *. induction  a as [| p0]. simpl in H1. rewrite (H p ad_z H1 H2). simpl in |- *. reflexivity. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]; simpl in H1.
+	simple induction s; intros. inversion H. simpl in |- *. simpl in H. elim (bool_is_true_or_false (Neqb a a1)); intro; rewrite H1 in H;
+  inversion H. exact H0. simpl in |- *. induction  a as [| p0]. simpl in H1. rewrite (H p N0 H1 H2). simpl in |- *. reflexivity. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]; simpl in H1.
 	rewrite (H0 _ _ H1 H2). elim (bool_is_true_or_false (st_non_empty m m0)); intro; rewrite H3;
   reflexivity. rewrite (H _ _ H1 H2).
 	reflexivity. rewrite (H0 _ _ H1 H2). elim (bool_is_true_or_false (st_non_empty m m0)); intro; rewrite H3;
@@ -305,17 +307,17 @@ Qed.
 
 Lemma st_non_empty_1 :
  forall (d : preDTA) (m r : Map bool) (a : ad) (l : state),
- MapGet state d a = SOME state l ->
+ MapGet state d a = Some l ->
  domain_equal state bool d r ->
  st_non_empty m l = true ->
- MapGet bool (dta_app_ne_aux d m r) a = SOME bool true.
+ MapGet bool (dta_app_ne_aux d m r) a = Some true.
 Proof.
 	simple induction d. intros. inversion H. intros. induction  r as [| a2 a3| r1 Hrecr1 r0 Hrecr0]. 
 	inversion H0. simpl in |- *. simpl in H0. simpl in H. rewrite H0.
-	rewrite (ad_eq_correct a2). simpl in |- *. rewrite H0 in H. elim (bool_is_true_or_false (ad_eq a2 a1)); intro; rewrite H2 in H.
+	rewrite (Neqb_correct a2). simpl in |- *. rewrite H0 in H. elim (bool_is_true_or_false (Neqb a2 a1)); intro; rewrite H2 in H.
 	inversion H. rewrite H2. rewrite H1. elim (bool_is_true_or_false a3); intros; rewrite H3; reflexivity. inversion H. inversion H0.
 	intros. induction  r as [| a0 a1| r1 Hrecr1 r0 Hrecr0]. inversion H2. inversion H2. elim H2; intros.
-	induction  a as [| p]. simpl in |- *. simpl in H1. apply (H m1 r1 ad_z l H1 H4).
+	induction  a as [| p]. simpl in |- *. simpl in H1. apply (H m1 r1 N0 l H1 H4).
 	exact H3. induction  p as [p Hrecp| p Hrecp| ]; simpl in |- *; simpl in H1. elim H2. intros.
 	exact (H0 _ _ _ _ H1 H7 H3). exact (H _ _ _ _ H1 H4 H3).
 	exact (H0 _ _ _ _ H1 H5 H3).
@@ -328,7 +330,7 @@ Definition dt_non_empty_def_0 (d : preDTA) (a : ad)
   forall n : nat,
   term_high t <= n ->
   MapGet bool (power (Map bool) (dta_app_ne d) (map_mini state d) n) a =
-  SOME bool true.
+  Some true.
 
 Definition dt_non_empty_def_1 (d : preDTA) (s : state) 
   (t : term) (pr : state_reconnait d s t) :=
@@ -346,7 +348,7 @@ Definition dt_non_empty_def_2 (d : preDTA) (p : prec_list)
 
 Lemma dt_non_empty_0 :
  forall (d : preDTA) (a : ad) (t : term) (ladj : state)
-   (e : MapGet state d a = SOME state ladj) (s : state_reconnait d ladj t),
+   (e : MapGet state d a = Some ladj) (s : state_reconnait d ladj t),
  dt_non_empty_def_1 d ladj t s ->
  dt_non_empty_def_0 d a t (rec_dta d a t ladj e s).
 Proof.
@@ -363,7 +365,7 @@ Qed.
 
 Lemma dt_non_empty_1 :
  forall (d : preDTA) (s : state) (c : ad) (tl : term_list) 
-   (l : prec_list) (e : MapGet prec_list s c = SOME prec_list l)
+   (l : prec_list) (e : MapGet prec_list s c = Some l)
    (l0 : liste_reconnait d l tl),
  dt_non_empty_def_2 d l tl l0 ->
  dt_non_empty_def_1 d s (app c tl) (rec_st d s c tl l e l0).
@@ -421,7 +423,7 @@ Lemma dt_non_empty_5 :
  forall n : nat,
  term_high t <= n ->
  MapGet bool (power (Map bool) (dta_app_ne d) (map_mini state d) n) a =
- SOME bool true.
+ Some true.
 Proof.
 	exact
   (mreconnaissance_ind dt_non_empty_def_0 dt_non_empty_def_1
@@ -444,7 +446,7 @@ Lemma dt_non_empty_d :
  reconnaissance d a t ->
  exists n : nat,
    MapGet bool (power (Map bool) (dta_app_ne d) (map_mini state d) n) a =
-   SOME bool true.
+   Some true.
 Proof.
 	intros. split with (term_high t). exact (dt_non_empty_5 d a t H (term_high t) (le_n_n _)).
 Qed.
@@ -463,14 +465,14 @@ Qed.
 
 Lemma dt_non_empty_r_0 :
  forall (d : preDTA) (m r : Map bool) (a : ad) (l : state),
- MapGet state d a = SOME state l ->
+ MapGet state d a = Some l ->
  domain_equal state bool d r ->
- MapGet bool (dta_app_ne_aux d m r) a = SOME bool true ->
- MapGet bool r a = SOME bool true \/ st_non_empty m l = true.
+ MapGet bool (dta_app_ne_aux d m r) a = Some true ->
+ MapGet bool r a = Some true \/ st_non_empty m l = true.
 Proof.
 	simple induction d. intros. inversion H. intros. induction  r as [| a2 a3| r1 Hrecr1 r0 Hrecr0].
 	inversion H0. simpl in H0. rewrite H0 in H. rewrite H0 in H1.
-	simpl in H. elim (bool_is_true_or_false (ad_eq a2 a1)); intro; rewrite H2 in H. inversion H. simpl in H1. rewrite (ad_eq_correct a2) in H1. simpl in H1. rewrite H2 in H1. inversion H1. rewrite H5.
+	simpl in H. elim (bool_is_true_or_false (Neqb a2 a1)); intro; rewrite H2 in H. inversion H. simpl in H1. rewrite (Neqb_correct a2) in H1. simpl in H1. rewrite H2 in H1. inversion H1. rewrite H5.
 	simpl in |- *. rewrite H2. elim (bool_is_true_or_false a3); intros; rewrite H3. left. reflexivity. rewrite H3 in H5. simpl in H5.
 	rewrite H4 in H5. right. exact H5. inversion H. inversion H0.
 	intros. induction  r as [| a0 a1| r1 Hrecr1 r0 Hrecr0]. inversion H2. inversion H2. induction  a as [| p].
@@ -484,16 +486,16 @@ Lemma dt_non_empty_r_1 :
  st_non_empty m s = true ->
  exists c : ad,
    (exists p : prec_list,
-      MapGet prec_list s c = SOME prec_list p /\ pl_non_empty m p = true).
+      MapGet prec_list s c = Some p /\ pl_non_empty m p = true).
 Proof.
 	simple induction s; intros. simpl in H. inversion H. simpl in H.
-	split with a. split with a0. split. simpl in |- *. rewrite (ad_eq_correct a). reflexivity. exact H. simpl in H1.
+	split with a. split with a0. split. simpl in |- *. rewrite (Neqb_correct a). reflexivity. exact H. simpl in H1.
 	elim (bool_is_true_or_false (st_non_empty m1 m)); intros.
 	elim (H m1 H2). intros. elim H3. intros. elim H4. intros.
-	induction  x as [| p]. split with ad_z. split with x0. simpl in |- *. split; assumption. split with (ad_x (xO p)). split with x0. simpl in |- *.
+	induction  x as [| p]. split with N0. split with x0. simpl in |- *. split; assumption. split with (Npos (xO p)). split with x0. simpl in |- *.
 	split; assumption. rewrite H2 in H1. simpl in H1. elim (H0 _ H1). intros. elim H3. intros. elim H4. intros. induction  x as [| p].
-	split with (ad_x 1). simpl in |- *. split with x0. split; assumption.
-	split with (ad_x (xI p)). split with x0. simpl in |- *. split; assumption.
+	split with (Npos 1). simpl in |- *. split with x0. split; assumption.
+	split with (Npos (xI p)). split with x0. simpl in |- *. split; assumption.
 Qed.
 
 Lemma dt_non_empty_r_2 :
@@ -522,7 +524,7 @@ Qed.
 Definition dt_non_empty_r_def_0 (n : nat) : Prop :=
   forall (d : preDTA) (a : ad),
   MapGet bool (power (Map bool) (dta_app_ne d) (map_mini state d) n) a =
-  SOME bool true -> exists t : term, reconnaissance d a t.
+  Some true -> exists t : term, reconnaissance d a t.
 
 Lemma dt_non_empty_r_3 : dt_non_empty_r_def_0 0.
 Proof.
@@ -579,7 +581,7 @@ Qed.
 Lemma dt_non_empty_r :
  forall (n : nat) (d : preDTA) (a : ad),
  MapGet bool (power (Map bool) (dta_app_ne d) (map_mini state d) n) a =
- SOME bool true -> exists t : term, reconnaissance d a t.
+ Some true -> exists t : term, reconnaissance d a t.
 Proof.
 	exact (nat_ind dt_non_empty_r_def_0 dt_non_empty_r_3 dt_non_empty_r_5).
 Qed.
@@ -601,7 +603,7 @@ Qed.
 Lemma dt_non_empty_fix_1 :
  forall (d : preDTA) (a : ad) (n : nat),
  MapGet bool (power (Map bool) (dta_app_ne d) (map_mini state d) n) a =
- SOME bool true -> MapGet bool (dta_non_empty_states d) a = SOME bool true.
+ Some true -> MapGet bool (dta_non_empty_states d) a = Some true.
 Proof.
 	intros. elim
   (domain_equal_mapget bool bool
@@ -628,19 +630,19 @@ Qed.
 
 Lemma dt_non_empty_fix_2 :
  forall (d : preDTA) (a : ad),
- MapGet bool (dta_non_empty_states d) a = SOME bool true ->
+ MapGet bool (dta_non_empty_states d) a = Some true ->
  exists n : nat,
    MapGet bool (power (Map bool) (dta_app_ne d) (map_mini state d) n) a =
-   SOME bool true.
+   Some true.
 Proof.
 	unfold dta_non_empty_states in |- *. intros. split with (S (MapCard state d)). exact H.
 Qed.
 
-(* correction et complètude du test au vide *)
+(* correction et complÃ¨tude du test au vide *)
 
 Lemma dt_non_empty_fix :
  forall (d : preDTA) (a : ad),
- MapGet bool (dta_non_empty_states d) a = SOME bool true <->
+ MapGet bool (dta_non_empty_states d) a = Some true <->
  (exists t : term, reconnaissance d a t).
 Proof.
 	intros. split. intros. elim (dt_non_empty_fix_2 d a H).
@@ -650,7 +652,7 @@ Qed.
 
 Lemma dt_non_empty_lazy_fix :
  forall (d : preDTA) (a : ad),
- MapGet bool (dta_non_empty_states_lazy d) a = SOME bool true <->
+ MapGet bool (dta_non_empty_states_lazy d) a = Some true <->
  (exists t : term, reconnaissance d a t).
 Proof.
 	intro. unfold dta_non_empty_states_lazy in |- *. rewrite

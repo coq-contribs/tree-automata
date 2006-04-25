@@ -15,29 +15,30 @@
 
 
 Require Import Bool.
+Require Import NArith Ndec.
 Require Import Allmaps.
 Require Import bases.
 Require Import defs.
 
-(* correction d'un preDTA : pas de référence à des adresses extérieures à l'automate *)
+(* correction d'un preDTA : pas de rÃ©fÃ©rence Ã  des adresses extÃ©rieures Ã  l'automate *)
 
 Definition prec_list_ref_ok (p : prec_list) (d : preDTA) : Prop :=
   forall a : ad,
-  prec_occur p a -> exists s : state, MapGet state d a = SOME state s.
+  prec_occur p a -> exists s : state, MapGet state d a = Some s.
 
 Definition state_ref_ok (s : state) (d : preDTA) : Prop :=
   forall (a : ad) (p : prec_list),
-  MapGet prec_list s a = SOME prec_list p -> prec_list_ref_ok p d.
+  MapGet prec_list s a = Some p -> prec_list_ref_ok p d.
 
 Definition preDTA_ref_ok (d : preDTA) : Prop :=
   forall (a : ad) (s : state) (c : ad) (pl : prec_list) (b : ad),
-  MapGet state d a = SOME state s ->
-  MapGet prec_list s c = SOME prec_list pl ->
-  prec_occur pl b -> exists s0 : state, MapGet state d b = SOME state s0.
+  MapGet state d a = Some s ->
+  MapGet prec_list s c = Some pl ->
+  prec_occur pl b -> exists s0 : state, MapGet state d b = Some s0.
 
 Definition preDTA_ref_ok_distinct (d d' : preDTA) : Prop :=
   forall (a : ad) (s : state),
-  MapGet state d a = SOME state s -> state_ref_ok s d'.
+  MapGet state d a = Some s -> state_ref_ok s d'.
 
 Definition DTA_ref_ok (d : DTA) : Prop :=
   match d with
@@ -59,7 +60,7 @@ Lemma state_ref_ok_M2_destr :
  state_ref_ok (M2 prec_list s0 s1) d ->
  state_ref_ok s0 d /\ state_ref_ok s1 d.
 Proof.
-	unfold state_ref_ok in |- *. intros. split; intros. apply (H (ad_double a) p). induction  a as [| p0]; exact H0. apply (H (ad_double_plus_un a) p).
+	unfold state_ref_ok in |- *. intros. split; intros. apply (H (Ndouble a) p). induction  a as [| p0]; exact H0. apply (H (Ndouble_plus_one a) p).
 	induction  a as [| p0]; exact H0.
 Qed.
 
@@ -67,7 +68,7 @@ Lemma preDTA_ref_ok_def :
  forall d : preDTA,
  preDTA_ref_ok d <->
  (forall (a : ad) (s : state),
-  MapGet state d a = SOME state s -> state_ref_ok s d).
+  MapGet state d a = Some s -> state_ref_ok s d).
 Proof.
 	intros. unfold preDTA_ref_ok in |- *. unfold state_ref_ok in |- *. unfold prec_list_ref_ok in |- *. split. intros. exact (H a s a0 p a1 H0 H1 H2).
 	intros. exact (H a s H0 c pl H1 b H2).
@@ -79,16 +80,16 @@ Lemma preDTA_ref_ok_distinct_dest :
  preDTA_ref_ok_distinct d0 d /\ preDTA_ref_ok_distinct d1 d.
 Proof.
 	unfold preDTA_ref_ok_distinct in |- *. intros. split. intros.
-	apply (H (ad_double a) s). induction  a as [| p]; exact H0. intros.
-	apply (H (ad_double_plus_un a) s). induction  a as [| p]; exact H0.
+	apply (H (Ndouble a) s). induction  a as [| p]; exact H0. intros.
+	apply (H (Ndouble_plus_one a) s). induction  a as [| p]; exact H0.
 Qed.
 
-(* une fonction permettant de décider la propriété preDTA_ref_ok *)
+(* une fonction permettant de dÃ©cider la propriÃ©tÃ© preDTA_ref_ok *)
 
 Definition addr_in_dta_check (d : preDTA) (a : ad) : bool :=
   match MapGet state d a with
-  | NONE => false
-  | SOME _ => true
+  | None => false
+  | Some _ => true
   end.
 
 Fixpoint prec_list_ref_ok_check (p : prec_list) : preDTA -> bool :=
@@ -135,9 +136,9 @@ Lemma state_ref_ok_check_correct :
 Proof.
 	unfold state_ref_ok in |- *. simple induction s. intros. reflexivity. intros.
 	simpl in |- *. apply (prec_list_ref_ok_check_correct a0 d). apply (H a a0).
-	simpl in |- *. rewrite (ad_eq_correct a). reflexivity. intros. simpl in |- *.
-	rewrite (H d). rewrite (H0 d). reflexivity. intros. apply (H1 (ad_double_plus_un a) p). induction  a as [| p0]; simpl in |- *; exact H2. intros.
-	apply (H1 (ad_double a) p). induction  a as [| p0]; simpl in |- *; exact H2.
+	simpl in |- *. rewrite (Neqb_correct a). reflexivity. intros. simpl in |- *.
+	rewrite (H d). rewrite (H0 d). reflexivity. intros. apply (H1 (Ndouble_plus_one a) p). induction  a as [| p0]; simpl in |- *; exact H2. intros.
+	apply (H1 (Ndouble a) p). induction  a as [| p0]; simpl in |- *; exact H2.
 Qed.
 
 Lemma state_ref_ok_check_complete :
@@ -145,12 +146,12 @@ Lemma state_ref_ok_check_complete :
  state_ref_ok_check s d = true -> state_ref_ok s d.
 Proof.
 	unfold state_ref_ok in |- *. simple induction s. intros. inversion H0. intros.
-	simpl in H0. elim (bool_is_true_or_false (ad_eq a a1)); intros; rewrite H1 in H0. inversion H0. simpl in H. rewrite H3 in H.
+	simpl in H0. elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H1 in H0. inversion H0. simpl in H. rewrite H3 in H.
 	exact (prec_list_ref_ok_check_complete p d H). inversion H0. intros.
 	simpl in H1. elim (bool_is_true_or_false (state_ref_ok_check m d)); intros;
   rewrite H3 in H1. elim (bool_is_true_or_false (state_ref_ok_check m0 d)); intros;
   rewrite H4 in H1. induction  a as [| p0]. simpl in H2.
-	exact (H d H3 ad_z p H2). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]; simpl in H2. exact (H0 d H4 (ad_x p0) p H2). exact (H d H3 (ad_x p0) p H2). exact (H0 d H4 ad_z p H2). inversion H1. inversion H1.
+	exact (H d H3 N0 p H2). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]; simpl in H2. exact (H0 d H4 (Npos p0) p H2). exact (H d H3 (Npos p0) p H2). exact (H0 d H4 N0 p H2). inversion H1. inversion H1.
 Qed.
 
 Fixpoint predta_ref_ok_check_0 (d : preDTA) : preDTA -> bool :=
@@ -169,9 +170,9 @@ Lemma predta_ref_ok_check_correct_0 :
  preDTA_ref_ok_distinct d d' -> predta_ref_ok_check_0 d d' = true.
 Proof.
 	intros. unfold preDTA_ref_ok_distinct in H. induction  d as [| a a0| d1 Hrecd1 d0 Hrecd0]. intros.
-	reflexivity. simpl in |- *. apply (state_ref_ok_check_correct a0 d'). apply (H a a0). simpl in |- *. rewrite (ad_eq_correct a). reflexivity. simpl in |- *.
-	rewrite Hrecd1. rewrite Hrecd0. reflexivity. intros. apply (H (ad_double_plus_un a) s). induction  a as [| p]; simpl in |- *; exact H0. intros.
-	apply (H (ad_double a) s). induction  a as [| p]; simpl in |- *; exact H0. 
+	reflexivity. simpl in |- *. apply (state_ref_ok_check_correct a0 d'). apply (H a a0). simpl in |- *. rewrite (Neqb_correct a). reflexivity. simpl in |- *.
+	rewrite Hrecd1. rewrite Hrecd0. reflexivity. intros. apply (H (Ndouble_plus_one a) s). induction  a as [| p]; simpl in |- *; exact H0. intros.
+	apply (H (Ndouble a) s). induction  a as [| p]; simpl in |- *; exact H0. 
 Qed.
 
 Lemma predta_ref_ok_check_complete_0 :
@@ -179,13 +180,13 @@ Lemma predta_ref_ok_check_complete_0 :
  predta_ref_ok_check_0 d d' = true -> preDTA_ref_ok_distinct d d'.
 Proof.
 	unfold preDTA_ref_ok_distinct in |- *. simple induction d; simpl in |- *; intros. inversion H0.
-	elim (bool_is_true_or_false (ad_eq a a1)); intros; rewrite H1 in H0;
+	elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H1 in H0;
   inversion H0. rewrite <- H3. exact (state_ref_ok_check_complete _ _ H).
  	elim (bool_is_true_or_false (predta_ref_ok_check_0 m d')); intros;
    rewrite H3 in H1. elim (bool_is_true_or_false (predta_ref_ok_check_0 m0 d')); intros;
-  rewrite H4 in H1. induction  a as [| p]. exact (H d' H3 ad_z s H2).
-	induction  p as [p Hrecp| p Hrecp| ]. exact (H0 d' H4 (ad_x p) s H2). exact (H d' H3 (ad_x p) s H2).
-	exact (H0 d' H4 ad_z s H2). inversion H1. inversion H1.
+  rewrite H4 in H1. induction  a as [| p]. exact (H d' H3 N0 s H2).
+	induction  p as [p Hrecp| p Hrecp| ]. exact (H0 d' H4 (Npos p) s H2). exact (H d' H3 (Npos p) s H2).
+	exact (H0 d' H4 N0 s H2). inversion H1. inversion H1.
 Qed.
 
 Lemma predta_ref_ok_check_correct :
@@ -222,7 +223,7 @@ Qed.
 (* autre correction a verifier : appartenance du dernier etat *)
 
 Definition addr_in_preDTA (d : preDTA) (a : ad) : Prop :=
-  exists s : state, MapGet state d a = SOME state s.
+  exists s : state, MapGet state d a = Some s.
 
 Definition DTA_main_state_correct (d : DTA) : Prop :=
   match d with
@@ -233,8 +234,8 @@ Definition DTA_main_state_correct_check (d : DTA) : bool :=
   match d with
   | dta p a =>
       match MapGet state p a with
-      | NONE => false
-      | SOME _ => true
+      | None => false
+      | Some _ => true
       end
   end.
 

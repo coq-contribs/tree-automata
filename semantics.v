@@ -21,7 +21,7 @@ Require Import Allmaps.
 Require Import bases.
 Require Import defs.
 
-(* fonction définissant la sémantique : reconnaissance d'un terme par un automate *)
+(* fonction dÃ©finissant la sÃ©mantique : reconnaissance d'un terme par un automate *)
 
 Fixpoint rec_term (d : preDTA) (a : ad) (t : term) 
  (n : nat) {struct n} : bool :=
@@ -31,11 +31,11 @@ Fixpoint rec_term (d : preDTA) (a : ad) (t : term)
       match t with
       | app c l =>
           match MapGet _ d a with
-          | NONE => false
-          | SOME lts =>
+          | None => false
+          | Some lts =>
               match MapGet _ lts c with
-              | NONE => false
-              | SOME pre => rec_list_terms d pre l k
+              | None => false
+              | Some pre => rec_list_terms d pre l k
               end
           end
       end
@@ -61,7 +61,7 @@ Fixpoint rec_term (d : preDTA) (a : ad) (t : term)
       end
   end.
 
-(* bornes sur l'entier décroissant (terminaison de la fonction reconnaissance *)
+(* bornes sur l'entier dÃ©croissant (terminaison de la fonction reconnaissance *)
 
 Lemma borne_0_0 :
  forall p : prec_list,
@@ -182,7 +182,7 @@ Proof.
 	assumption.
 Qed.
 
-(* définition de la quantité d'essence (Astuce de Boyer, définition de *)
+(* dÃ©finition de la quantitÃ© d'essence (Astuce de Boyer, dÃ©finition de *)
 (* la reconnaissance par fixpoint...) *)
 
 Definition essence (t : term) (d : preDTA) : nat :=
@@ -199,7 +199,7 @@ Definition essence_list (l : term_list) (d : preDTA)
       taille_0 pl + S (term_high_0 l) * S (DTA_taille d)
   end.
 
-(* lemmes concernant la gestion de la diminution de la quantité d'essence *)
+(* lemmes concernant la gestion de la diminution de la quantitÃ© d'essence *)
 
 Lemma conservation_0_0 : forall n n0 : nat, S n * S n0 = S (n0 + n * S n0).
 Proof.
@@ -420,18 +420,18 @@ Definition dta_rec_term (d : DTA) (t : term) : bool :=
   | dta p a => rec_term p a t (essence t p)
   end.
 
-(* définitions inductives pour la reconnaissance d'un terme par un automate *)
+(* dÃ©finitions inductives pour la reconnaissance d'un terme par un automate *)
 
 Inductive reconnaissance : preDTA -> ad -> term -> Prop :=
     rec_dta :
       forall (d : preDTA) (a : ad) (t : term) (ladj : state),
-      MapGet state d a = SOME state ladj ->
+      MapGet state d a = Some ladj ->
       state_reconnait d ladj t -> reconnaissance d a t
 with state_reconnait : preDTA -> state -> term -> Prop :=
     rec_st :
       forall (d : preDTA) (s : state) (c : ad) (tl : term_list)
         (l : prec_list),
-      MapGet prec_list s c = SOME prec_list l ->
+      MapGet prec_list s c = Some l ->
       liste_reconnait d l tl -> state_reconnait d s (app c tl)
 with liste_reconnait : preDTA -> prec_list -> term_list -> Prop :=
   | rec_empty : forall d : preDTA, liste_reconnait d prec_empty tnil
@@ -460,7 +460,7 @@ Scheme mreconnaissance_ind := Induction for reconnaissance
   Sort Prop
   with mlrec_ind := Induction for liste_reconnait Sort Prop.
 
-(* lemmes de base sur la sémantique précédente (pour simplifier d'autres démos) *)
+(* lemmes de base sur la sÃ©mantique prÃ©cÃ©dente (pour simplifier d'autres dÃ©mos) *)
 
 Lemma sem_listes_0 :
  forall (d : preDTA) (p : prec_list) (hd : term) (tl : term_list),
@@ -485,8 +485,8 @@ Proof.
 	intros. inversion H. trivial.
 Qed.
 
-(* lemmes d'équivalence sémantique entre la fonction calculatoire (Fixpoint) *)
-(* et la définition par Inductive *)
+(* lemmes d'Ã©quivalence sÃ©mantique entre la fonction calculatoire (Fixpoint) *)
+(* et la dÃ©finition par Inductive *)
 
 Definition sem_equiv_prop_t (t : term) :=
   forall (d : preDTA) (a : ad) (n : nat),
@@ -515,8 +515,8 @@ Lemma semantic_equiv_0_2 :
  forall (d : preDTA) (a a' : ad) (l : term_list) (n : nat) 
    (s : state) (p : prec_list),
  rec_term d a (app a' l) (S n) = true ->
- MapGet state d a = SOME state s ->
- MapGet prec_list s a' = SOME prec_list p -> rec_list_terms d p l n = true.
+ MapGet state d a = Some s ->
+ MapGet prec_list s a' = Some p -> rec_list_terms d p l n = true.
 Proof.
 	intro. intro. intro. intro. simple induction n. intros. simpl in H. 
 	rewrite H0 in H. rewrite H1 in H. discriminate H.
@@ -532,21 +532,21 @@ Qed.
 Lemma semantic_equiv_0_3 :
  forall (d : preDTA) (a a' : ad) (l : term_list) (n : nat),
  rec_term d a (app a' l) (S n) = true ->
- exists s : state, MapGet state d a = SOME state s.
+ exists s : state, MapGet state d a = Some s.
 Proof.
 	intro. intro. intro. intro. simpl in |- *. intro.
-	elim (MapGet state d a). intro H. discriminate H.
+	elim (MapGet state d a). Focus 2. intro H. discriminate H.
 	intro. split with a0. trivial.
 Qed.
 
 Lemma semantic_equiv_0_4 :
  forall (d : preDTA) (a a' : ad) (l : term_list) (n : nat) (s : state),
- MapGet state d a = SOME state s ->
+ MapGet state d a = Some s ->
  rec_term d a (app a' l) (S n) = true ->
- exists p : prec_list, MapGet prec_list s a' = SOME prec_list p.
+ exists p : prec_list, MapGet prec_list s a' = Some p.
 Proof.
 	intro. intro. intro. intro. intro. intro. intro. simpl in |- *.
-	rewrite H. simpl in |- *. elim (MapGet prec_list s a'). 
+	rewrite H. simpl in |- *. elim (MapGet prec_list s a'). Focus 2.
 	intro H0. discriminate H0.
 	intro. intro. split with a0. trivial.
 Qed.
@@ -556,9 +556,9 @@ Lemma semantic_equiv_0_5 :
  sem_equiv_prop_l t -> sem_equiv_prop_t (app a t).
 Proof.
 	unfold sem_equiv_prop_l in |- *. unfold sem_equiv_prop_t in |- *. intros.
-	cut (exists s : state, MapGet state d a0 = SOME state s).
+	cut (exists s : state, MapGet state d a0 = Some s).
 	intro. elim H1. intros.
-	cut (exists p : prec_list, MapGet prec_list x a = SOME prec_list p).
+	cut (exists p : prec_list, MapGet prec_list x a = Some p).
 	intros. elim H3. intros. induction  n as [| n Hrecn]. simpl in H0. discriminate H0.
 	exact
   (rec_dta d a0 (app a t) x H2
@@ -631,8 +631,8 @@ Qed.
 Lemma invar_1_0 :
  forall (d : preDTA) (a c : ad) (t : term_list) (n : nat) 
    (s : state) (p : prec_list),
- MapGet state d a = SOME state s ->
- MapGet prec_list s c = SOME prec_list p ->
+ MapGet state d a = Some s ->
+ MapGet prec_list s c = Some p ->
  rec_list_terms d p t n = true -> rec_term d a (app c t) (S n) = true.
 Proof.
 	intro; intro; intro; simple induction n. intros. simpl in H1. discriminate H1.
@@ -644,9 +644,9 @@ Lemma invar_1_1 :
  rec_term d a (app c t) (S n) = true ->
  exists p : prec_list, rec_list_terms d p t n = true.
 Proof.
-	intros. cut (exists s : state, MapGet state d a = SOME state s).
+	intros. cut (exists s : state, MapGet state d a = Some s).
 	intro. elim H0. intros.
-	cut (exists p : prec_list, MapGet prec_list x c = SOME prec_list p).
+	cut (exists p : prec_list, MapGet prec_list x c = Some p).
 	intro. elim H2. intros. split with x0.
 	exact (semantic_equiv_0_2 d a c t n x x0 H H1 H3).
 	exact (semantic_equiv_0_4 d a c t n x H1 H).
@@ -659,9 +659,9 @@ Proof.
 	intro. intro. intro. unfold invar_list in H. unfold invar_term in |- *.
 	simple induction n. intros. simpl in H0. discriminate H0.
 	intro. intro. simple induction m; intros. elim (le_Sn_O n0 H2).
-	cut (exists s : state, MapGet state d a0 = SOME state s).
+	cut (exists s : state, MapGet state d a0 = Some s).
 	intro. elim H4. intros. 
-	cut (exists p : prec_list, MapGet prec_list x a = SOME prec_list p).
+	cut (exists p : prec_list, MapGet prec_list x a = Some p).
 	intro. elim H6. intros. apply (invar_1_0 d a0 a t n1 x x0 H5 H7).
 	cut (rec_list_terms d x0 t n0 = true). intro.
 	exact (H n0 n1 d x0 H8 (le_S_n n0 n1 H3)).
@@ -757,7 +757,7 @@ Proof.
 	exact (term_list_term_ind invar_term invar_list invar_1 invar_0 invar_2).
 Qed.
 
-(* Second sens de l'équivalence sémantique *)
+(* Second sens de l'Ã©quivalence sÃ©mantique *)
 
 Definition dta_reconnait (d : preDTA) (a : ad) (t : term)
   (pr : reconnaissance d a t) := rec_term d a t (essence t d) = true.
@@ -767,7 +767,7 @@ Definition st_reconnait (d : preDTA) (s : state) (t : term)
   match t with
   | app c l =>
       exists p : prec_list,
-        MapGet prec_list s c = SOME prec_list p /\
+        MapGet prec_list s c = Some p /\
         rec_list_terms d p l (essence_list l d p) = true
   end.
 
@@ -777,7 +777,7 @@ Definition pre_reconnait (d : preDTA) (p : prec_list)
 
 Lemma semantic_equiv_1_0 :
  forall (d : preDTA) (a : ad) (t : term) (ladj : state)
-   (e : MapGet state d a = SOME state ladj) (s : state_reconnait d ladj t),
+   (e : MapGet state d a = Some ladj) (s : state_reconnait d ladj t),
  st_reconnait d ladj t s -> dta_reconnait d a t (rec_dta d a t ladj e s).
 Proof.
 	intros. unfold dta_reconnait in |- *. unfold st_reconnait in H. induction  t as (a0, t).
@@ -794,7 +794,7 @@ Qed.
 
 Lemma semantic_equiv_1_1 :
  forall (d : preDTA) (s : state) (c : ad) (tl : term_list) 
-   (l : prec_list) (e : MapGet prec_list s c = SOME prec_list l)
+   (l : prec_list) (e : MapGet prec_list s c = Some l)
    (l0 : liste_reconnait d l tl),
  pre_reconnait d l tl l0 ->
  st_reconnait d s (app c tl) (rec_st d s c tl l e l0).

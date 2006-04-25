@@ -15,8 +15,10 @@
 
 
 Require Import Classical_Prop.
-Require Import Arith.
 Require Import Bool.
+Require Import Arith.
+Require Import NArith.
+Require Import Ndec.
 Require Import Allmaps.
 Require Import bases.
 
@@ -37,10 +39,10 @@ Fixpoint domain_equal (A B : Set) (m0 : Map A) (m1 : Map B) {struct m1} :
 Lemma domain_equal_mapget :
  forall (A B : Set) (m0 : Map A) (m1 : Map B) (a : ad) (x : A),
  domain_equal A B m0 m1 ->
- MapGet A m0 a = SOME A x -> exists y : B, MapGet B m1 a = SOME B y.
+ MapGet A m0 a = Some x -> exists y : B, MapGet B m1 a = Some y.
 Proof.
 	simple induction m0. intros. inversion H0. intros. induction  m1 as [| a2 a3| m1_1 Hrecm1_1 m1_0 Hrecm1_0]. inversion H.
-	simpl in H0. simpl in H. elim (bool_is_true_or_false (ad_eq a a1)); intros; rewrite H1 in H0. inversion H0. simpl in |- *. rewrite <- H. rewrite H1.
+	simpl in H0. simpl in H. elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H1 in H0. inversion H0. simpl in |- *. rewrite <- H. rewrite H1.
 	split with a3. reflexivity. inversion H0. inversion H. simple induction m2.
 	intros. inversion H1. intros. inversion H1. intros. elim H3. intros.
 	induction  a as [| p]. simpl in |- *. exact (H _ _ _ H5 H4). induction  p as [p Hrecp| p Hrecp| ]. simpl in |- *. simpl in H4.
@@ -335,7 +337,7 @@ Proof.
 	exact H0. exact (dist_compl_8 A p).
 Qed.
 
-(* propriété de chaine strictement croissante bornée *)
+(* propriÃ©tÃ© de chaine strictement croissante bornÃ©e *)
 
 Definition bounded_sas_chain (A : Set) (T : mEnsemble A) 
   (r : mRelation A) (n : nat) : Prop :=
@@ -358,7 +360,7 @@ Definition lower_fix_point (A : Set) (T : mEnsemble A)
   (r : mRelation A) (f : Map A -> Map A) (x : Map A) : Prop :=
   fix_point A T f x /\ inf_fix_points A T r f x.
 
-(* itération d'une fonction *)
+(* itÃ©ration d'une fonction *)
 
 Fixpoint iteres (A : Set) (f : Map A -> Map A) (x : Map A) 
  (n : nat) {struct n} : prechain A :=
@@ -696,7 +698,7 @@ Proof.
 	exact H3. unfold inf_fix_points in |- *. intros. exact (iteres_inf_fps A T r f e y n H H4 H1).
 Qed.
 
-(* définition d'un ordre sur bool et sur le treillis des (Map bool) à domaine fixé*)
+(* dÃ©finition d'un ordre sur bool et sur le treillis des (Map bool) Ã  domaine fixÃ©*)
 
 Definition leb (b0 b1 : bool) : Prop :=
   match b0, b1 with
@@ -730,7 +732,7 @@ Fixpoint lem (m0 m1 : Map bool) {struct m1} : Prop :=
   | M0, M1 _ _ => False
   | M0, M2 _ _ => False
   | M1 _ _, M0 => False
-  | M1 a b, M1 a' b' => if ad_eq a a' then leb b b' else False
+  | M1 a b, M1 a' b' => if Neqb a a' then leb b b' else False
   | M1 _ _, M2 _ _ => False
   | M2 _ _, M0 => False
   | M2 _ _, M1 _ _ => False
@@ -740,7 +742,7 @@ Fixpoint lem (m0 m1 : Map bool) {struct m1} : Prop :=
 Lemma lem_reflexive : r_reflexive bool lem.
 Proof.
 	unfold r_reflexive in |- *. simple induction x. exact I. simpl in |- *. intros.
-	rewrite (ad_eq_correct a). exact (leb_reflexive a0). intros.
+	rewrite (Neqb_correct a). exact (leb_reflexive a0). intros.
 	simpl in |- *. split. exact H. exact H0.
 Qed.
 
@@ -748,8 +750,8 @@ Lemma lem_antisymmetric : r_antisymmetric bool lem.
 Proof.
 	unfold r_antisymmetric in |- *. simple induction x; simple induction y. intros.
 	reflexivity. intros. elim H. intros. elim H1. intros. elim H.
-	intros. simpl in H. elim (bool_is_true_or_false (ad_eq a a1)).
-	intros. rewrite H1 in H. simpl in H0. rewrite (ad_eq_comm a1 a) in H0. rewrite H1 in H0. rewrite (ad_eq_complete _ _ H1). rewrite (leb_antisymmetric _ _ H H0). reflexivity. intros. rewrite H1 in H.
+	intros. simpl in H. elim (bool_is_true_or_false (Neqb a a1)).
+	intros. rewrite H1 in H. simpl in H0. rewrite (Neqb_comm a1 a) in H0. rewrite H1 in H0. rewrite (Neqb_complete _ _ H1). rewrite (leb_antisymmetric _ _ H H0). reflexivity. intros. rewrite H1 in H.
 	elim H. intros. elim H1. intros. elim H1. intros. elim H1. intros.
 	elim H3. intros. elim H4. intros. rewrite (H m1 H5 H7). rewrite (H0 m2 H6 H8). reflexivity.
 Qed.
@@ -760,7 +762,7 @@ Proof.
 	exact I. intros. elim H0. intros. elim H2. intros. elim H. intros.
 	elim H. intros. elim H1. intros. elim H1. intros. elim H1. intros.
 	elim H3. intros. elim H. intros. elim H. intros. elim H1. intros.
-	elim H0. intros. simpl in H. simpl in H0. elim (bool_is_true_or_false (ad_eq a a1)); intro. rewrite H1 in H. elim (bool_is_true_or_false (ad_eq a1 a3)); intro. rewrite (ad_eq_complete _ _ H1). rewrite (ad_eq_complete _ _ H2). rewrite H2 in H0. simpl in |- *. rewrite (ad_eq_correct a3). exact (leb_transitive _ _ _ H H0). rewrite H2 in H0.
+	elim H0. intros. simpl in H. simpl in H0. elim (bool_is_true_or_false (Neqb a a1)); intro. rewrite H1 in H. elim (bool_is_true_or_false (Neqb a1 a3)); intro. rewrite (Neqb_complete _ _ H1). rewrite (Neqb_complete _ _ H2). rewrite H2 in H0. simpl in |- *. rewrite (Neqb_correct a3). exact (leb_transitive _ _ _ H H0). rewrite H2 in H0.
 	elim H0. rewrite H1 in H. elim H. intros. elim H2. intros. elim H2.
  	intros. elim H2. intros. elim H3. intros. elim H1. intros. elim H1.
 	intros. elim H3. intros. elim H1. intros. elim H1. intros. elim H3.
@@ -812,7 +814,7 @@ Proof.
 	intros. unfold mini in |- *. split. exact (map_mini_appartient A x). induction  x as [| a a0| x1 Hrecx1 x0 Hrecx0].
 	intros. induction  x as [| a a0| x1 Hrecx1 x0 Hrecx0]. simpl in |- *. exact I. elim H. elim H. intros. induction  x as [| a1 a2| x1 Hrecx1 x0 Hrecx0].
 	elim H. unfold ensemble_base in H. simpl in H. rewrite H. simpl in |- *.
-	rewrite (ad_eq_correct a1). elim (bool_is_true_or_false a2); intro; rewrite H0; exact I. elim H. intros. induction  x as [| a a0| x2 Hrecx2 x3 Hrecx3]. elim H. elim H. simpl in |- *.
+	rewrite (Neqb_correct a1). elim (bool_is_true_or_false a2); intro; rewrite H0; exact I. elim H. intros. induction  x as [| a a0| x2 Hrecx2 x3 Hrecx3]. elim H. elim H. simpl in |- *.
 	unfold ensemble_base in H. simpl in H. elim H. intros. split. exact (Hrecx1 x2 H0). exact (Hrecx0 x3 H1).
 Qed.
 
@@ -823,22 +825,22 @@ Proof.
 	intros. unfold maxi in |- *. split. exact (map_maxi_appartient A x). induction  x as [| a a0| x1 Hrecx1 x0 Hrecx0].
 	intros. induction  x as [| a a0| x1 Hrecx1 x0 Hrecx0]. simpl in |- *. exact I. elim H. elim H. intros. induction  x as [| a1 a2| x1 Hrecx1 x0 Hrecx0].
 	elim H. unfold ensemble_base in H. simpl in H. rewrite H. simpl in |- *.
-	rewrite (ad_eq_correct a1). elim (bool_is_true_or_false a2); intro; rewrite H0; exact I. elim H. intros. induction  x as [| a a0| x2 Hrecx2 x3 Hrecx3]. elim H. elim H. simpl in |- *.
+	rewrite (Neqb_correct a1). elim (bool_is_true_or_false a2); intro; rewrite H0; exact I. elim H. intros. induction  x as [| a a0| x2 Hrecx2 x3 Hrecx3]. elim H. elim H. simpl in |- *.
 	unfold ensemble_base in H. simpl in H. elim H. intros. split. exact (Hrecx1 x2 H0). exact (Hrecx0 x3 H1).
 Qed.
 
 Lemma map_mini_mapget_false :
  forall (A : Set) (x : Map A) (a : ad) (b : bool),
- MapGet bool (map_mini A x) a = SOME bool b -> b = false.
+ MapGet bool (map_mini A x) a = Some b -> b = false.
 Proof.
 	intro. simple induction x. intros. inversion H. intros. simpl in H.
-	elim (bool_is_true_or_false (ad_eq a a1)); intro; rewrite H0 in H. inversion H. reflexivity. inversion H. intros. induction  a as [| p].
+	elim (bool_is_true_or_false (Neqb a a1)); intro; rewrite H0 in H. inversion H. reflexivity. inversion H. intros. induction  a as [| p].
 	simpl in H1. exact (H _ _ H1). induction  p as [p Hrecp| p Hrecp| ]; simpl in H1. exact (H0 _ _ H1). exact (H _ _ H1). exact (H0 _ _ H1).
 Qed.
 
 Lemma map_mini_mapget_true :
  forall (A : Set) (x : Map A) (a : ad),
- MapGet bool (map_mini A x) a = SOME bool true -> False.
+ MapGet bool (map_mini A x) a = Some true -> False.
 Proof.
 	intros. cut (true <> false). intros. exact (H0 (map_mini_mapget_false _ _ _ _ H)). intro.
 	inversion H0.
@@ -852,7 +854,7 @@ Proof.
 	exact (map_maxi_maxi A x).
 Qed.
 
-(* démonstration de la propriété de hauteur de chaine bornée dans le treillis *)
+(* dÃ©monstration de la propriÃ©tÃ© de hauteur de chaine bornÃ©e dans le treillis *)
 
 Definition lattice_bounded_def_0 (p : prechain bool) : Prop :=
   forall (A : Set) (m0 m1 : Map A),
@@ -1010,20 +1012,20 @@ Proof.
 	unfold lattice_bounded_def_2 in |- *. intros. induction  p as [m| p Hrecp m]. simpl in |- *. exact (le_n_Sn _).
 	elim (prechain_sum bool p). intros. elim H0. intros. rewrite H1. simpl in |- *.
 	exact (le_n_n _). intros. elim H0. intros. elim H1. intros. rewrite H2 in H. elim (prechain_sum bool x0). intros. elim H3. intros. rewrite H4 in H. inversion H. inversion H5. inversion H14. induction  m as [| a1 a2| m1 Hrecm1 m0 Hrecm0]. elim H12.
-	induction  x as [| a3 a4| x4 Hrecx1 x5 Hrecx0]. elim H20. induction  x1 as [| a5 a6| x1_1 Hrecx1_1 x1_0 Hrecx1_0]. elim H17. simpl in H13. simpl in H21. elim (bool_is_true_or_false (ad_eq a3 a1)); intro; rewrite H22 in H13. elim (bool_is_true_or_false (ad_eq a5 a3)); intro; rewrite H23 in H21. inversion H6. inversion H28. rewrite (ad_eq_complete _ _ H22) in H26.
-	rewrite (ad_eq_complete _ _ H23) in H30. induction  a6 as [| ]. induction  a4 as [| ].
+	induction  x as [| a3 a4| x4 Hrecx1 x5 Hrecx0]. elim H20. induction  x1 as [| a5 a6| x1_1 Hrecx1_1 x1_0 Hrecx1_0]. elim H17. simpl in H13. simpl in H21. elim (bool_is_true_or_false (Neqb a3 a1)); intro; rewrite H22 in H13. elim (bool_is_true_or_false (Neqb a5 a3)); intro; rewrite H23 in H21. inversion H6. inversion H28. rewrite (Neqb_complete _ _ H22) in H26.
+	rewrite (Neqb_complete _ _ H23) in H30. induction  a6 as [| ]. induction  a4 as [| ].
 	elim H30. reflexivity. elim H21. induction  a4 as [| ]. induction  a2 as [| ]. elim H26.
 	reflexivity. elim H13. elim H30. reflexivity. elim H21. elim H13. elim H17.
 	elim H20. elim H12. intros. elim H3. intros. elim H4. intros. rewrite H5 in H. inversion H. inversion H6. inversion H15. inversion H23. induction  m as [| a1 a2| m1 Hrecm1 m0 Hrecm0].
 	elim H13. induction  x as [| a3 a4| x6 Hrecx1 x7 Hrecx0]. elim H21. induction  x1 as [| a5 a6| x1_1 Hrecx1_1 x1_0 Hrecx1_0]. elim H29. simpl in H14.
-	simpl in H22. elim (bool_is_true_or_false (ad_eq a3 a1)); intro; rewrite H31 in H14. elim (bool_is_true_or_false (ad_eq a5 a3)); intro; rewrite H32 in H22. inversion H7. inversion H37. rewrite (ad_eq_complete _ _ H31) in H35. rewrite (ad_eq_complete _ _ H32) in H40. induction  a6 as [| ]. induction  a4 as [| ].
+	simpl in H22. elim (bool_is_true_or_false (Neqb a3 a1)); intro; rewrite H31 in H14. elim (bool_is_true_or_false (Neqb a5 a3)); intro; rewrite H32 in H22. inversion H7. inversion H37. rewrite (Neqb_complete _ _ H31) in H35. rewrite (Neqb_complete _ _ H32) in H40. induction  a6 as [| ]. induction  a4 as [| ].
 	elim H40. reflexivity. elim H22. induction  a4 as [| ]. induction  a2 as [| ]. elim H35.
 	reflexivity. elim H14. elim H40. reflexivity. elim H22. elim H14. elim H29.
 	elim H21. elim H13. induction  m as [| a1 a2| m1 Hrecm1 m0 Hrecm0]. elim H13. induction  x as [| a3 a4| x6 Hrecx1 x7 Hrecx0]. elim H21.
-	induction  x1 as [| a5 a6| x1_1 Hrecx1_1 x1_0 Hrecx1_0]. elim H26. simpl in H14. simpl in H22. elim (bool_is_true_or_false (ad_eq a3 a1)); intro; rewrite H31 in H14.
-	elim (bool_is_true_or_false (ad_eq a5 a3)); intro; rewrite H32 in H22.
-	inversion H7. inversion H37. rewrite (ad_eq_complete _ _ H31) in H35.
-	rewrite (ad_eq_complete _ _ H32) in H40. induction  a6 as [| ]. induction  a4 as [| ].
+	induction  x1 as [| a5 a6| x1_1 Hrecx1_1 x1_0 Hrecx1_0]. elim H26. simpl in H14. simpl in H22. elim (bool_is_true_or_false (Neqb a3 a1)); intro; rewrite H31 in H14.
+	elim (bool_is_true_or_false (Neqb a5 a3)); intro; rewrite H32 in H22.
+	inversion H7. inversion H37. rewrite (Neqb_complete _ _ H31) in H35.
+	rewrite (Neqb_complete _ _ H32) in H40. induction  a6 as [| ]. induction  a4 as [| ].
 	elim H40. reflexivity. elim H22. induction  a4 as [| ]. induction  a2 as [| ]. elim H35.
 	reflexivity. elim H14. elim H40. reflexivity. elim H22. elim H14. elim H26.
 	elim H21. elim H13.
@@ -1066,7 +1068,7 @@ Proof.
 	unfold bounded_sas_chain in |- *. intros. exact (lattice_bounded_10 A x p H).
 Qed.
 
-(* égalité dans bool puis sur les (Map bool) (dans bool) *)
+(* Ã©galitÃ© dans bool puis sur les (Map bool) (dans bool) *)
 
 Definition eq_bool (b0 b1 : bool) : bool :=
   match b0, b1 with
@@ -1094,7 +1096,7 @@ Fixpoint eqm_bool (x y : Map bool) {struct y} : bool :=
   | M0, M1 _ _ => false
   | M0, M2 _ _ => false
   | M1 _ _, M0 => false
-  | M1 a b, M1 c d => ad_eq a c && eq_bool b d
+  | M1 a b, M1 c d => Neqb a c && eq_bool b d
   | M1 _ _, M2 _ _ => false
   | M2 _ _, M0 => false
   | M2 _ _, M1 _ _ => false
@@ -1105,8 +1107,8 @@ Lemma eqm_bool_equal : forall x y : Map bool, eqm_bool x y = true -> x = y.
 Proof.
 	simple induction x. simple induction y. intros. reflexivity. intros. inversion H.
 	intros. inversion H1. intros. induction  y as [| a1 a2| y1 Hrecy1 y0 Hrecy0]. inversion H. simpl in H.
-	elim (bool_is_true_or_false (ad_eq a a1)); intro; rewrite H0 in H.
-	rewrite (ad_eq_complete _ _ H0). elim (bool_is_true_or_false (eq_bool a0 a2)); intro; rewrite H1 in H. rewrite (eq_bool_equal _ _ H1).
+	elim (bool_is_true_or_false (Neqb a a1)); intro; rewrite H0 in H.
+	rewrite (Neqb_complete _ _ H0). elim (bool_is_true_or_false (eq_bool a0 a2)); intro; rewrite H1 in H. rewrite (eq_bool_equal _ _ H1).
 	reflexivity. inversion H. inversion H. inversion H. intros.
 	induction  y as [| a a0| y1 Hrecy1 y0 Hrecy0]. inversion H1. inversion H1. simpl in H1. elim (bool_is_true_or_false (eqm_bool m y1)); intro; rewrite H2 in H1.
 	elim (bool_is_true_or_false (eqm_bool m0 y0)); intro; rewrite H3 in H1.
@@ -1116,7 +1118,7 @@ Qed.
 
 Lemma equal_eqm_bool : forall x : Map bool, eqm_bool x x = true.
 Proof.
-	simple induction x. reflexivity. intros. simpl in |- *. rewrite (ad_eq_correct a).
+	simple induction x. reflexivity. intros. simpl in |- *. rewrite (Neqb_correct a).
 	rewrite (equal_eq_bool a0). reflexivity. intros. simpl in |- *. rewrite H.
 	rewrite H0. reflexivity.
 Qed.
@@ -1126,11 +1128,11 @@ Qed.
 Lemma lem_get_leb :
  forall (m0 m1 : Map bool) (a : ad) (b0 b1 : bool),
  lem m0 m1 ->
- MapGet bool m0 a = SOME bool b0 ->
- MapGet bool m1 a = SOME bool b1 -> leb b0 b1.
+ MapGet bool m0 a = Some b0 ->
+ MapGet bool m1 a = Some b1 -> leb b0 b1.
 Proof.
 	simple induction m0. intros. inversion H0. simple induction m1. intros. inversion H1.
-	intros. simpl in H. elim (bool_is_true_or_false (ad_eq a a1)); intros; rewrite H2 in H. simpl in H0. simpl in H1. elim (bool_is_true_or_false (ad_eq a a3)); intro; rewrite H3 in H0. inversion H0. elim (bool_is_true_or_false (ad_eq a1 a3)); intros; rewrite H4 in H1.
+	intros. simpl in H. elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H2 in H. simpl in H0. simpl in H1. elim (bool_is_true_or_false (Neqb a a3)); intro; rewrite H3 in H0. inversion H0. elim (bool_is_true_or_false (Neqb a1 a3)); intros; rewrite H4 in H1.
 	inversion H1. rewrite H7 in H. rewrite H5 in H. exact H. inversion H1.
 	inversion H0. elim H. intros. inversion H1. simple induction m2. intros.
 	inversion H3. intros. simpl in H1. elim H1. intros. simpl in H3.
@@ -1142,8 +1144,8 @@ Lemma lem_domain_equal :
 Proof.
 	simple induction m0. simple induction m1. intros. exact I. intros. inversion H.
 	intros. inversion H1. simple induction m1. intros. inversion H. intros.
-	simpl in |- *. simpl in H. elim (bool_is_true_or_false (ad_eq a a1)); intros.
-	exact (ad_eq_complete _ _ H0). rewrite H0 in H. elim H. intros.
+	simpl in |- *. simpl in H. elim (bool_is_true_or_false (Neqb a a1)); intros.
+	exact (Neqb_complete _ _ H0). rewrite H0 in H. elim H. intros.
 	inversion H1. intros. induction  m2 as [| a a0| m2_1 Hrecm2_1 m2_0 Hrecm2_0]. inversion H1. inversion H1.
 	elim H1; intros. simpl in |- *. split. exact (H _ H2). exact (H0 _ H3).
 Qed.

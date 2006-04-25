@@ -21,7 +21,7 @@ Require Import Allmaps.
 Require Import EqNat.
 Require Import bases.
 
-(* définition inductive du type des termes : *)
+(* dÃ©finition inductive du type des termes : *)
 Inductive term : Set :=
     app : ad -> term_list -> term
 with term_list : Set :=
@@ -114,7 +114,7 @@ Fixpoint taille_term (t : term) : nat :=
   | tcons hd tl => max (taille_term hd) (mtaille_term_list tl)
   end.
 
-(* définition des structures prec_list : adjacence des états de l'automate *)
+(* dÃ©finition des structures prec_list : adjacence des Ã©tats de l'automate *)
 
 Inductive prec_list : Set :=
   | prec_cons : ad -> prec_list -> prec_list -> prec_list
@@ -130,11 +130,11 @@ Proof.
 	split with pl0. reflexivity. left. reflexivity.
 Qed.
 
-(* définition des états *)
+(* dÃ©finition des Ã©tats *)
 
 Definition state := Map prec_list.
 
-(* définition des automates *)
+(* dÃ©finition des automates *)
 
 Definition preDTA := Map state.
 
@@ -212,38 +212,38 @@ Inductive prec_contained : prec_list -> prec_list -> Prop :=
       forall (p p0 p1 : prec_list) (a : ad),
       prec_contained p p1 -> prec_contained p (prec_cons a p0 p1).
 
-(* définition de l'appartenance d'un état à un pre dta *)
+(* dÃ©finition de l'appartenance d'un Ã©tat Ã  un pre dta *)
 
 Definition state_in_dta (d : preDTA) (s : state) : Prop :=
-  exists a : ad, MapGet state d a = SOME state s.
+  exists a : ad, MapGet state d a = Some s.
 
 Definition state_in_dta_diff (d : preDTA) (s : state) 
-  (a : ad) : Prop := exists b : ad, MapGet state d b = SOME state s /\ a <> b.
+  (a : ad) : Prop := exists b : ad, MapGet state d b = Some s /\ a <> b.
 
-(* définition de l'appartenance d'une adjacence à un pre dta *)
+(* dÃ©finition de l'appartenance d'une adjacence Ã  un pre dta *)
 
 Definition prec_in_dta (d : preDTA) (p : prec_list) : Prop :=
   exists s : state,
     (exists a : ad,
        (exists c : ad,
-          MapGet state d a = SOME state s /\
-          MapGet prec_list s c = SOME prec_list p)).
+          MapGet state d a = Some s /\
+          MapGet prec_list s c = Some p)).
 
 Definition prec_in_dta_cont (d : preDTA) (p : prec_list) : Prop :=
   exists s : state,
     (exists b : ad,
        (exists c : ad,
           (exists p0 : prec_list,
-             MapGet state d b = SOME state s /\
-             MapGet prec_list s c = SOME prec_list p0 /\ prec_contained p p0))).
+             MapGet state d b = Some s /\
+             MapGet prec_list s c = Some p0 /\ prec_contained p p0))).
 
 Definition prec_in_dta_diff (d : preDTA) (p : prec_list) 
   (a : ad) : Prop :=
   exists s : state,
     (exists b : ad,
        (exists c : ad,
-          MapGet state d b = SOME state s /\
-          MapGet prec_list s c = SOME prec_list p /\ a <> b)).
+          MapGet state d b = Some s /\
+          MapGet prec_list s c = Some p /\ a <> b)).
 
 Definition prec_in_dta_diff_cont (d : preDTA) (p : prec_list) 
   (a : ad) : Prop :=
@@ -251,14 +251,14 @@ Definition prec_in_dta_diff_cont (d : preDTA) (p : prec_list)
     (exists b : ad,
        (exists c : ad,
           (exists p0 : prec_list,
-             MapGet state d b = SOME state s /\
-             MapGet prec_list s c = SOME prec_list p0 /\
+             MapGet state d b = Some s /\
+             MapGet prec_list s c = Some p0 /\
              prec_contained p p0 /\ a <> b))).
 
-(* définition de l'appartenance d'une adjacence à un etat *)
+(* dÃ©finition de l'appartenance d'une adjacence Ã  un etat *)
 
 Definition prec_in_state (s : state) (p : prec_list) : Prop :=
-  exists c : ad, MapGet prec_list s c = SOME prec_list p.
+  exists c : ad, MapGet prec_list s c = Some p.
 
 Lemma prec_in_state_M0_false :
  forall p : prec_list, ~ prec_in_state (M0 prec_list) p.
@@ -405,29 +405,29 @@ Proof.
 	intros. exact (indprinciple_3_2 (term_high t) P H t (le_n_n _)).
 Qed.
 
-(* lemmes sur ad_double, ad_double_plus_un *)
+(* lemmes sur Ndouble, Ndouble_plus_one *)
 
-Lemma ad_double_inv_ad_z : forall x : ad, ad_double x = ad_z -> x = ad_z.
+Lemma Ndouble_inv_N0 : forall x : ad, Ndouble x = N0 -> x = N0.
 Proof.
 	simple induction x. intros. reflexivity. simpl in |- *. intros. inversion H.
 Qed.
 
-Lemma ad_double_inv_xO :
- forall (x : ad) (p : positive), ad_double x = ad_x (xO p) -> x = ad_x p.
+Lemma Ndouble_inv_xO :
+ forall (x : ad) (p : positive), Ndouble x = Npos (xO p) -> x = Npos p.
 Proof.
 	simple induction x. intros. inversion H. intros. simpl in H.
 	inversion H. reflexivity.
 Qed.
 
-Lemma ad_double_plus_un_inv_xH :
- forall x : ad, ad_double_plus_un x = ad_x 1 -> x = ad_z.
+Lemma Ndouble_plus_one_inv_xH :
+ forall x : ad, Ndouble_plus_one x = Npos 1 -> x = N0.
 Proof.
 	simple induction x. intros. reflexivity. simpl in |- *. intros. inversion H.
 Qed.
 
-Lemma ad_double_plus_un_inv_xI :
+Lemma Ndouble_plus_one_inv_xI :
  forall (x : ad) (p : positive),
- ad_double_plus_un x = ad_x (xI p) -> x = ad_x p.
+ Ndouble_plus_one x = Npos (xI p) -> x = Npos p.
 Proof.
 	simple induction x. intros. inversion H. intros. simpl in H.
 	inversion H. reflexivity.

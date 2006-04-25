@@ -32,7 +32,7 @@ Require Import empty_test.
 Lemma prec_list_kill_correct_wrt_sign_invar :
  forall (m : Map bool) (p p' : prec_list) (n : nat),
  pl_tl_length p n ->
- prec_list_kill m p = SOME prec_list p' -> pl_tl_length p' n.
+ prec_list_kill m p = Some p' -> pl_tl_length p' n.
 Proof.
 	intros. apply (forall_incl_length p' n). intros. elim (pl_kill_1 p p' m p0 H0 H1). intros. exact (pl_path_incl_length p0 p n H2 H).
 Qed.
@@ -50,7 +50,7 @@ Qed.
 Lemma states_kill_correct_wrt_sign_invar :
  forall (s s' : state) (m : Map bool) (sigma : signature),
  state_correct_wrt_sign s sigma ->
- states_kill m s = SOME state s' -> state_correct_wrt_sign s' sigma.
+ states_kill m s = Some s' -> state_correct_wrt_sign s' sigma.
 Proof.
 	unfold states_kill in |- *. intros. elim (map_sum prec_list (states_kill_aux m s)); intros. rewrite H1 in H0. inversion H0.
 	elim H1; intros; elim H2; intros; elim H3; intros; rewrite H4 in H0. inversion H0. rewrite <- H4. exact (states_kill_aux_correct_wrt_sign_invar _ _ _ H). inversion H0.
@@ -72,7 +72,7 @@ Proof.
 	simple induction d. simpl in |- *. intros. elim (option_sum state (MapGet state (preDTA_kill m p) a)). intros y. elim y. intros x y0.
 	rewrite y0. exact (preDTA_kill_correct_wrt_sign_invar _ _ _ H). intros y. rewrite y. unfold dta_correct_wrt_sign in |- *.
 	unfold predta_correct_wrt_sign in |- *. intros. simpl in H0.
-	elim (ad_sum a0); intros y0. elim y0. intros x y1. rewrite y1 in H0. inversion H0. rewrite y0 in H0. inversion H0.
+	elim (Ndiscr a0); intros y0. elim y0. intros x y1. rewrite y1 in H0. inversion H0. rewrite y0 in H0. inversion H0.
 	unfold state_correct_wrt_sign in |- *. intros. inversion H1.
 Qed.
 
@@ -93,7 +93,7 @@ Proof.
   (option_sum state (MapGet state (preDTA_kill (dta_non_empty_states p) p) a));
   intros y.
 	elim y. intros x y0. rewrite y0. simpl in |- *. exact (kill_empty_correct_wrt_sign_invar p sigma (dta_non_empty_states p) H). rewrite y. simpl in |- *. unfold predta_correct_wrt_sign in |- *.
-	intros. simpl in H0. elim (ad_sum a0). intros y0. elim y0.
+	intros. simpl in H0. elim (Ndiscr a0). intros y0. elim y0.
 	intros x y1. rewrite y1 in H0. inversion H0. intros y0. rewrite y0 in H0. inversion H0. unfold state_correct_wrt_sign in |- *.
 	intros. inversion H1.
 Qed.
@@ -111,8 +111,8 @@ Qed.
 
 Lemma prec_list_kill_occur :
  forall (p p' : prec_list) (b : ad) (m : Map bool),
- prec_list_kill m p = SOME prec_list p' ->
- prec_occur p' b -> MapGet bool m b = SOME bool true.
+ prec_list_kill m p = Some p' ->
+ prec_occur p' b -> MapGet bool m b = Some true.
 Proof.
 	simple induction p. intros. simpl in H1. elim (pl_sum p1); intros.
 	rewrite H3 in H1. elim (option_sum bool (MapGet bool m a)); intros y. elim y. intros x y0. rewrite y0 in H1. elim (bool_is_true_or_false x); intros; rewrite H4 in H1.
@@ -137,7 +137,7 @@ Lemma prec_list_kill_ref_ok_invar :
  forall (d : preDTA) (p p' : prec_list) (sigma : signature),
  prec_list_ref_ok p d ->
  predta_correct_wrt_sign d sigma ->
- prec_list_kill (dta_non_empty_states d) p = SOME prec_list p' ->
+ prec_list_kill (dta_non_empty_states d) p = Some p' ->
  prec_list_ref_ok p' (preDTA_kill (dta_non_empty_states d) d).
 Proof.
 	intros. unfold prec_list_ref_ok in |- *. intros. elim (dt_non_empty_fix d a). intros. elim (H3 (prec_list_kill_occur _ _ _ _ H1 H2)). intros.
@@ -160,7 +160,7 @@ Lemma states_kill_ref_ok_invar :
  forall (d : preDTA) (s s' : state) (sigma : signature),
  state_ref_ok s d ->
  predta_correct_wrt_sign d sigma ->
- states_kill (dta_non_empty_states d) s = SOME state s' ->
+ states_kill (dta_non_empty_states d) s = Some s' ->
  state_ref_ok s' (preDTA_kill (dta_non_empty_states d) d).
 Proof.
 	intros. unfold states_kill in H1. elim (map_sum prec_list (states_kill_aux (dta_non_empty_states d) s));
@@ -198,7 +198,7 @@ Proof.
 	simple induction d. simpl in |- *. intros. elim
   (option_sum state (MapGet state (preDTA_kill (dta_non_empty_states p) p) a));
   intros y. elim y. intros x y0. rewrite y0. exact (preDTA_kill_ref_ok_invar _ _ H H0). rewrite y. simpl in |- *.
-	unfold preDTA_ref_ok in |- *. intros. simpl in H1. elim (ad_sum a0); intros y0. elim y0. intros x y1. rewrite y1 in H1. inversion H1. rewrite y0 in H1. inversion H1. rewrite <- H5 in H2.
+	unfold preDTA_ref_ok in |- *. intros. simpl in H1. elim (Ndiscr a0); intros y0. elim y0. intros x y1. rewrite y1 in H1. inversion H1. rewrite y0 in H1. inversion H1. rewrite <- H5 in H2.
 	inversion H2.
 Qed.
 

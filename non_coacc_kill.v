@@ -16,6 +16,7 @@
 
 Require Import Bool.
 Require Import Arith.
+Require Import NArith Ndec.
 Require Import ZArith.
 Require Import Allmaps.
 Require Import bases.
@@ -30,7 +31,7 @@ Require Import coacc_test.
 Fixpoint non_coacc_kill (d : preDTA) (m : Map bool) {struct m} : preDTA :=
   match d, m with
   | M0, M0 => M0 state
-  | M1 a s, M1 a' b => if ad_eq a a' && b then M1 state a s else M0 state
+  | M1 a s, M1 a' b => if Neqb a a' && b then M1 state a s else M0 state
   | M2 x y, M2 z t => M2 state (non_coacc_kill x z) (non_coacc_kill y t)
   | _, _ => M0 state
   end.
@@ -69,13 +70,13 @@ Qed.
 Lemma non_coacc_kill_0 :
  forall (d : preDTA) (a : ad) (s : state) (m : Map bool),
  ensemble_base state d m ->
- MapGet state d a = SOME state s ->
- MapGet bool m a = SOME bool true ->
- MapGet state (non_coacc_kill d m) a = SOME state s.
+ MapGet state d a = Some s ->
+ MapGet bool m a = Some true ->
+ MapGet state (non_coacc_kill d m) a = Some s.
 Proof.
-	simple induction d; intros. inversion H0. induction  m as [| a2 a3| m1 Hrecm1 m0 Hrecm0]; simpl in H1. inversion H1. simpl in H0. simpl in |- *. elim (bool_is_true_or_false (ad_eq a a1)); intros. rewrite H2 in H0. elim (bool_is_true_or_false (ad_eq a2 a1)); intros; rewrite H3 in H1;
-  inversion H1. rewrite (ad_eq_complete _ _ H2). rewrite (ad_eq_complete _ _ H3).
-	rewrite (ad_eq_correct a1). simpl in |- *. rewrite (ad_eq_correct a1). inversion H0. reflexivity. rewrite H2 in H0.
+	simple induction d; intros. inversion H0. induction  m as [| a2 a3| m1 Hrecm1 m0 Hrecm0]; simpl in H1. inversion H1. simpl in H0. simpl in |- *. elim (bool_is_true_or_false (Neqb a a1)); intros. rewrite H2 in H0. elim (bool_is_true_or_false (Neqb a2 a1)); intros; rewrite H3 in H1;
+  inversion H1. rewrite (Neqb_complete _ _ H2). rewrite (Neqb_complete _ _ H3).
+	rewrite (Neqb_correct a1). simpl in |- *. rewrite (Neqb_correct a1). inversion H0. reflexivity. rewrite H2 in H0.
 	inversion H0. inversion H. induction  m1 as [| a0 a1| m1_1 Hrecm1_1 m1_0 Hrecm1_0]. inversion H1.
 	inversion H1. simpl in |- *. unfold ensemble_base in H1. elim H1.
 	intros. induction  a as [| p]; simpl in |- *; simpl in H2; simpl in H3.
@@ -86,14 +87,14 @@ Qed.
 Lemma non_coacc_kill_1 :
  forall (d : preDTA) (a : ad) (s : state) (m : Map bool),
  ensemble_base state d m ->
- MapGet state (non_coacc_kill d m) a = SOME state s ->
- MapGet state d a = SOME state s /\ MapGet bool m a = SOME bool true.
+ MapGet state (non_coacc_kill d m) a = Some s ->
+ MapGet state d a = Some s /\ MapGet bool m a = Some true.
 Proof.
 	simple induction d; intros. induction  m as [| a0 a1| m1 Hrecm1 m0 Hrecm0]; inversion H0.
 	induction  m as [| a2 a3| m1 Hrecm1 m0 Hrecm0]. inversion H. simpl in H. simpl in H0.
-	elim (bool_is_true_or_false (ad_eq a a2)); intros; rewrite H1 in H0. elim (bool_is_true_or_false a3); intros; rewrite H2 in H0. simpl in H0. elim (bool_is_true_or_false (ad_eq a a1)); intros; rewrite H3 in H0;
-  inversion H0. rewrite (ad_eq_complete _ _ H1).
-	simpl in |- *. rewrite <- (ad_eq_complete _ _ H1). rewrite <- (ad_eq_complete _ _ H3). rewrite H2. rewrite (ad_eq_correct a). split; reflexivity. simpl in H0.
+	elim (bool_is_true_or_false (Neqb a a2)); intros; rewrite H1 in H0. elim (bool_is_true_or_false a3); intros; rewrite H2 in H0. simpl in H0. elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H3 in H0;
+  inversion H0. rewrite (Neqb_complete _ _ H1).
+	simpl in |- *. rewrite <- (Neqb_complete _ _ H1). rewrite <- (Neqb_complete _ _ H3). rewrite H2. rewrite (Neqb_correct a). split; reflexivity. simpl in H0.
 	inversion H0. simpl in H0. inversion H0. inversion H.
 	induction  m1 as [| a0 a1| m1_1 Hrecm1_1 m1_0 Hrecm1_0]. inversion H1. inversion H1. unfold ensemble_base in H1. elim H1. intros. induction  a as [| p]; simpl in |- *; simpl in H2. exact (H _ _ _ H3 H2). induction  p as [p Hrecp| p Hrecp| ]; simpl in |- *; simpl in H2. exact (H0 _ _ _ H4 H2).
 	exact (H _ _ _ H3 H2). exact (H0 _ _ _ H4 H2).
@@ -102,8 +103,8 @@ Qed.
 Lemma predta_kill_non_coacc_0 :
  forall (d : preDTA) (a a0 : ad) (s : state),
  preDTA_ref_ok d ->
- (MapGet state d a0 = SOME state s /\ coacc d a a0 <->
-  MapGet state (predta_kill_non_coacc d a) a0 = SOME state s).
+ (MapGet state d a0 = Some s /\ coacc d a a0 <->
+  MapGet state (predta_kill_non_coacc d a) a0 = Some s).
 Proof.
 	intros. split. intros. intros. elim (predta_coacc_fix d a a0). intros. intros. elim H0. intros. apply
   (fun p : ensemble_base state d (predta_coacc_states d a) =>
@@ -129,7 +130,7 @@ Definition predta_kill_non_coacc_def_0 (d : preDTA)
 
 Lemma predta_kill_non_coacc_1 :
  forall (d : preDTA) (a : ad) (s : state),
- MapGet state d a = SOME state s -> predta_kill_non_coacc_def_0 d a a.
+ MapGet state d a = Some s -> predta_kill_non_coacc_def_0 d a a.
 Proof.
 	unfold predta_kill_non_coacc_def_0 in |- *. intros. elim (predta_coacc_fix d a a H0). intros. apply (coacc_id (predta_kill_non_coacc d a) a s).
 	unfold predta_kill_non_coacc in |- *. apply (non_coacc_kill_0 d a s (predta_coacc_states d a)). unfold predta_coacc_states in |- *.
@@ -142,9 +143,9 @@ Qed.
 Lemma predta_kill_non_coacc_2 :
  forall (d : preDTA) (a0 a1 a2 : ad) (s1 s2 : state) 
    (pl : prec_list) (c : ad),
- MapGet state d a2 = SOME state s2 ->
- MapGet state d a1 = SOME state s1 ->
- MapGet prec_list s1 c = SOME prec_list pl ->
+ MapGet state d a2 = Some s2 ->
+ MapGet state d a1 = Some s1 ->
+ MapGet prec_list s1 c = Some pl ->
  prec_occur pl a2 ->
  coacc d a0 a1 ->
  predta_kill_non_coacc_def_0 d a0 a1 -> predta_kill_non_coacc_def_0 d a0 a2.
@@ -188,7 +189,7 @@ Definition predta_kill_non_coacc_rec_def_2 (p : preDTA)
 
 Lemma predta_kill_non_coacc_rec_0 :
  forall (d : preDTA) (a : ad) (t : term) (ladj : state)
-   (e : MapGet state d a = SOME state ladj) (s : state_reconnait d ladj t),
+   (e : MapGet state d a = Some ladj) (s : state_reconnait d ladj t),
  predta_kill_non_coacc_rec_def_1 d ladj t s ->
  predta_kill_non_coacc_rec_def_0 d a t (rec_dta d a t ladj e s).
 Proof.
@@ -199,7 +200,7 @@ Qed.
 
 Lemma predta_kill_non_coacc_rec_1 :
  forall (d : preDTA) (s : state) (c : ad) (tl : term_list) 
-   (l : prec_list) (e : MapGet prec_list s c = SOME prec_list l)
+   (l : prec_list) (e : MapGet prec_list s c = Some l)
    (l0 : liste_reconnait d l tl),
  predta_kill_non_coacc_rec_def_2 d l tl l0 ->
  predta_kill_non_coacc_rec_def_1 d s (app c tl) (rec_st d s c tl l e l0).
@@ -261,14 +262,14 @@ Qed.
 Inductive reconnaissance_co : preDTA -> ad -> ad -> term -> Prop :=
     rec_co_dta :
       forall (d : preDTA) (a b : ad) (t : term) (ladj : state),
-      MapGet state d a = SOME state ladj ->
+      MapGet state d a = Some ladj ->
       state_reconnait_co d ladj b t ->
       coacc d b a -> reconnaissance_co d a b t
 with state_reconnait_co : preDTA -> state -> ad -> term -> Prop :=
     rec_co_st :
       forall (d : preDTA) (s : state) (c b : ad) (tl : term_list)
         (l : prec_list),
-      MapGet prec_list s c = SOME prec_list l ->
+      MapGet prec_list s c = Some l ->
       liste_reconnait_co d l b tl -> state_reconnait_co d s b (app c tl)
 with liste_reconnait_co : preDTA -> prec_list -> ad -> term_list -> Prop :=
   | rec_co_empty :
@@ -306,7 +307,7 @@ Definition rec_co_def_2 (d : preDTA) (p : prec_list)
 
 Lemma rec_co_0 :
  forall (d : preDTA) (a b : ad) (t : term) (ladj : state)
-   (e : MapGet state d a = SOME state ladj)
+   (e : MapGet state d a = Some ladj)
    (s : state_reconnait_co d ladj b t),
  rec_co_def_1 d ladj b t s ->
  forall c : coacc d b a, rec_co_def_0 d a b t (rec_co_dta d a b t ladj e s c).
@@ -316,7 +317,7 @@ Qed.
 
 Lemma rec_co_1 :
  forall (d : preDTA) (s : state) (c b : ad) (tl : term_list) 
-   (l : prec_list) (e : MapGet prec_list s c = SOME prec_list l)
+   (l : prec_list) (e : MapGet prec_list s c = Some l)
    (l0 : liste_reconnait_co d l b tl),
  rec_co_def_2 d l b tl l0 ->
  rec_co_def_1 d s b (app c tl) (rec_co_st d s c b tl l e l0).
@@ -454,7 +455,7 @@ Definition rec_co_rec_def_2 (d : preDTA) (p : prec_list)
 
 Lemma rec_co_rec_0 :
  forall (d : preDTA) (a b : ad) (t : term) (ladj : state)
-   (e : MapGet state d a = SOME state ladj)
+   (e : MapGet state d a = Some ladj)
    (s : state_reconnait_co d ladj b t),
  rec_co_rec_def_1 d ladj b t s ->
  forall c : coacc d b a,
@@ -465,7 +466,7 @@ Qed.
 
 Lemma rec_co_rec_1 :
  forall (d : preDTA) (s : state) (c b : ad) (tl : term_list) 
-   (l : prec_list) (e : MapGet prec_list s c = SOME prec_list l)
+   (l : prec_list) (e : MapGet prec_list s c = Some l)
    (l0 : liste_reconnait_co d l b tl),
  rec_co_rec_def_2 d l b tl l0 ->
  rec_co_rec_def_1 d s b (app c tl) (rec_co_st d s c b tl l e l0).
@@ -526,7 +527,7 @@ Definition rec_nonco_kill_def_2 (d : preDTA) (p : prec_list)
 
 Lemma rec_nonco_kill_0 :
  forall (d : preDTA) (a b : ad) (t : term) (ladj : state)
-   (e : MapGet state d a = SOME state ladj)
+   (e : MapGet state d a = Some ladj)
    (s : state_reconnait_co d ladj b t),
  rec_nonco_kill_def_1 d ladj b t s ->
  forall c : coacc d b a,
@@ -543,7 +544,7 @@ Qed.
 
 Lemma rec_nonco_kill_1 :
  forall (d : preDTA) (s : state) (c b : ad) (tl : term_list) 
-   (l : prec_list) (e : MapGet prec_list s c = SOME prec_list l)
+   (l : prec_list) (e : MapGet prec_list s c = Some l)
    (l0 : liste_reconnait_co d l b tl),
  rec_nonco_kill_def_2 d l b tl l0 ->
  rec_nonco_kill_def_1 d s b (app c tl) (rec_co_st d s c b tl l e l0).
