@@ -1,3 +1,4 @@
+-R . tree_automata
 auto.v 
 bases.v 
 coacc_test.v 
