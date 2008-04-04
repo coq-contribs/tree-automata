@@ -1,4 +1,4 @@
--R . tree_automata
+-R . TreeAutomata
 -R ../../Cachan/IntMap IntMap
 auto.v 
 bases.v 

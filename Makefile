@@ -24,9 +24,9 @@
 #########################
 
 OCAMLLIBS:=-I ../GRAPHS
-COQLIBS:=-I ../GRAPHS -R . tree_automata\
+COQLIBS:=-I ../GRAPHS -R . TreeAutomata\
   -R ../../Cachan/IntMap IntMap
-COQDOCLIBS:=-R . tree_automata\
+COQDOCLIBS:=-R . TreeAutomata\
   -R ../../Cachan/IntMap IntMap
 
 ##########################
@@ -94,25 +94,7 @@ GFILES:=$(VFILES:.v=.g)
 HTMLFILES:=$(VFILES:.v=.html)
 GHTMLFILES:=$(VFILES:.v=.g.html)
 
-all: auto.vo\
-  bases.vo\
-  coacc_test.vo\
-  defs.vo\
-  empty_test.vo\
-  inter_correct.vo\
-  inter.vo\
-  lattice_fixpoint.vo\
-  non_coacc_kill_correct.vo\
-  non_coacc_kill.vo\
-  pl_path.vo\
-  refcorrect.vo\
-  semantics.vo\
-  signature.vo\
-  states_kill_correct.vo\
-  states_kill_empty.vo\
-  union_correct.vo\
-  union.vo
-
+all: $(VOFILES) 
 spec: $(VIFILES)
 
 gallina: $(GFILES)
@@ -140,8 +122,6 @@ all-gal.ps: $(VFILES)
 ####################
 
 .PHONY: all opt byte archclean clean install depend html
-
-.SUFFIXES: .v .vo .vi .g .html .tex .g.tex .g.html
 
 %.vo %.glob: %.v
 	$(COQC) -dump-glob $*.glob $(COQDEBUG) $(COQFLAGS) $*
