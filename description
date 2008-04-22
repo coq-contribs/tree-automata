@@ -9,3 +9,4 @@ Description: provides tree automatas algorithms in Coq (merge,
   deletion of non coaccessible states)
 Keywords:tree automatas bottom up reflexion terms 
 Require:graphs
+Category: Computer Science/Formal Languages Theory and Automata
