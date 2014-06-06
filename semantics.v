@@ -21,6 +21,8 @@ Require Import Allmaps.
 Require Import bases.
 Require Import defs.
 
+Unset Standard Proposition Elimination Names.
+
 (* fonction définissant la sémantique : reconnaissance d'un terme par un automate *)
 
 Fixpoint rec_term (d : preDTA) (a : ad) (t : term) 
