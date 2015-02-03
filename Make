@@ -1,5 +1,4 @@
 -R . TreeAutomata
--R ../../Cachan/IntMap IntMap
 auto.v 
 bases.v 
 coacc_test.v 
