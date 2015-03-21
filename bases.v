@@ -19,7 +19,7 @@ Require Import Arith.
 Require Import ZArith.
 Require Import NArith.
 Require Import Ndec.
-Require Import Allmaps.
+From IntMap Require Import Allmaps.
 Require Import EqNat.
 Require Export Max.
 

@@ -16,7 +16,7 @@
 
 Require Import Bool.
 Require Import NArith Ndec.
-Require Import Allmaps.
+From IntMap Require Import Allmaps.
 Require Import bases.
 Require Import defs.
 

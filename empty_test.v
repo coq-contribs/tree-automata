@@ -20,7 +20,7 @@ Require Import NArith.
 Require Import Ndec.
 Require Import ZArith.
 Require Import Classical_Prop.
-Require Import Allmaps.
+From IntMap Require Import Allmaps.
 Require Import lattice_fixpoint.
 Require Import bases.
 Require Import defs.

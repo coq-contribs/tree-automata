@@ -19,7 +19,7 @@ Require Import Bool.
 Require Import Arith.
 Require Import NArith.
 Require Import Ndec.
-Require Import Allmaps.
+From IntMap Require Import Allmaps.
 Require Import bases.
 
 Fixpoint domain_equal (A B : Set) (m0 : Map A) (m1 : Map B) {struct m1} :

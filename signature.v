@@ -19,7 +19,7 @@ Require Import NArith.
 Require Import Ndec.
 Require Import ZArith.
 Require Import EqNat.
-Require Import Allmaps.
+From IntMap Require Import Allmaps.
 Require Import bases.
 Require Import defs.
 Require Import semantics.

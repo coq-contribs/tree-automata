@@ -18,7 +18,7 @@ Require Import Bool.
 Require Import NArith Ndec Ndigits.
 Require Import ZArith.
 Require Import Classical_Prop.
-Require Import Allmaps.
+From IntMap Require Import Allmaps.
 Require Import bases.
 Require Import defs.
 Require Import semantics.

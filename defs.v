@@ -17,7 +17,7 @@
 Require Import Bool.
 Require Import Arith.
 Require Import ZArith.
-Require Import Allmaps.
+From IntMap Require Import Allmaps.
 Require Import EqNat.
 Require Import bases.
 
