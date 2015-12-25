@@ -1859,15 +1859,14 @@ Proof.
 	intros. unfold mpl_compat in H. inversion H1. apply (rec_st d (union_mpl_0 c pl (M1 prec_list c0 pl0)) c tl l). simpl in |- *. elim (bool_is_true_or_false (Neqb c c0)); intros; rewrite H8. elim (H0 (Neqb_complete c c0 H8)). elim (Ndiscr (Nxor c0 c)).
 	intro y. elim y; intros x y0. rewrite y0. cut
   (MapGet prec_list (MapPut1 prec_list c0 pl0 c pl x) c =
-   (fun a0 : ad =>
-    match Neqb c0 a0 with
+    match Neqb c0 c with
     | true => Some pl0
     | false =>
-        match Neqb c a0 with
+        match Neqb c c with
         | true => Some pl
         | false => None
         end
-    end) c). intro. rewrite <- (Neqb_comm c c0) in H9.
+    end). intro. rewrite <- (Neqb_comm c c0) in H9.
 	rewrite H8 in H9. rewrite (Neqb_correct c) in H9. rewrite H9. simpl in H6.
 	rewrite (Neqb_correct c) in H6. inversion H6. trivial. exact (MapPut1_semantics prec_list x c0 c pl0 pl y0 c). intro y. rewrite (Neqb_comm c c0) in H8. rewrite (Nxor_eq_true c0 c y) in H8. inversion H8. assumption.
 Qed.
