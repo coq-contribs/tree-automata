@@ -1,4 +1,4 @@
--R . TreeAutomata
+-R . TreeAutomata -R int-map IntMap
 auto.v 
 bases.v 
 coacc_test.v 
