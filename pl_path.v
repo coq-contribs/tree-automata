@@ -292,7 +292,7 @@ Proof.
      pl_path_incl_length_1 pl_path_incl_length_2 plp pl H n H H0).
 Qed.
 
-(* CNS pour la propriété pl_tl_length, partie suffisante *)
+(* CNS pour la propriÃ©tÃ© pl_tl_length, partie suffisante *)
 
 Lemma forall_incl_length :
  forall (pl : prec_list) (n : nat),

@@ -25,7 +25,7 @@ Require Import semantics.
 Require Import refcorrect.
 Require Import lattice_fixpoint.
 
-(* définition inductive de la coaccessibilité *)
+(* dÃ©finition inductive de la coaccessibilitÃ© *)
 
 Inductive coacc : preDTA -> ad -> ad -> Prop :=
   | coacc_id :
@@ -273,7 +273,7 @@ Proof.
 	intros. right. exact H2. right. exact H1. left. reflexivity.
 Qed.
 
-(* définition ok de l'application predta_coacc *)
+(* dÃ©finition ok de l'application predta_coacc *)
 
 Lemma map_or_def_ok :
  forall m0 m1 : Map bool,
@@ -550,7 +550,7 @@ Proof.
      (predta_coacc_0_incr d d x y H)).
 Qed.
 
-(* démonstration : propriété de chaine croissantes bornées *)
+(* dÃ©monstration : propriÃ©tÃ© de chaine croissantes bornÃ©es *)
 
 Definition lattice_lemd_bounded_0_def (p : prechain bool) : Prop :=
   forall d : preDTA,
@@ -612,7 +612,7 @@ Proof.
 	unfold bounded_sas_chain in |- *. intros. exact (lattice_bounded state d p (lattice_lemd_bounded p d H)).
 Qed.
 
-(* démo : si un état est coaccessible alors il existe n tel que ... *)
+(* dÃ©mo : si un Ã©tat est coaccessible alors il existe n tel que ... *)
 
 Lemma pl_coacc_contain_coacc_ads :
  forall (d : preDTA) (p : prec_list) (a : ad),
@@ -762,7 +762,7 @@ Proof.
      a1 H H H0).
 Qed.
 
-(* démo si mapget power predta_coacc = true alors l'état est coaccessible *)
+(* dÃ©mo si mapget power predta_coacc = true alors l'Ã©tat est coaccessible *)
 
 Lemma pl_coacc_rev :
  forall (d : preDTA) (pl : prec_list) (a : ad),

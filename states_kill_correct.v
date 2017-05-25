@@ -210,7 +210,7 @@ Proof.
 	intro. rewrite (kill_empty_states_lazy_eg_kill_empty_states d). exact (DTA_kill_ref_ok_invar d).
 Qed.
 
-(* correction : appartenance de l'état final *)
+(* correction : appartenance de l'Ã©tat final *)
 
 Lemma inter_DTA_main_state_correct_invar :
  forall d : DTA,

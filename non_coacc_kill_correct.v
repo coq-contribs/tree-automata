@@ -27,7 +27,7 @@ Require Import lattice_fixpoint.
 Require Import coacc_test.
 Require Import non_coacc_kill.
 
-(* correction par rapport à la signature *)
+(* correction par rapport Ã  la signature *)
 
 Lemma predta_kill_non_coacc_correct_wrt_sign :
  forall (d : preDTA) (a : ad) (sigma : signature),
@@ -80,7 +80,7 @@ Proof.
 	exact (dta_kill_non_coacc_correct_ref_ok d H).
 Qed.
 
-(* correction : appartenance de l'état final *)
+(* correction : appartenance de l'Ã©tat final *)
 
 Lemma dta_kill_non_coacc_correct_main_state :
  forall d : DTA,

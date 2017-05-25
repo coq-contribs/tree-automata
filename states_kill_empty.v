@@ -679,7 +679,7 @@ Proof.
 	exact (dta_kill_empty_states_semantics d).
 Qed.
 
-(* invariance de la compatibilité par rapport à une signature *)
+(* invariance de la compatibilitÃ© par rapport Ã  une signature *)
 
 Lemma kill_empty_correct_wrt_sign_invar_0 :
  forall (p p' : prec_list) (m : Map bool) (n : nat),
@@ -727,7 +727,7 @@ Proof.
   rewrite <- H7 in H3; inversion H3; reflexivity.
 Qed.
 
-(* kill empty détruit tous les états vides *)
+(* kill empty dÃ©truit tous les Ã©tats vides *)
 
 Lemma dt_kill_empty_kill_empty_0 :
  forall (d : preDTA) (p p' : prec_list),

@@ -26,7 +26,7 @@ Require Import signature.
 Require Import refcorrect.
 Require Import union.
 
-(* conservation de l'invariant de compatibilité par rapport à une signature pour l'union *)
+(* conservation de l'invariant de compatibilitÃ© par rapport Ã  une signature pour l'union *)
 
 Lemma upl_conv_0_correct_wrt_sign_invar :
  forall (p : prec_list) (n : nat),
@@ -567,7 +567,7 @@ Proof.
 	exact (u_merge_ref_ok _ _ H H0 _ _ _ _ _ H1 H2 H3).
 Qed.
 
-(* correction : appartenance de l'état final *)
+(* correction : appartenance de l'Ã©tat final *)
 
 Lemma union_DTA_main_state_correct_invar :
  forall d0 d1 : DTA,

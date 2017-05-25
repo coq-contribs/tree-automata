@@ -26,7 +26,7 @@ Require Import refcorrect.
 Require Import lattice_fixpoint.
 Require Import coacc_test.
 
-(* fonction de suppression des états non coaccessibles *)
+(* fonction de suppression des Ã©tats non coaccessibles *)
 
 Fixpoint non_coacc_kill (d : preDTA) (m : Map bool) {struct m} : preDTA :=
   match d, m with
@@ -65,7 +65,7 @@ Proof.
 	exact (equal_eqm_bool b).
 Qed.
 
-(* démo : un état apparait dans non_coacc_kill ssi il est coacc *)
+(* dÃ©mo : un Ã©tat apparait dans non_coacc_kill ssi il est coacc *)
 
 Lemma non_coacc_kill_0 :
  forall (d : preDTA) (a : ad) (s : state) (m : Map bool),
@@ -121,7 +121,7 @@ Proof.
 	intros. exact (predta_coacc_def_ok d a x). exact (map_mini_appartient state d).
 Qed.
 
-(* coaccessibilité des états conservée en supprimant les coaccessibles *)
+(* coaccessibilitÃ© des Ã©tats conservÃ©e en supprimant les coaccessibles *)
 
 Definition predta_kill_non_coacc_def_0 (d : preDTA) 
   (a0 a1 : ad) : Prop :=
@@ -164,9 +164,9 @@ Proof.
      predta_kill_non_coacc_2 d a0 a1 H0 H H0).
 Qed.
 
-(* sémantique de reconnaissance dans les coaccessibles *)
+(* sÃ©mantique de reconnaissance dans les coaccessibles *)
 
-(* sens trivial : si un terme est reconnu par l'automate où on a kille
+(* sens trivial : si un terme est reconnu par l'automate oÃ¹ on a kille
 les non coaccessibles alors il est reconnu dans l automate *)
 
 Definition predta_kill_non_coacc_rec_def_0 (p : preDTA) 
@@ -604,7 +604,7 @@ Proof.
 	intros. exact (rec_co_rec _ _ _ _ (rec_nonco_kill d a a t (rec_co d a t H H0) H)).
 Qed.
 
-(* sémantique du kill non coacc states : *)
+(* sÃ©mantique du kill non coacc states : *)
 
 Lemma predta_kill_non_coacc_semantics :
  forall (d : DTA) (t : term),

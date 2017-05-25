@@ -25,7 +25,7 @@ Require Import signature.
 Require Import refcorrect.
 Require Import inter.
 
-(* correction de l'invariant de compatibilité par rapport à une signature *)
+(* correction de l'invariant de compatibilitÃ© par rapport Ã  une signature *)
 
 Lemma pl_produit_correct_wrt_sign_invar :
  forall (p0 p1 : prec_list) (n : nat),
@@ -587,7 +587,7 @@ Proof.
 	simpl in H0. simpl in |- *. exact (preDTA_produit_ref_ok p p0 H H0).
 Qed.
 
-(* correction : appartenance de l'état final *)
+(* correction : appartenance de l'Ã©tat final *)
 
 Lemma inter_DTA_main_state_correct_invar :
  forall d0 d1 : DTA,
