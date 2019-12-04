@@ -214,15 +214,15 @@ Proof.
 	symmetry  in |- *. assumption.
 	assumption.
 	exact (M1_semantics_1 A x0 e).
-	cut (Neqb x x0 = false \/ Neqb x x0 = true). intro. elim H1; intros.
+	cut (N.eqb x x0 = false \/ N.eqb x x0 = true). intro. elim H1; intros.
 	cut (MapGet A (M1 A x e) x0 = None). intro. cut (Some a = None).
 	intro. inversion H4. transitivity (MapGet A (M1 A x e) x0). symmetry  in |- *.
 	assumption.
 	assumption.
 	exact (M1_semantics_2 A x x0 e H2).
 	exact (Neqb_complete x x0 H2).
-	elim (bool_dec_eq (Neqb x x0) true). intros. right. assumption.
-	intro y. left. exact (not_true_is_false (Neqb x x0) y).
+	elim (bool_dec_eq (N.eqb x x0) true). intros. right. assumption.
+	intro y. left. exact (not_true_is_false (N.eqb x x0) y).
 Qed.
 
 Lemma in_M2_disj :
@@ -241,13 +241,13 @@ Qed.
 
 (* équations auxilliaires sur Neqb_1 *)
 
-Lemma aux_Neqb_1_0 : forall p : positive, Peqb p p = true.
+Lemma aux_Neqb_1_0 : forall p : positive, Pos.eqb p p = true.
 Proof.
 	simple induction p. simpl in |- *. intros. trivial. simpl in |- *. intros.
 	trivial. trivial.
 Qed.
 
-Lemma aux_Neqb_1_1 : forall p p0 : positive, Peqb p p0 = true -> p = p0.
+Lemma aux_Neqb_1_1 : forall p p0 : positive, Pos.eqb p p0 = true -> p = p0.
 Proof.
 	simple induction p. intro. intro. simple induction p1. intros. simpl in H1.
 	cut (p0 = p2). intro. rewrite H2. trivial. exact (H p2 H1).
@@ -262,7 +262,7 @@ Qed.
 (* lemmes auxilliaires sur Neqb *)
 
 Lemma aux_Neqb_trans :
- forall a b c : ad, Neqb a b = true -> Neqb b c = true -> Neqb a c = true.
+ forall a b c : ad, N.eqb a b = true -> N.eqb b c = true -> N.eqb a c = true.
 Proof.
 	intros. rewrite <- (Neqb_complete b c H0). trivial.
 Qed.

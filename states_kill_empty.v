@@ -84,7 +84,7 @@ Fixpoint states_kill_aux (m : Map bool) (s : state) {struct s} : state :=
       match states_kill_aux m s0, states_kill_aux m s1 with
       | M0, M0 => M0 prec_list
       | M0, M1 a p => M1 prec_list (Ndouble_plus_one a) p
-      | M1 a p, M0 => M1 prec_list (Ndouble a) p
+      | M1 a p, M0 => M1 prec_list (N.double a) p
       | s0', s1' => M2 prec_list s0' s1'
       end
   end.
@@ -108,7 +108,7 @@ Fixpoint preDTA_kill (m : Map bool) (d : preDTA) {struct d} : preDTA :=
       match preDTA_kill m d0, preDTA_kill m d1 with
       | M0, M0 => M0 state
       | M0, M1 a s' => M1 state (Ndouble_plus_one a) s'
-      | M1 a s', M0 => M1 state (Ndouble a) s'
+      | M1 a s', M0 => M1 state (N.double a) s'
       | d0', d1' => M2 state d0' d1'
       end
   end.
@@ -233,7 +233,7 @@ Lemma st_kill_0 :
  MapGet prec_list s a = Some p ->
  MapGet prec_list (states_kill_aux m s) a = Some p'.
 Proof.
-	simple induction s. intros. inversion H0. intros. simpl in H0. elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H1 in H0.
+	simple induction s. intros. inversion H0. intros. simpl in H0. elim (bool_is_true_or_false (N.eqb a a1)); intros; rewrite H1 in H0.
 	inversion H0. simpl in |- *. rewrite H. simpl in |- *. rewrite H1. reflexivity.
 	inversion H0. intros. simpl in |- *. simpl in H2. simpl in |- *. elim (map_sum prec_list (states_kill_aux m1 m)). intro. rewrite H3. elim (map_sum prec_list (states_kill_aux m1 m0)). intro. rewrite H4.
 	induction  a as [| p0]. rewrite <- (H _ _ _ _ H1 H2). rewrite H3. reflexivity.
@@ -242,14 +242,14 @@ Proof.
 	rewrite <- (H0 _ _ _ _ H1 H2). rewrite H4. reflexivity. intro.
 	elim H4. intros. elim H5. intros. elim H6. intros. rewrite H7.
 	induction  a as [| p0]. cut (MapGet prec_list (states_kill_aux m1 m) N0 = Some p'). intro. rewrite H3 in H8. inversion H8.
-	exact (H _ _ _ _ H1 H2). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. rewrite <- (H0 _ _ _ _ H1 H2). rewrite H7. simpl in |- *. elim (bool_is_true_or_false (Neqb x (Npos p0))). intro. rewrite H8. rewrite (Neqb_complete _ _ H8). simpl in |- *. rewrite (aux_Neqb_1_0 p0). reflexivity. intro.
-	rewrite H8. elim (bool_is_true_or_false (Neqb (Ndouble_plus_one x) (Npos (xI p0)))). intro. rewrite (Ndouble_plus_one_inv_xI _ _ (Neqb_complete _ _ H9)) in H8. rewrite (Neqb_correct (Npos p0)) in H8. inversion H8. intro. rewrite H9. reflexivity.
+	exact (H _ _ _ _ H1 H2). induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. rewrite <- (H0 _ _ _ _ H1 H2). rewrite H7. simpl in |- *. elim (bool_is_true_or_false (N.eqb x (Npos p0))). intro. rewrite H8. rewrite (Neqb_complete _ _ H8). simpl in |- *. rewrite (aux_Neqb_1_0 p0). reflexivity. intro.
+	rewrite H8. elim (bool_is_true_or_false (N.eqb (Ndouble_plus_one x) (Npos (xI p0)))). intro. rewrite (Ndouble_plus_one_inv_xI _ _ (Neqb_complete _ _ H9)) in H8. rewrite (Neqb_correct (Npos p0)) in H8. inversion H8. intro. rewrite H9. reflexivity.
 	rewrite <- (H _ _ _ _ H1 H2). rewrite H3. induction  x as [| p1]. simpl in |- *.
 	reflexivity. simpl in |- *. reflexivity. rewrite <- (H0 _ _ _ _ H1 H2).
-	simpl in |- *. rewrite H7. simpl in |- *. elim (bool_is_true_or_false (Neqb (Ndouble_plus_one x) (Npos 1))); intro;
-  rewrite H8. elim (bool_is_true_or_false (Neqb x N0)); intro; rewrite H9.
+	simpl in |- *. rewrite H7. simpl in |- *. elim (bool_is_true_or_false (N.eqb (Ndouble_plus_one x) (Npos 1))); intro;
+  rewrite H8. elim (bool_is_true_or_false (N.eqb x N0)); intro; rewrite H9.
 	reflexivity. rewrite (Ndouble_plus_one_inv_xH _ (Neqb_complete _ _ H8)) in H9. rewrite (Neqb_correct N0) in H9. inversion H9.
-	elim (bool_is_true_or_false (Neqb x N0)); intro; rewrite H9.
+	elim (bool_is_true_or_false (N.eqb x N0)); intro; rewrite H9.
 	rewrite (Neqb_complete _ _ H9) in H8. inversion H8. 
 	reflexivity. intros. elim H5. intros. elim H6. intros.
 	rewrite H7. induction  a as [| p0]. rewrite <- (H _ _ _ _ H1 H2).
@@ -257,13 +257,13 @@ Proof.
 	simpl in |- *. exact (H0 _ _ _ _ H1 H2). rewrite <- (H _ _ _ _ H1 H2).
 	rewrite H3. reflexivity. rewrite <- (H0 _ _ _ _ H1 H2). simpl in |- *.
 	rewrite H7. simpl in |- *. reflexivity. intros. elim H3. intros.
-	elim H4. intros. elim H5. intros. rewrite H6. elim (map_sum prec_list (states_kill_aux m1 m0)); intro. rewrite H7. induction  a as [| p0]. rewrite <- (H _ _ _ _ H1 H2). rewrite H6. simpl in |- *. elim (bool_is_true_or_false (Neqb (Ndouble x) N0)); intro; rewrite H8. elim (bool_is_true_or_false (Neqb x N0)); intro; rewrite H9. reflexivity. rewrite (Ndouble_inv_N0 _ (Neqb_complete _ _ H8)) in H9. inversion H9. elim (bool_is_true_or_false (Neqb x N0)); intro; rewrite H9.
+	elim H4. intros. elim H5. intros. rewrite H6. elim (map_sum prec_list (states_kill_aux m1 m0)); intro. rewrite H7. induction  a as [| p0]. rewrite <- (H _ _ _ _ H1 H2). rewrite H6. simpl in |- *. elim (bool_is_true_or_false (N.eqb (N.double x) N0)); intro; rewrite H8. elim (bool_is_true_or_false (N.eqb x N0)); intro; rewrite H9. reflexivity. rewrite (Ndouble_inv_N0 _ (Neqb_complete _ _ H8)) in H9. inversion H9. elim (bool_is_true_or_false (N.eqb x N0)); intro; rewrite H9.
 	rewrite (Neqb_complete _ _ H9) in H8. inversion H8.
 	reflexivity. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. rewrite <- (H0 _ _ _ _ H1 H2).
 	rewrite H7. induction  x as [| p1]; simpl in |- *. reflexivity. reflexivity.
 	rewrite <- (H _ _ _ _ H1 H2). rewrite H6. simpl in |- *.
-	elim (bool_is_true_or_false (Neqb (Ndouble x) (Npos (xO p0)))); intro;
-  rewrite H8. elim (bool_is_true_or_false (Neqb x (Npos p0))); intro; rewrite H9. reflexivity. rewrite (Ndouble_inv_xO _ _ (Neqb_complete _ _ H8)) in H9. rewrite (Neqb_correct (Npos p0)) in H9. inversion H9. elim (bool_is_true_or_false (Neqb x (Npos p0))); intro; rewrite H9. rewrite (Neqb_complete _ _ H9) in H8. simpl in H8. rewrite (aux_Neqb_1_0 p0) in H8. inversion H8.
+	elim (bool_is_true_or_false (N.eqb (N.double x) (Npos (xO p0)))); intro;
+  rewrite H8. elim (bool_is_true_or_false (N.eqb x (Npos p0))); intro; rewrite H9. reflexivity. rewrite (Ndouble_inv_xO _ _ (Neqb_complete _ _ H8)) in H9. rewrite (Neqb_correct (Npos p0)) in H9. inversion H9. elim (bool_is_true_or_false (N.eqb x (Npos p0))); intro; rewrite H9. rewrite (Neqb_complete _ _ H9) in H8. simpl in H8. rewrite (aux_Neqb_1_0 p0) in H8. inversion H8.
 	reflexivity. rewrite <- (H0 _ _ _ _ H1 H2). rewrite H7. simpl in |- *.
 	induction  x as [| p0]; reflexivity. elim H7. intros. elim H8. intros.
 	elim H9. intros. rewrite H10. induction  a as [| p0]. unfold MapGet in |- *.
@@ -308,28 +308,28 @@ Proof.
 	simple induction s. intros. inversion H. intros. simpl in H.
 	elim (option_sum prec_list (prec_list_kill m a0)).
 	intro y. elim y. intros x y0. rewrite y0 in H. simpl in H.
-	elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H0 in H. simpl in |- *. rewrite H0. inversion H. split with a0.
+	elim (bool_is_true_or_false (N.eqb a a1)); intros; rewrite H0 in H. simpl in |- *. rewrite H0. inversion H. split with a0.
 	split. reflexivity. rewrite H2 in y0. exact y0. inversion H. intro y. rewrite y in H. inversion H. intros. simpl in H1. elim (map_sum prec_list (states_kill_aux m1 m)); intros. rewrite H2 in H1. elim (map_sum prec_list (states_kill_aux m1 m0)); intros. rewrite H3 in H1.
 	inversion H1. elim H3. intros. elim H4. intros. elim H5.
 	intros. rewrite H6 in H1. induction  a as [| p0]. induction  x as [| p0]; inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. elim (H0 m1 (Npos p0) p).
-	intros. elim H7. intros. split with x1. simpl in |- *. split; assumption. simpl in H1. rewrite H6. simpl in |- *. elim (bool_is_true_or_false (Neqb (Ndouble_plus_one x) (Npos (xI p0))));
+	intros. elim H7. intros. split with x1. simpl in |- *. split; assumption. simpl in H1. rewrite H6. simpl in |- *. elim (bool_is_true_or_false (N.eqb (Ndouble_plus_one x) (Npos (xI p0))));
   intros; rewrite H7 in H1. inversion H1. rewrite (Ndouble_plus_one_inv_xI _ _ (Neqb_complete _ _ H7)). rewrite (Neqb_correct (Npos p0)). reflexivity.
 	inversion H1. simpl in H1. induction  x as [| p1]; inversion H1.
-	elim (H0 m1 N0 p). intros. elim H7. intros. split with x1. simpl in |- *. split; assumption. rewrite H6. simpl in |- *. simpl in H1. elim (bool_is_true_or_false (Neqb (Ndouble_plus_one x) (Npos 1))); intros;
+	elim (H0 m1 N0 p). intros. elim H7. intros. split with x1. simpl in |- *. split; assumption. rewrite H6. simpl in |- *. simpl in H1. elim (bool_is_true_or_false (N.eqb (Ndouble_plus_one x) (Npos 1))); intros;
   rewrite H7 in H1. inversion H1.
-	elim (bool_is_true_or_false (Neqb x N0)); intros; rewrite H8. reflexivity. rewrite (Ndouble_plus_one_inv_xH _ (Neqb_complete _ _ H7)) in H8. inversion H8. inversion H1. intros. elim H4. intros. elim H5. intros. rewrite H6 in H1. induction  a as [| p0]. inversion H1. rewrite <- H6 in H1.
+	elim (bool_is_true_or_false (N.eqb x N0)); intros; rewrite H8. reflexivity. rewrite (Ndouble_plus_one_inv_xH _ (Neqb_complete _ _ H7)) in H8. inversion H8. inversion H1. intros. elim H4. intros. elim H5. intros. rewrite H6 in H1. induction  a as [| p0]. inversion H1. rewrite <- H6 in H1.
 	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]; simpl in H1. elim (H0 _ _ _ H1). intros.
 	elim H7. intros. split with x1. simpl in |- *. split; assumption.
 	inversion H1. elim (H0 _ _ _ H1). intros. elim H7.
 	intros. split with x1. simpl in |- *. split; assumption.
 	elim H2. intros. elim H3. intros. elim H4. intros.
 	rewrite H5 in H1. elim (map_sum prec_list (states_kill_aux m1 m0)); intros. rewrite H6 in H1. induction  a as [| p0]. simpl in H1.
-	simpl in |- *. elim (bool_is_true_or_false (Neqb (Ndouble x) N0)); intros;
-  rewrite H7 in H1. inversion H1. apply (H m1 N0 p). rewrite H5. simpl in |- *. elim (bool_is_true_or_false (Neqb x N0)); intros; rewrite H8. rewrite H9. reflexivity.
+	simpl in |- *. elim (bool_is_true_or_false (N.eqb (N.double x) N0)); intros;
+  rewrite H7 in H1. inversion H1. apply (H m1 N0 p). rewrite H5. simpl in |- *. elim (bool_is_true_or_false (N.eqb x N0)); intros; rewrite H8. rewrite H9. reflexivity.
 	rewrite (Ndouble_inv_N0 _ (Neqb_complete _ _ H7)) in H8.
-	inversion H8. inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. induction  x as [| p1]; inversion H1. simpl in H1. simpl in |- *. elim (bool_is_true_or_false (Neqb (Ndouble x) (Npos (xO p0)))); intros;
+	inversion H8. inversion H1. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. induction  x as [| p1]; inversion H1. simpl in H1. simpl in |- *. elim (bool_is_true_or_false (N.eqb (N.double x) (Npos (xO p0)))); intros;
   rewrite H7 in H1. inversion H1. apply (H m1 (Npos p0) p). rewrite H5.
-	simpl in |- *. elim (bool_is_true_or_false (Neqb x (Npos p0))); intros; rewrite H8. rewrite H9. reflexivity. rewrite (Ndouble_inv_xO _ _ (Neqb_complete _ _ H7)) in H8.
+	simpl in |- *. elim (bool_is_true_or_false (N.eqb x (Npos p0))); intros; rewrite H8. rewrite H9. reflexivity. rewrite (Ndouble_inv_xO _ _ (Neqb_complete _ _ H7)) in H8.
 	rewrite (Neqb_correct (Npos p0)) in H8. inversion H8.
 	inversion H1. induction  x as [| p0]; inversion H1. elim H6; intros; elim H7; intros; elim H8; intros. rewrite H9 in H1.
 	induction  a as [| p0]. simpl in |- *. simpl in H1. apply (H m1 N0 p).
@@ -367,7 +367,7 @@ Proof.
 	split with a0. split with (Ndouble_plus_one x1). simpl in |- *.
 	rewrite (Neqb_correct (Ndouble_plus_one x1)). reflexivity.
 	inversion H. elim H5; intros; elim H6; intros; elim H7; intros; rewrite H8 in H. elim (map_sum prec_list (states_kill_aux m x0)); intros. rewrite H9 in H. inversion H.
-	split with a0. split with (Ndouble x1). simpl in |- *. rewrite (Neqb_correct (Ndouble x1)). reflexivity. elim H9; intros; elim H10; intros; elim H11; intros; rewrite H12 in H.
+	split with a0. split with (N.double x1). simpl in |- *. rewrite (Neqb_correct (N.double x1)). reflexivity. elim H9; intros; elim H10; intros; elim H11; intros; rewrite H12 in H.
 	inversion H. inversion H. inversion H. intros. elim (map_sum prec_list s). intros. rewrite H3 in H1. simpl in H1. inversion H1. intros. elim H3; intros; elim H4; intros; elim H5; intros; rewrite H6 in H1. simpl in H1. elim (option_sum prec_list (prec_list_kill m1 x0)); intro y. elim y. intros x1 y0. rewrite y0 in H1. inversion H1. rewrite y in H1. inversion H1. simpl in H1. elim (map_sum prec_list (states_kill_aux m1 x)); intros.
 	rewrite H7 in H1. elim (map_sum prec_list (states_kill_aux m1 x0)); intros. rewrite H8 in H1. inversion H1. elim H8; intros; elim H9; intros; elim H10; intros; rewrite H11 in H1. 
 	inversion H1. inversion H1. elim (H0 x0 m1). intros. elim H12.
@@ -376,12 +376,12 @@ Proof.
 	elim H7; intros; elim H8; intros; elim H9; intros; rewrite H10 in H1. elim (map_sum prec_list (states_kill_aux m1 x0)); intros.
 	rewrite H11 in H1. inversion H1. elim H11; intros; elim H12; intros; elim H13; intros; rewrite H14 in H1. inversion H1.
 	elim (H x m1). intros. elim H15. intros. split with x5.
-	split with (Ndouble x6). rewrite <- H16 in H18. simpl in H18. induction  x6 as [| p]; simpl in |- *; exact H18. rewrite H16 in H10.
+	split with (N.double x6). rewrite <- H16 in H18. simpl in H18. induction  x6 as [| p]; simpl in |- *; exact H18. rewrite H16 in H10.
 	exact H10. intro. rewrite <- H16 in H15. inversion H15.
 	inversion H1. elim (H x m1); intros. elim H15. intros.
-	split with x5. split with (Ndouble x6). rewrite <- H16 in H18. simpl in H18. induction  x6 as [| p]; simpl in |- *; exact H18.
+	split with x5. split with (N.double x6). rewrite <- H16 in H18. simpl in H18. induction  x6 as [| p]; simpl in |- *; exact H18.
 	rewrite H16 in H10. exact H10. intro. rewrite <- H16 in H15. inversion H15. inversion H1. elim (H x m1). intros.
-	elim H11. intros. split with x3. split with (Ndouble x4).
+	elim H11. intros. split with x3. split with (N.double x4).
 	rewrite <- H12 in H14. simpl in H14. induction  x4 as [| p]; simpl in |- *; exact H14. rewrite <- H12. assumption. intro. rewrite <- H12 in H11. inversion H11.
 Qed.
 
@@ -402,7 +402,7 @@ Lemma dt_kill_0 :
  MapGet state (preDTA_kill m d) a = Some s'.
 Proof.
 	simple induction d. intros. inversion H0. intros. simpl in H0.
-	elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H1 in H0. simpl in |- *. inversion H0. rewrite H.
+	elim (bool_is_true_or_false (N.eqb a a1)); intros; rewrite H1 in H0. simpl in |- *. inversion H0. rewrite H.
 	simpl in |- *. rewrite H1. reflexivity. inversion H0. intros.
 	simpl in |- *. simpl in H2. elim (map_sum state (preDTA_kill m1 m)); intros. rewrite H3. elim (map_sum state (preDTA_kill m1 m0)); intro. rewrite H4. induction  a as [| p].
 	rewrite <- (H _ _ _ _ H1 H2). rewrite H3. reflexivity.
@@ -412,12 +412,12 @@ Proof.
 	reflexivity. elim H4. intros. elim H5. intros. elim H6.
 	intros. rewrite H7. induction  a as [| p]. rewrite <- (H _ _ _ _ H1 H2). rewrite H3. simpl in |- *. induction  x as [| p]; reflexivity.
 	induction  p as [p Hrecp| p Hrecp| ]. rewrite <- (H0 _ _ _ _ H1 H2). simpl in |- *.
-	rewrite H7. simpl in |- *. elim (bool_is_true_or_false (Neqb (Ndouble_plus_one x) (Npos (xI p))));
+	rewrite H7. simpl in |- *. elim (bool_is_true_or_false (N.eqb (Ndouble_plus_one x) (Npos (xI p))));
   intros; rewrite H8.
-	elim (bool_is_true_or_false (Neqb x (Npos p))); intros; rewrite H9. reflexivity. rewrite (Ndouble_plus_one_inv_xI _ _ (Neqb_complete _ _ H8)) in H9. rewrite (Neqb_correct (Npos p)) in H9. inversion H9. elim (bool_is_true_or_false (Neqb x (Npos p))); intros. rewrite H9. rewrite (Neqb_complete _ _ H9) in H8. simpl in H8. rewrite (aux_Neqb_1_0 p) in H8. inversion H8. rewrite H9.
+	elim (bool_is_true_or_false (N.eqb x (Npos p))); intros; rewrite H9. reflexivity. rewrite (Ndouble_plus_one_inv_xI _ _ (Neqb_complete _ _ H8)) in H9. rewrite (Neqb_correct (Npos p)) in H9. inversion H9. elim (bool_is_true_or_false (N.eqb x (Npos p))); intros. rewrite H9. rewrite (Neqb_complete _ _ H9) in H8. simpl in H8. rewrite (aux_Neqb_1_0 p) in H8. inversion H8. rewrite H9.
 	reflexivity. rewrite <- (H _ _ _ _ H1 H2). rewrite H3.
-	simpl in |- *. induction  x as [| p0]; reflexivity. rewrite <- (H0 _ _ _ _ H1 H2). rewrite H7. simpl in |- *. elim (bool_is_true_or_false (Neqb (Ndouble_plus_one x) (Npos 1))); intros;
-  rewrite H8. elim (bool_is_true_or_false (Neqb x N0)); intros; rewrite H9. reflexivity. rewrite (Ndouble_plus_one_inv_xH _ (Neqb_complete _ _ H8)) in H9. rewrite (Neqb_correct N0) in H9. inversion H9. elim (bool_is_true_or_false (Neqb x N0)); intro; rewrite H9. rewrite (Neqb_complete _ _ H9) in H8. simpl in H8. inversion H8. reflexivity.
+	simpl in |- *. induction  x as [| p0]; reflexivity. rewrite <- (H0 _ _ _ _ H1 H2). rewrite H7. simpl in |- *. elim (bool_is_true_or_false (N.eqb (Ndouble_plus_one x) (Npos 1))); intros;
+  rewrite H8. elim (bool_is_true_or_false (N.eqb x N0)); intros; rewrite H9. reflexivity. rewrite (Ndouble_plus_one_inv_xH _ (Neqb_complete _ _ H8)) in H9. rewrite (Neqb_correct N0) in H9. inversion H9. elim (bool_is_true_or_false (N.eqb x N0)); intro; rewrite H9. rewrite (Neqb_complete _ _ H9) in H8. simpl in H8. inversion H8. reflexivity.
 	intros. elim H5. intros. elim H6. intros. rewrite H7.
 	induction  a as [| p]. rewrite <- (H _ _ _ _ H1 H2). rewrite H3.
 	reflexivity. induction  p as [p Hrecp| p Hrecp| ]. rewrite <- (H0 _ _ _ _ H1 H2).
@@ -426,12 +426,12 @@ Proof.
 	rewrite H7. reflexivity. elim H3. intros. elim H4.
 	intros. elim H5. intros. rewrite H6. elim (map_sum state (preDTA_kill m1 m0)); intros. rewrite H7. induction  a as [| p].
 	rewrite <- (H _ _ _ _ H1 H2). rewrite H6. simpl in |- *.
-	elim (bool_is_true_or_false (Neqb (Ndouble x) N0)); intros; rewrite H8. elim (bool_is_true_or_false (Neqb x N0)); intros; rewrite H9. reflexivity. rewrite (Ndouble_inv_N0 _ (Neqb_complete _ _ H8)) in H9.
-	rewrite (Neqb_correct N0) in H9. inversion H9. elim (bool_is_true_or_false (Neqb x N0)); intros; rewrite H9.
+	elim (bool_is_true_or_false (N.eqb (N.double x) N0)); intros; rewrite H8. elim (bool_is_true_or_false (N.eqb x N0)); intros; rewrite H9. reflexivity. rewrite (Ndouble_inv_N0 _ (Neqb_complete _ _ H8)) in H9.
+	rewrite (Neqb_correct N0) in H9. inversion H9. elim (bool_is_true_or_false (N.eqb x N0)); intros; rewrite H9.
 	rewrite (Neqb_complete _ _ H9) in H8. simpl in H8. inversion H8. reflexivity. induction  p as [p Hrecp| p Hrecp| ]. rewrite <- (H0 _ _ _ _ H1 H2).
-	rewrite H7. induction  x as [| p0]; reflexivity. rewrite <- (H _ _ _ _ H1 H2). rewrite H6. simpl in |- *. elim (bool_is_true_or_false (Neqb (Ndouble x) (Npos (xO p)))); intros;
+	rewrite H7. induction  x as [| p0]; reflexivity. rewrite <- (H _ _ _ _ H1 H2). rewrite H6. simpl in |- *. elim (bool_is_true_or_false (N.eqb (N.double x) (Npos (xO p)))); intros;
   rewrite H8.
-	elim (bool_is_true_or_false (Neqb x (Npos p))); intros; rewrite H9. reflexivity. rewrite (Ndouble_inv_xO _ _ (Neqb_complete _ _ H8)) in H9. rewrite (Neqb_correct (Npos p)) in H9. inversion H9. elim (bool_is_true_or_false (Neqb x (Npos p))); intros; rewrite H9. rewrite (Neqb_complete _ _ H9) in H8. simpl in H8. rewrite (aux_Neqb_1_0 p) in H8. inversion H8. reflexivity.
+	elim (bool_is_true_or_false (N.eqb x (Npos p))); intros; rewrite H9. reflexivity. rewrite (Ndouble_inv_xO _ _ (Neqb_complete _ _ H8)) in H9. rewrite (Neqb_correct (Npos p)) in H9. inversion H9. elim (bool_is_true_or_false (N.eqb x (Npos p))); intros; rewrite H9. rewrite (Neqb_complete _ _ H9) in H8. simpl in H8. rewrite (aux_Neqb_1_0 p) in H8. inversion H8. reflexivity.
 	rewrite <- (H0 _ _ _ _ H1 H2). rewrite H7. induction  x as [| p]; reflexivity. elim H7. intros. elim H8. intros. elim H9.
 	intros. rewrite H10. induction  a as [| p]. simpl in |- *. rewrite <- (H _ _ _ _ H1 H2). rewrite H6. reflexivity. induction  p as [p Hrecp| p Hrecp| ].
 	rewrite <- (H0 _ _ _ _ H1 H2). rewrite H10. reflexivity.
@@ -453,28 +453,28 @@ Lemma dt_kill_1 :
 Proof.
 	simple induction d. intros. inversion H. intros. simpl in H.
 	simpl in |- *. elim (option_sum state (states_kill m a0)); intro y.
-	elim y. intros x y0. rewrite y0 in H. simpl in H. elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H0 in H;
+	elim y. intros x y0. rewrite y0 in H. simpl in H. elim (bool_is_true_or_false (N.eqb a a1)); intros; rewrite H0 in H;
   rewrite H0. inversion H. split with a0. split. reflexivity.
 	rewrite H2 in y0. exact y0. inversion H. rewrite y in H.
 	inversion H. intros. simpl in H1. elim (map_sum state (preDTA_kill m1 m)); intros. rewrite H2 in H1. elim (map_sum state (preDTA_kill m1 m0)); intros. rewrite H3 in H1.
 	inversion H1. elim H3. intros. elim H4. intros. elim H5.
 	intros. rewrite H6 in H1. induction  a as [| p]. simpl in H1.
 	induction  x as [| p]; inversion H1. induction  p as [p Hrecp| p Hrecp| ]; simpl in |- *; simpl in H1.
-	apply (H0 m1 (Npos p) s). rewrite H6. simpl in |- *. elim (bool_is_true_or_false (Neqb (Ndouble_plus_one x) (Npos (xI p))));
-  intros; rewrite H7 in H1. inversion H1. elim (bool_is_true_or_false (Neqb x (Npos p))); intros; rewrite H8. reflexivity. rewrite (Ndouble_plus_one_inv_xI _ _ (Neqb_complete _ _ H7)) in H8. rewrite (Neqb_correct (Npos p)) in H8. inversion H8. inversion H1. induction  x as [| p0]; inversion H1. apply (H0 m1 N0 s). rewrite H6. simpl in |- *. elim (bool_is_true_or_false (Neqb (Ndouble_plus_one x) (Npos 1))); intros;
-  rewrite H7 in H1. inversion H1. elim (bool_is_true_or_false (Neqb x N0)); intros; rewrite H8.
+	apply (H0 m1 (Npos p) s). rewrite H6. simpl in |- *. elim (bool_is_true_or_false (N.eqb (Ndouble_plus_one x) (Npos (xI p))));
+  intros; rewrite H7 in H1. inversion H1. elim (bool_is_true_or_false (N.eqb x (Npos p))); intros; rewrite H8. reflexivity. rewrite (Ndouble_plus_one_inv_xI _ _ (Neqb_complete _ _ H7)) in H8. rewrite (Neqb_correct (Npos p)) in H8. inversion H8. inversion H1. induction  x as [| p0]; inversion H1. apply (H0 m1 N0 s). rewrite H6. simpl in |- *. elim (bool_is_true_or_false (N.eqb (Ndouble_plus_one x) (Npos 1))); intros;
+  rewrite H7 in H1. inversion H1. elim (bool_is_true_or_false (N.eqb x N0)); intros; rewrite H8.
 	reflexivity. rewrite (Ndouble_plus_one_inv_xH _ (Neqb_complete _ _ H7)) in H8. inversion H8. inversion H1.
 	intros. elim H4. intros. elim H5. intros. rewrite H6 in H1.
 	induction  a as [| p]. inversion H1. rewrite <- H6 in H1. induction  p as [p Hrecp| p Hrecp| ]; simpl in |- *; simpl in H1. apply (H0 m1 (Npos p) s). rewrite H6.
 	rewrite H6 in H1. exact H1. inversion H1. exact (H0 _ _ _ H1). elim H2. intros. elim H3. intros. elim H4. intros.
 	rewrite H5 in H1. elim (map_sum state (preDTA_kill m1 m0)); intros. rewrite H6 in H1. induction  a as [| p]. simpl in |- *. simpl in H1.
-	apply (H m1 N0 s). rewrite H5. simpl in |- *. elim (bool_is_true_or_false (Neqb (Ndouble x) N0)); intros;
-  rewrite H7 in H1. inversion H1. elim (bool_is_true_or_false (Neqb x N0)); intros; rewrite H8. reflexivity. rewrite (Ndouble_inv_N0 _ (Neqb_complete _ _ H7)) in H8.
+	apply (H m1 N0 s). rewrite H5. simpl in |- *. elim (bool_is_true_or_false (N.eqb (N.double x) N0)); intros;
+  rewrite H7 in H1. inversion H1. elim (bool_is_true_or_false (N.eqb x N0)); intros; rewrite H8. reflexivity. rewrite (Ndouble_inv_N0 _ (Neqb_complete _ _ H7)) in H8.
 	inversion H8. inversion H1. induction  p as [p Hrecp| p Hrecp| ]; simpl in |- *; simpl in H1.
-	induction  x as [| p0]; inversion H1. elim (bool_is_true_or_false (Neqb (Ndouble x) (Npos (xO p)))); intros;
+	induction  x as [| p0]; inversion H1. elim (bool_is_true_or_false (N.eqb (N.double x) (Npos (xO p)))); intros;
   rewrite H7 in H1.
 	inversion H1. apply (H m1 (Npos p) s). rewrite H5. simpl in |- *.
-	elim (bool_is_true_or_false (Neqb x (Npos p))); intros; rewrite H8. assumption. rewrite (Ndouble_inv_xO _ _ (Neqb_complete _ _ H7)) in H8. rewrite (Neqb_correct (Npos p)) in H8. inversion H8. inversion H1. induction  x as [| p]; inversion H1. elim H6; intros; elim H7; intros; elim H8; intros; rewrite H9 in H1. rewrite <- H9 in H1. induction  a as [| p].
+	elim (bool_is_true_or_false (N.eqb x (Npos p))); intros; rewrite H8. assumption. rewrite (Ndouble_inv_xO _ _ (Neqb_complete _ _ H7)) in H8. rewrite (Neqb_correct (Npos p)) in H8. inversion H8. inversion H1. induction  x as [| p]; inversion H1. elim H6; intros; elim H7; intros; elim H8; intros; rewrite H9 in H1. rewrite <- H9 in H1. induction  a as [| p].
 	simpl in |- *. rewrite <- H5 in H1. simpl in H1. exact (H _ _ _ H1).
 	rewrite <- H5 in H1. induction  p as [p Hrecp| p Hrecp| ]; simpl in |- *; simpl in H1. exact (H0 _ _ _ H1). exact (H _ _ _ H1). exact (H0 _ _ _ H1).
 	rewrite <- H9 in H1. rewrite <- H5 in H1. induction  a as [| p].

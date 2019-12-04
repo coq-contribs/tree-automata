@@ -31,7 +31,7 @@ Require Import coacc_test.
 Fixpoint non_coacc_kill (d : preDTA) (m : Map bool) {struct m} : preDTA :=
   match d, m with
   | M0, M0 => M0 state
-  | M1 a s, M1 a' b => if Neqb a a' && b then M1 state a s else M0 state
+  | M1 a s, M1 a' b => if N.eqb a a' && b then M1 state a s else M0 state
   | M2 x y, M2 z t => M2 state (non_coacc_kill x z) (non_coacc_kill y t)
   | _, _ => M0 state
   end.
@@ -74,7 +74,7 @@ Lemma non_coacc_kill_0 :
  MapGet bool m a = Some true ->
  MapGet state (non_coacc_kill d m) a = Some s.
 Proof.
-	simple induction d; intros. inversion H0. induction  m as [| a2 a3| m1 Hrecm1 m0 Hrecm0]; simpl in H1. inversion H1. simpl in H0. simpl in |- *. elim (bool_is_true_or_false (Neqb a a1)); intros. rewrite H2 in H0. elim (bool_is_true_or_false (Neqb a2 a1)); intros; rewrite H3 in H1;
+	simple induction d; intros. inversion H0. induction  m as [| a2 a3| m1 Hrecm1 m0 Hrecm0]; simpl in H1. inversion H1. simpl in H0. simpl in |- *. elim (bool_is_true_or_false (N.eqb a a1)); intros. rewrite H2 in H0. elim (bool_is_true_or_false (N.eqb a2 a1)); intros; rewrite H3 in H1;
   inversion H1. rewrite (Neqb_complete _ _ H2). rewrite (Neqb_complete _ _ H3).
 	rewrite (Neqb_correct a1). simpl in |- *. rewrite (Neqb_correct a1). inversion H0. reflexivity. rewrite H2 in H0.
 	inversion H0. inversion H. induction  m1 as [| a0 a1| m1_1 Hrecm1_1 m1_0 Hrecm1_0]. inversion H1.
@@ -92,7 +92,7 @@ Lemma non_coacc_kill_1 :
 Proof.
 	simple induction d; intros. induction  m as [| a0 a1| m1 Hrecm1 m0 Hrecm0]; inversion H0.
 	induction  m as [| a2 a3| m1 Hrecm1 m0 Hrecm0]. inversion H. simpl in H. simpl in H0.
-	elim (bool_is_true_or_false (Neqb a a2)); intros; rewrite H1 in H0. elim (bool_is_true_or_false a3); intros; rewrite H2 in H0. simpl in H0. elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H3 in H0;
+	elim (bool_is_true_or_false (N.eqb a a2)); intros; rewrite H1 in H0. elim (bool_is_true_or_false a3); intros; rewrite H2 in H0. simpl in H0. elim (bool_is_true_or_false (N.eqb a a1)); intros; rewrite H3 in H0;
   inversion H0. rewrite (Neqb_complete _ _ H1).
 	simpl in |- *. rewrite <- (Neqb_complete _ _ H1). rewrite <- (Neqb_complete _ _ H3). rewrite H2. rewrite (Neqb_correct a). split; reflexivity. simpl in H0.
 	inversion H0. simpl in H0. inversion H0. inversion H.

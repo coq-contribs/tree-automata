@@ -255,15 +255,15 @@ Proof.
 	unfold udta_conv_0 in |- *. unfold udta_conv_0_aux in |- *. cut (a = a1).
 	intro. rewrite H0. rewrite H0 in H. induction  a1 as [| p]. simpl in |- *.
 	simpl in H. inversion H. trivial. simpl in |- *. simpl in H.
-	cut (Peqb p p = true). intro. rewrite H1 in H. rewrite H1.
+	cut (Pos.eqb p p = true). intro. rewrite H1 in H. rewrite H1.
 	inversion H. trivial. exact (aux_Neqb_1_0 p). intros. 
-	cut (Neqb a a1 = true). intro. exact (Neqb_complete a a1 H0).
-	cut (Neqb a a1 = true \/ Neqb a a1 = false). intros. elim H0.
+	cut (N.eqb a a1 = true). intro. exact (Neqb_complete a a1 H0).
+	cut (N.eqb a a1 = true \/ N.eqb a a1 = false). intros. elim H0.
 	intros. assumption. intro. 
 	cut (MapGet state (M1 state a a0) a1 = None).
 	intro. rewrite H2 in H. inversion H.
 	exact (M1_semantics_2 state a a1 a0 H1).
-	exact (bool_is_true_or_false (Neqb a a1)).
+	exact (bool_is_true_or_false (N.eqb a a1)).
 	intro. intro. intro. intro. simple induction a. exact (H N0).
 	simple induction p. intros. simpl in |- *. simpl in H2. 
 	exact (H0 (Npos p0) ladj H2). intros. simpl in |- *. simpl in H2.
@@ -277,11 +277,11 @@ Lemma u_conv_0_invar_1 :
  MapGet prec_list (umpl_conv_0 s) c = Some (upl_conv_0 p).
 Proof.
 	simple induction s. intros. simpl in H. inversion H. intros.
-	simpl in |- *. simpl in H. cut (Neqb a c = true). intro.
+	simpl in |- *. simpl in H. cut (N.eqb a c = true). intro.
 	rewrite H0 in H. rewrite H0. inversion H. trivial.
-	cut (Neqb a c = true \/ Neqb a c = false). intro. 
+	cut (N.eqb a c = true \/ N.eqb a c = false). intro. 
 	elim H0; intros. assumption. rewrite H1 in H.
-	inversion H. exact (bool_is_true_or_false (Neqb a c)).
+	inversion H. exact (bool_is_true_or_false (N.eqb a c)).
 	intro. intro. intro. intro. simple induction c. simpl in |- *. intros.
 	exact (H N0 p H1). simple induction p. intros. simpl in H2.
 	simpl in |- *. exact (H0 (Npos p0) p1 H2). intros. simpl in |- *.
@@ -302,20 +302,20 @@ Proof.
 	simpl in H0. inversion H0. intros. inversion H0. intros. inversion H.
 	intro. simple induction a1. intros. inversion H. intros. induction  p as [p Hrecp| p Hrecp| ].
 	induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in H. simpl in |- *.
-	cut (Peqb p p0 = true \/ Peqb p p0 = false). intro. elim H0; intros.
+	cut (Pos.eqb p p0 = true \/ Pos.eqb p p0 = false). intro. elim H0; intros.
 	rewrite H1. rewrite H1 in H. inversion H. cut (a0 = ladj). intro. rewrite H2.
 	trivial.  exact (umpl_conv_0_inj a0 ladj H3). rewrite H1. rewrite H1 in H.
-	inversion H. exact (bool_is_true_or_false (Peqb p p0)).
+	inversion H. exact (bool_is_true_or_false (Pos.eqb p p0)).
 	inversion H. inversion H. simpl in H. simpl in |- *.
-	cut (Peqb (xO p) p0 = true \/ Peqb (xO p) p0 = false). intro.
+	cut (Pos.eqb (xO p) p0 = true \/ Pos.eqb (xO p) p0 = false). intro.
 	elim H0; intros. rewrite H1. rewrite H1 in H. inversion H. cut (a0 = ladj).
 	intro. rewrite H2. trivial. exact (umpl_conv_0_inj a0 ladj H3).
 	rewrite H1 in H. inversion H. 
-	exact (bool_is_true_or_false (Peqb (xO p) p0)). simpl in |- *. simpl in H. 
-	cut (Peqb 1 p0 = true \/ Peqb 1 p0 = false). intro. elim H0; intros.
+	exact (bool_is_true_or_false (Pos.eqb (xO p) p0)). simpl in |- *. simpl in H. 
+	cut (Pos.eqb 1 p0 = true \/ Pos.eqb 1 p0 = false). intro. elim H0; intros.
 	rewrite H1 in H. rewrite H1. inversion H. cut (a0 = ladj). intros. rewrite H2.
 	trivial. exact (umpl_conv_0_inj a0 ladj H3). rewrite H1 in H. inversion H.
-	exact (bool_is_true_or_false (Peqb 1 p0)). intros. induction  a as [| p].
+	exact (bool_is_true_or_false (Pos.eqb 1 p0)). intros. induction  a as [| p].
 	simpl in H1. unfold udta_conv_0 in H. simpl in |- *. apply (H N0 ladj).
 	simpl in |- *. trivial. induction  p as [p Hrecp| p Hrecp| ]. simpl in |- *. unfold udta_conv_0 in H0.
 	apply (H0 (Npos p) ladj). simpl in |- *. simpl in H1. trivial. simpl in |- *. simpl in H1.
@@ -333,16 +333,16 @@ Proof.
 	trivial. exact (upl_conv_0_inj a0 p H1). simpl in |- *. intros. inversion H.
 	intro. intro. simple induction c. simpl in |- *. intros. inversion H. induction  p as [p Hrecp| p Hrecp| ].
 	simple induction p0. intros. simpl in H0. 
-	cut (Peqb p p1 = true \/ Peqb p p1 = false). intros. elim H1; intros.
+	cut (Pos.eqb p p1 = true \/ Pos.eqb p p1 = false). intros. elim H1; intros.
 	simpl in |- *. rewrite H2. rewrite H2 in H0. inversion H0. cut (a0 = p2). intro.
 	rewrite H3. trivial. exact (upl_conv_0_inj a0 p2 H4). simpl in |- *. rewrite H2.
-	rewrite H2 in H0. inversion H0. exact (bool_is_true_or_false (Peqb p p1)).
+	rewrite H2 in H0. inversion H0. exact (bool_is_true_or_false (Pos.eqb p p1)).
 	intros. inversion H0. intros. inversion H. simple induction p0. intros. inversion H0.
-	intros. simpl in H0. simpl in |- *. cut (Peqb p p1 = true \/ Peqb p p1 = false).
+	intros. simpl in H0. simpl in |- *. cut (Pos.eqb p p1 = true \/ Pos.eqb p p1 = false).
 	intros. elim H1; intros. rewrite H2 in H0. rewrite H2. inversion H0.
 	cut (a0 = p2). intro. rewrite H3. trivial. exact (upl_conv_0_inj a0 p2 H4).
 	rewrite H2. rewrite H2 in H0. inversion H0.
-	exact (bool_is_true_or_false (Peqb p p1)). intros. inversion H.
+	exact (bool_is_true_or_false (Pos.eqb p p1)). intros. inversion H.
 	simple induction p. intros. inversion H0. intros. inversion H0. intros. simpl in H.
 	inversion H. cut (a0 = p0). intro. rewrite H0. trivial.
 	exact (upl_conv_0_inj a0 p0 H1). intro. intro. intro. intro. simple induction c.
@@ -362,9 +362,9 @@ Proof.
 	simpl in |- *. inversion H. trivial. split with (M1 prec_list a0 a2). inversion H.
 	trivial. split with (M2 prec_list a0_1 a0_0). inversion H. trivial. simpl in |- *.
 	intros. inversion H. intro. intro. simple induction a1. simpl in |- *. intros. inversion H.
-	simpl in |- *. intros. cut (Peqb p p0 = true \/ Peqb p p0 = false). intro.
+	simpl in |- *. intros. cut (Pos.eqb p p0 = true \/ Pos.eqb p p0 = false). intro.
 	elim H0; intros. rewrite H1 in H. inversion H. split with a0. trivial.
-	rewrite H1 in H. inversion H. exact (bool_is_true_or_false (Peqb p p0)).
+	rewrite H1 in H. inversion H. exact (bool_is_true_or_false (Pos.eqb p p0)).
 	intro. intro. intro. intro. simple induction a. simpl in |- *. intros. exact (H N0 ladj H1).
 	simple induction p. intros. simpl in H2. exact (H0 (Npos p0) ladj H2). intros.
 	simpl in H2. exact (H (Npos p0) ladj H2). simpl in |- *. intros. exact (H0 N0 ladj H1).
@@ -390,14 +390,14 @@ Proof.
 	simple induction a. intro. simple induction c. intros. simpl in H. inversion H. split with a0.
 	trivial. simpl in |- *. intros. inversion H. simple induction p. intro. intro. simple induction c.
 	simpl in |- *. intros. inversion H0. simpl in |- *. simple induction p1. intros. simpl in H1.
-	cut (Peqb p0 p2 = true \/ Peqb p0 p2 = false). intro. elim H2. intros. 
+	cut (Pos.eqb p0 p2 = true \/ Pos.eqb p0 p2 = false). intro. elim H2. intros. 
 	rewrite H3 in H1. inversion H1. split with a0. trivial. intro. rewrite H3 in H1.
-	inversion H1. exact (bool_is_true_or_false (Peqb p0 p2)). intros. inversion H1.
+	inversion H1. exact (bool_is_true_or_false (Pos.eqb p0 p2)). intros. inversion H1.
 	intros. inversion H0. intro. intro. intro. simple induction c. intros. inversion H0.
 	simple induction p1. intros. simpl in H1. inversion H1. intros. simpl in H1.
-	cut (Peqb p0 p2 = true \/ Peqb p0 p2 = false). intro. elim H2; intro. 
+	cut (Pos.eqb p0 p2 = true \/ Pos.eqb p0 p2 = false). intro. elim H2; intro. 
 	rewrite H3 in H1. inversion H1. split with a0. trivial. rewrite H3 in H1. inversion H1.
-	exact (bool_is_true_or_false (Peqb p0 p2)). intros. inversion H0. intro.
+	exact (bool_is_true_or_false (Pos.eqb p0 p2)). intros. inversion H0. intro.
 	simple induction c. intros. inversion H. simple induction p0. intros. inversion H0. intros.
 	inversion H0. intros. simpl in H. inversion H. split with a0. trivial. intro. intro.
 	intro. intro. simple induction c. simpl in |- *. intros. simpl in H1. exact (H N0 p H1). simple induction p.
@@ -428,12 +428,12 @@ Proof.
 	trivial. simpl in H. induction  p as [p Hrecp| p Hrecp| ]; inversion H.
 	split with (Npos p). simpl in |- *. induction  a1 as [| p1]. simpl in H.
 	inversion H. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. simpl in H. inversion H.
-	simpl in H. cut (Peqb p p1 = true). intro. cut (p1 = p).
+	simpl in H. cut (Pos.eqb p p1 = true). intro. cut (p1 = p).
 	intro. rewrite H1. trivial. symmetry  in |- *. 
 	exact (aux_Neqb_1_1 p p1 H0).
-	cut (Peqb p p1 = true \/ Peqb p p1 = false). intro.
+	cut (Pos.eqb p p1 = true \/ Pos.eqb p p1 = false). intro.
 	elim H0; intros. assumption. rewrite H1 in H. inversion H.
-	exact (bool_is_true_or_false (Peqb p p1)).
+	exact (bool_is_true_or_false (Pos.eqb p p1)).
  	simpl in H. inversion H. unfold udta_conv_0 in |- *. intro. intro.
 	intro. intro. simple induction a0. intros. split with N0. simpl in |- *.
 	trivial. simple induction p. intros. inversion H2. intros.
@@ -653,14 +653,14 @@ Proof.
 	simple induction d. intros. simpl in H. inversion H. intros. 
 	unfold udta_conv_1 in |- *. cut (a = a1). intro. rewrite H0. rewrite H0 in H.
 	induction  a1 as [| p]. simpl in |- *. simpl in H. inversion H. inversion H. trivial.
-	simpl in |- *. simpl in H. cut (Peqb p p = true). intro. rewrite H1. simpl in H.
+	simpl in |- *. simpl in H. cut (Pos.eqb p p = true). intro. rewrite H1. simpl in H.
 	rewrite H1 in H. inversion H. trivial. exact (aux_Neqb_1_0 p).
- 	cut (Neqb a a1 = true \/ Neqb a a1 = false). intros. elim H0. intros.
+ 	cut (N.eqb a a1 = true \/ N.eqb a a1 = false). intros. elim H0. intros.
 	exact (Neqb_complete a a1 H1). intro. 
 	cut (MapGet state (M1 state a a0) a1 = None).
 	intro. rewrite H2 in H. inversion H.
 	exact (M1_semantics_2 state a a1 a0 H1).
-	exact (bool_is_true_or_false (Neqb a a1)).
+	exact (bool_is_true_or_false (N.eqb a a1)).
 	intro. intro. intro. intro. simple induction a. simpl in |- *. intros. 
 	exact (H N0 ladj H1). simple induction p. intros. simpl in |- *. simpl in H2.
 	exact (H0 (Npos p0) ladj H2). intros. simpl in |- *. simpl in H2.
@@ -674,11 +674,11 @@ Lemma u_conv_1_invar_1 :
  MapGet prec_list (umpl_conv_1 s) c = Some (upl_conv_1 p).
 Proof.
 	simple induction s. simpl in |- *. intros. inversion H.
-	intros. simpl in H. simpl in |- *. cut (Neqb a c = true). intro.
+	intros. simpl in H. simpl in |- *. cut (N.eqb a c = true). intro.
 	rewrite H0 in H. rewrite H0. inversion H. trivial.
-	cut (Neqb a c = true \/ Neqb a c = false). intros.
+	cut (N.eqb a c = true \/ N.eqb a c = false). intros.
 	elim H0; intros. assumption. rewrite H1 in H. inversion H.
-	exact (bool_is_true_or_false (Neqb a c)).
+	exact (bool_is_true_or_false (N.eqb a c)).
 	intro. intro. intro. intro. simple induction c. simpl in |- *. intros.
 	exact (H N0 p H1). simple induction p. intros. simpl in H2.
 	simpl in |- *. exact (H0 (Npos p0) p1 H2). intros. simpl in |- *. 
@@ -697,16 +697,16 @@ Proof.
 	exact (umpl_conv_1_inj a0 ladj H1). simpl in |- *. intros. inversion H.
 	simple induction p. intro. intro. intro. simple induction a1. intros. simpl in H0.
 	inversion H0. simple induction p1. intros. simpl in H1. simpl in |- *.
-	cut (Peqb p0 p2 = true \/ Peqb p0 p2 = false). intros. elim H2; intros.
+	cut (Pos.eqb p0 p2 = true \/ Pos.eqb p0 p2 = false). intros. elim H2; intros.
 	rewrite H3 in H1. rewrite H3. inversion H1. cut (a0 = ladj). intro. rewrite H4.
 	trivial. exact (umpl_conv_1_inj a0 ladj H5). rewrite H3 in H1. inversion H1.
-	exact (bool_is_true_or_false (Peqb p0 p2)). intros. simpl in H1. 
+	exact (bool_is_true_or_false (Pos.eqb p0 p2)). intros. simpl in H1. 
 	inversion H1. intros. inversion H0. intros. induction  a1 as [| p1]. simpl in |- *. simpl in H0.
 	inversion H0. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. inversion H0. simpl in |- *. simpl in H0.
-	cut (Peqb p0 p1 = true \/ Peqb p0 p1 = false). intro. elim H1; intros.
+	cut (Pos.eqb p0 p1 = true \/ Pos.eqb p0 p1 = false). intro. elim H1; intros.
 	rewrite H2. rewrite H2 in H0. inversion H0. cut (a0 = ladj). intro. rewrite H3.
 	trivial. exact (umpl_conv_1_inj a0 ladj H4). rewrite H2 in H0.
-	inversion H0. exact (bool_is_true_or_false (Peqb p0 p1)).
+	inversion H0. exact (bool_is_true_or_false (Pos.eqb p0 p1)).
 	inversion H0. intros. induction  a1 as [| p0]. inversion H. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. inversion H.
 	inversion H. simpl in H. inversion H. cut (a0 = ladj). intro. rewrite H0.
 	trivial. exact (umpl_conv_1_inj a0 ladj H1). intro. intro. intro. intro.
@@ -725,15 +725,15 @@ Proof.
 	simpl in |- *. intros; inversion H. cut (a0 = p). intro. rewrite H0. trivial.
 	exact (upl_conv_1_inj a0 p H1). simpl in |- *. intros. inversion H. intro. intro.
 	simple induction c. simpl in |- *. intros. inversion H. induction  p as [p Hrecp| p Hrecp| ]. simple induction p0. intros.
-	simpl in |- *. simpl in H0. cut (Peqb p p1 = true \/ Peqb p p1 = false). intro.
+	simpl in |- *. simpl in H0. cut (Pos.eqb p p1 = true \/ Pos.eqb p p1 = false). intro.
 	elim H1; intros. rewrite H2. rewrite H2 in H0. inversion H0. cut (a0 = p2). intro.
 	rewrite H3. trivial. exact (upl_conv_1_inj a0 p2 H4). rewrite H2. 
-	rewrite H2 in H0. inversion H0. exact (bool_is_true_or_false (Peqb p p1)).
+	rewrite H2 in H0. inversion H0. exact (bool_is_true_or_false (Pos.eqb p p1)).
 	intros. inversion H0. intros. inversion H. simple induction p0. intros. inversion H0.
-	intros. simpl in |- *. simpl in H0. cut (Peqb p p1 = true \/ Peqb p p1 = false).
+	intros. simpl in |- *. simpl in H0. cut (Pos.eqb p p1 = true \/ Pos.eqb p p1 = false).
 	intro. elim H1; intros. rewrite H2 in H0. rewrite H2. inversion H0. cut (a0 = p2).
 	intro. rewrite H3. trivial. exact (upl_conv_1_inj a0 p2 H4). rewrite H2 in H0.
-	inversion H0. exact (bool_is_true_or_false (Peqb p p1)). intros. inversion H.
+	inversion H0. exact (bool_is_true_or_false (Pos.eqb p p1)). intros. inversion H.
 	intros. induction  p as [p Hrecp| p Hrecp| ]. inversion H. inversion H. simpl in H. inversion H. cut (a0 = p0).
 	intro. rewrite H0. trivial. exact (upl_conv_1_inj a0 p0 H1). intro. intro. intro.
 	intro. simple induction c. simpl in |- *. intros. exact (H N0 p H1). simple induction p. intros.
@@ -750,10 +750,10 @@ Proof.
 	inversion H0. inversion H. simple induction a. intro. simple induction a1. intros. simpl in H.
 	inversion H. split with a0. trivial. simpl in |- *. intros. inversion H. intro. intro.
 	simple induction a1. simpl in |- *. intros. inversion H. induction  p as [p Hrecp| p Hrecp| ]. simple induction p0. intros. 
-	simpl in H0. elim (bool_is_true_or_false (Peqb p p1)); intro; rewrite H1 in H0.
+	simpl in H0. elim (bool_is_true_or_false (Pos.eqb p p1)); intro; rewrite H1 in H0.
 	inversion H0. split with a0. trivial. inversion H0. intros. inversion H0. intros.
 	inversion H. simple induction p0. intros. inversion H0. intros. simpl in H0.
-	elim (bool_is_true_or_false (Peqb p p1)); intros; rewrite H1 in H0. inversion H0.
+	elim (bool_is_true_or_false (Pos.eqb p p1)); intros; rewrite H1 in H0. inversion H0.
 	split with a0. trivial. inversion H0. intros. inversion H. simple induction p. intros.
 	inversion H0. intros. inversion H0. intros. inversion H. split with a0. trivial.
 	intro. intro. intro. intro. simple induction a. intros. simpl in H1. exact (H N0 ladj H1).
@@ -782,10 +782,10 @@ Proof.
 	intro. simple induction c. simpl in |- *. intros. inversion H. split with a0. trivial.
 	simpl in |- *. intros. inversion H. intro. intro. simple induction c. simpl in |- *. intros.
 	inversion H. induction  p as [p Hrecp| p Hrecp| ]. simple induction p0. intros. simpl in H0.
-	elim (bool_is_true_or_false (Peqb p p1)); intro; rewrite H1 in H0.
+	elim (bool_is_true_or_false (Pos.eqb p p1)); intro; rewrite H1 in H0.
 	inversion H0. split with a0. trivial. inversion H0. intros. inversion H0.
 	intros. inversion H. simple induction p0. intros. inversion H0. intros. simpl in H0.
-	elim (bool_is_true_or_false (Peqb p p1)); intro; rewrite H1 in H0.
+	elim (bool_is_true_or_false (Pos.eqb p p1)); intro; rewrite H1 in H0.
 	inversion H0. split with a0. trivial. inversion H0. simpl in |- *. intros. inversion H.
 	simple induction p. intros. inversion H0. intros. inversion H0. intros. simpl in H.
 	inversion H. split with a0. trivial. intro. intro. intro. intro. simple induction c.
@@ -1571,7 +1571,7 @@ Fixpoint union_mpl_0 (c : ad) (pl : prec_list) (s : state) {struct s} :
   match s with
   | M0 => M1 prec_list c pl
   | M1 c0 pl0 =>
-      if Neqb c c0
+      if N.eqb c c0
       then M1 prec_list c (union_pl pl pl0)
       else MapMerge prec_list (M1 prec_list c pl) (M1 prec_list c0 pl0)
   | M2 s0 s1 =>
@@ -1732,7 +1732,7 @@ Qed.
 Lemma mpl_compat_7_1 :
  forall (a : ad) (a0 : prec_list), mpl_compat_7_def (M1 prec_list a a0).
 Proof.
-	unfold mpl_compat_7_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (Neqb a c)); intros; rewrite H0 in H;
+	unfold mpl_compat_7_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (N.eqb a c)); intros; rewrite H0 in H;
   inversion H. rewrite (Neqb_complete a c H0). simpl in |- *.
 	rewrite (Neqb_correct c). simpl in |- *. rewrite (Neqb_correct c). trivial.
 Qed.
@@ -1777,9 +1777,9 @@ Qed.
 Lemma mpl_compat_8_1 :
  forall (a : ad) (a0 : prec_list), mpl_compat_8_def (M1 prec_list a a0).
 Proof.
-	unfold mpl_compat_8_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (Neqb a c)); intros; rewrite H1 in H. inversion H. simpl in |- *. elim (bool_is_true_or_false (Neqb a1 a)); intro; rewrite H2. simpl in |- *. elim (bool_is_true_or_false (Neqb a1 c)). intro.
+	unfold mpl_compat_8_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (N.eqb a c)); intros; rewrite H1 in H. inversion H. simpl in |- *. elim (bool_is_true_or_false (N.eqb a1 a)); intro; rewrite H2. simpl in |- *. elim (bool_is_true_or_false (N.eqb a1 c)). intro.
 	elim (H0 (Neqb_complete a1 c H4)). intro. rewrite (Neqb_complete a1 a H2) in H4.
-	rewrite H1 in H4. inversion H4. elim (Ndiscr (Nxor a a1)). intro y. elim y.
+	rewrite H1 in H4. inversion H4. elim (N.discr (Nxor a a1)). intro y. elim y.
 	intros x y0. rewrite y0. rewrite (MapPut1_semantics prec_list x a a1 l pl y0 c).
 	rewrite H1. trivial. intro y. rewrite (Neqb_comm a1 a) in H2.
 	rewrite (Nxor_eq_true a a1 y) in H2. inversion H2. inversion H.
@@ -1856,13 +1856,13 @@ Lemma union_s0d_1_1 :
  state_reconnait d (M1 prec_list c pl) (app c tl) ->
  state_reconnait d (union_mpl_0 c pl (M1 prec_list c0 pl0)) (app c tl).
 Proof.
-	intros. unfold mpl_compat in H. inversion H1. apply (rec_st d (union_mpl_0 c pl (M1 prec_list c0 pl0)) c tl l). simpl in |- *. elim (bool_is_true_or_false (Neqb c c0)); intros; rewrite H8. elim (H0 (Neqb_complete c c0 H8)). elim (Ndiscr (Nxor c0 c)).
+	intros. unfold mpl_compat in H. inversion H1. apply (rec_st d (union_mpl_0 c pl (M1 prec_list c0 pl0)) c tl l). simpl in |- *. elim (bool_is_true_or_false (N.eqb c c0)); intros; rewrite H8. elim (H0 (Neqb_complete c c0 H8)). elim (N.discr (Nxor c0 c)).
 	intro y. elim y; intros x y0. rewrite y0. cut
   (MapGet prec_list (MapPut1 prec_list c0 pl0 c pl x) c =
-    match Neqb c0 c with
+    match N.eqb c0 c with
     | true => Some pl0
     | false =>
-        match Neqb c c with
+        match N.eqb c c with
         | true => Some pl
         | false => None
         end
@@ -1878,7 +1878,7 @@ Lemma union_s0d_2_0 :
  state_reconnait d (union_mpl_0 N0 pl (M2 prec_list s0 s1)) (app N0 tl).
 Proof.
 	intro. intro. simple induction s0. intros. simpl in |- *. inversion H0. apply (rec_st d (M2 prec_list (M1 prec_list N0 pl) s1) N0 tl l). simpl in |- *. simpl in H5. inversion H5. trivial.
-	assumption. intros. unfold union_mpl_0 in |- *. elim (bool_is_true_or_false (Neqb N0 a)); intros; rewrite H1. apply
+	assumption. intros. unfold union_mpl_0 in |- *. elim (bool_is_true_or_false (N.eqb N0 a)); intros; rewrite H1. apply
   (rec_st d (M2 prec_list (M1 prec_list N0 (union_pl pl a0)) s1) N0 tl
      (union_pl pl a0)). simpl in |- *. trivial. inversion H0. simpl in H6. inversion H6.
 	apply (union_pl_0d d l a0 tl). apply (mpl_compat_0 N0 l a0). rewrite <- (Neqb_complete N0 a H1) in H. rewrite H9 in H. apply (mpl_compat_sym (M1 prec_list N0 a0) (M1 prec_list N0 l)). apply (mpl_compat_3 (M1 prec_list N0 a0) s1 l). apply
@@ -1940,7 +1940,7 @@ Proof.
 	assumption. simpl in |- *. cut (state_reconnait d (union_mpl_0 N0 pl s1_1) (app N0 tl)). intro.
 	inversion H1. apply (rec_st d (M2 prec_list (union_mpl_0 N0 pl s1_1) s1_0) N0 tl l).
 	simpl in |- *. assumption. assumption. apply Hrecs1_1. cut (mpl_compat (M1 prec_list N0 pl) s1_1).
-	intro. unfold mpl_compat in |- *. intros. unfold mpl_compat in H1. unfold MapGet in H2. elim (bool_is_true_or_false (Neqb (Npos 1) c)); intro; rewrite H4 in H2;
+	intro. unfold mpl_compat in |- *. intros. unfold mpl_compat in H1. unfold MapGet in H2. elim (bool_is_true_or_false (N.eqb (Npos 1) c)); intro; rewrite H4 in H2;
   inversion H2.
 	apply (H1 N0 p0 p1). simpl in |- *. rewrite H6. trivial. rewrite <- (Neqb_complete (Npos 1) c H4) in H3. simpl in H3. assumption. apply (mpl_compat_sym s1_1 (M1 prec_list N0 pl)).
 	apply (mpl_compat_3 s1_1 s1_0 pl). apply (mpl_compat_4 s0 (M2 prec_list s1_1 s1_0) pl).
@@ -2023,9 +2023,9 @@ Lemma union_s1d_1_0 :
  state_reconnait d (M1 prec_list c pl0) (app c tl) ->
  state_reconnait d (union_mpl_0 a pl (M1 prec_list c pl0)) (app c tl).
 Proof.
-	intros. simpl in |- *. elim (bool_is_true_or_false (Neqb a c)). intro. 
+	intros. simpl in |- *. elim (bool_is_true_or_false (N.eqb a c)). intro. 
 	elim (H0 (Neqb_complete a c H2)). intro. rewrite H2. 
-	elim (Ndiscr (Nxor c a)); intro y. elim y. intros x y0. rewrite y0. inversion H1.
+	elim (N.discr (Nxor c a)); intro y. elim y. intros x y0. rewrite y0. inversion H1.
 	apply (rec_st d (MapPut1 prec_list c pl0 a pl x) c tl l).
 	rewrite (MapPut1_semantics prec_list x c a pl0 pl y0 c). rewrite (Neqb_correct c).
 	simpl in H7. rewrite (Neqb_correct c) in H7. inversion H7. trivial. trivial.
@@ -2050,7 +2050,7 @@ Lemma union_s1d_1 :
 Proof.
 	unfold union_s_prd1 in |- *. intros. cut (a = c). intro. rewrite H1 in H. rewrite H1 in H0.
 	rewrite H1. elim (classic (a1 = c)). intro. rewrite H2. rewrite H2 in H.
-	exact (union_s1d_1_1 d pl a0 c tl H H0). intro. exact (union_s1d_1_0 d a1 pl a0 c tl H H2 H0). inversion H0. simpl in H5. elim (bool_is_true_or_false (Neqb a c)).
+	exact (union_s1d_1_1 d pl a0 c tl H H0). intro. exact (union_s1d_1_0 d a1 pl a0 c tl H H2 H0). inversion H0. simpl in H5. elim (bool_is_true_or_false (N.eqb a c)).
 	intro. exact (Neqb_complete a c H7). intro. rewrite H7 in H5. inversion H5.
 Qed.
 
@@ -2148,23 +2148,23 @@ Lemma union_std_1 :
 Proof.
 	unfold union_std_def in |- *. intros. split. induction  s1 as [| a1 a2| s1_1 Hrecs1_1 s1_0 Hrecs1_0]. unfold union_mpl in |- *. cut (a = c).
 	intro. rewrite H1. rewrite H1 in H. rewrite H1 in H0. exact (union_s0d (M0 prec_list) d c a0 tl H H0). inversion H0. simpl in H5.
-	elim (bool_is_true_or_false (Neqb a c)); intro. exact (Neqb_complete a c H7).
+	elim (bool_is_true_or_false (N.eqb a c)); intro. exact (Neqb_complete a c H7).
 	rewrite H7 in H5. inversion H5. unfold union_mpl in |- *.
 	exact
   (union_s1d (M1 prec_list a a0) d a1 a2 c tl
      (mpl_compat_sym (M1 prec_list a a0) (M1 prec_list a1 a2) H) H0). unfold union_mpl in |- *. cut (a = c). intro. rewrite H1.
 	rewrite H1 in H. rewrite H1 in H0. exact (union_s0d (M2 prec_list s1_1 s1_0) d c a0 tl H H0).
-	inversion H0. simpl in H5. elim (bool_is_true_or_false (Neqb a c)). intro.
+	inversion H0. simpl in H5. elim (bool_is_true_or_false (N.eqb a c)). intro.
 	exact (Neqb_complete a c H7). intro. rewrite H7 in H5. inversion H5. induction  s1 as [| a1 a2| s1_1 Hrecs1_1 s1_0 Hrecs1_0].
 	unfold union_mpl in |- *. cut (a = c). intro. rewrite H1. rewrite H1 in H. rewrite H1 in H0.
 	exact (union_s0d (M0 prec_list) d c a0 tl H H0). inversion H0. simpl in H5.
-	elim (bool_is_true_or_false (Neqb a c)). intro. exact (Neqb_complete a c H7).
+	elim (bool_is_true_or_false (N.eqb a c)). intro. exact (Neqb_complete a c H7).
 	intro. rewrite H7 in H5. inversion H5. unfold union_mpl in |- *. cut (a = c). intro.
-	rewrite H1. rewrite H1 in H. rewrite H1 in H0. exact (union_s0d (M1 prec_list a1 a2) d c a0 tl H H0). inversion H0. simpl in H5. elim (bool_is_true_or_false (Neqb a c)).
+	rewrite H1. rewrite H1 in H. rewrite H1 in H0. exact (union_s0d (M1 prec_list a1 a2) d c a0 tl H H0). inversion H0. simpl in H5. elim (bool_is_true_or_false (N.eqb a c)).
 	intro. exact (Neqb_complete a c H7). intro. rewrite H7 in H5. inversion H5.
 	cut (a = c). intro. rewrite H1 in H. rewrite H1 in H0. rewrite H1.
 	exact (union_s0d (M2 prec_list s1_1 s1_0) d c a0 tl H H0). inversion H0.
-	elim (bool_is_true_or_false (Neqb a c)). intro. exact (Neqb_complete a c H7).
+	elim (bool_is_true_or_false (N.eqb a c)). intro. exact (Neqb_complete a c H7).
 	intro. simpl in H5. rewrite H7 in H5. inversion H5.
 Qed.
 
@@ -2354,17 +2354,17 @@ Qed.
 Lemma union_s_rpl_1 :
  forall (a : ad) (a0 : prec_list), union_s_rpl_def (M1 prec_list a a0).
 Proof.
-	unfold union_s_rpl_def in |- *. intros. simpl in H0. elim (bool_is_true_or_false (Neqb a1 a)); intro; rewrite H1 in H0. inversion H0. simpl in H6. elim (bool_is_true_or_false (Neqb a1 c)); intro; rewrite H8 in H6. inversion H6. rewrite <- H10 in H7.
+	unfold union_s_rpl_def in |- *. intros. simpl in H0. elim (bool_is_true_or_false (N.eqb a1 a)); intro; rewrite H1 in H0. inversion H0. simpl in H6. elim (bool_is_true_or_false (N.eqb a1 c)); intro; rewrite H8 in H6. inversion H6. rewrite <- H10 in H7.
 	cut (liste_reconnait d pl tl \/ liste_reconnait d a0 tl). intro. elim H9; intro.
 	left. rewrite (Neqb_complete a1 c H8). apply (rec_st d (M1 prec_list c pl) c tl pl).
 	simpl in |- *. rewrite (Neqb_correct c). trivial. assumption. right. rewrite <- (Neqb_complete a1 a H1). rewrite (Neqb_complete a1 c H8). apply (rec_st d (M1 prec_list c a0) c tl a0).
 	simpl in |- *. rewrite (Neqb_correct c). trivial. trivial. apply (union_pl_r d pl a0 tl).
 	apply (H c pl a0). simpl in |- *. rewrite H8. trivial. simpl in |- *. rewrite <- (Neqb_complete a1 a H1). rewrite H8. trivial.  assumption. inversion H6.
-	elim (Ndiscr (Nxor a a1)); intro y. elim y. intros x y0. rewrite y0 in H0. inversion H0.
+	elim (N.discr (Nxor a a1)); intro y. elim y. intros x y0. rewrite y0 in H0. inversion H0.
 	rewrite (MapPut1_semantics prec_list x a a1 a0 pl y0 c) in H6.
-	elim (bool_is_true_or_false (Neqb a c)); intro; rewrite H8 in H6. right. inversion H6.
+	elim (bool_is_true_or_false (N.eqb a c)); intro; rewrite H8 in H6. right. inversion H6.
 	apply (rec_st d (M1 prec_list a l) c tl l). simpl in |- *. rewrite H8. trivial. trivial.
-	elim (bool_is_true_or_false (Neqb a1 c)); intro; rewrite H9 in H6. inversion H6.
+	elim (bool_is_true_or_false (N.eqb a1 c)); intro; rewrite H9 in H6. inversion H6.
 	left. apply (rec_st d (M1 prec_list a1 l) c tl l). simpl in |- *. rewrite H9. trivial.
 	trivial. inversion H6. rewrite (Nxor_comm a a1) in y. rewrite (Nxor_eq_true a1 a y) in H1. inversion H1.
 Qed.
@@ -2600,7 +2600,7 @@ Proof.
 	unfold new_state_insd_def_dta in |- *. unfold new_state_insd_def_st in |- *.
 	intros. apply (rec_dta (MapPut state d a0 s0) a t ladj).
 	rewrite (MapPut_semantics state d a0 s0 a).
-	elim (bool_is_true_or_false (Neqb a0 a)); intros.
+	elim (bool_is_true_or_false (N.eqb a0 a)); intros.
 	rewrite (Neqb_complete a0 a H1) in H0. rewrite H0 in e.
 	inversion e. rewrite H1. assumption. exact (H a0 s0 H0).
 Qed.
@@ -2701,7 +2701,7 @@ Proof.
 	unfold new_state_insr_def_st in |- *. unfold new_state_insr_def_dta in |- *.
 	intros. apply (rec_dta d0 a t ladj). rewrite H1 in e.
 	rewrite (MapPut_semantics state d0 a0 s0) in e.
-	elim (bool_is_true_or_false (Neqb a0 a)); intro.
+	elim (bool_is_true_or_false (N.eqb a0 a)); intro.
 	elim (H3 (Neqb_complete _ _ H4)). rewrite H4 in e.
 	assumption. apply (H d0 a0 s0). assumption.
 	unfold state_in_dta_diff in |- *. split with a. split; assumption.
@@ -2733,7 +2733,7 @@ Proof.
 	split with x. split with x0. split with x1. split with x2.
 	split. simpl in H7. rewrite H0 in H7.
 	rewrite (MapPut_semantics state d0 a s) in H7.
-	elim (bool_is_true_or_false (Neqb a x0)); intro.
+	elim (bool_is_true_or_false (N.eqb a x0)); intro.
 	elim (H12 (Neqb_complete _ _ H13)). rewrite H13 in H7.
 	assumption. split. assumption. split; assumption.
 Qed.
@@ -2753,7 +2753,7 @@ Proof.
 	elim H6. intros. elim H7. intros. elim H8. intros. elim H10. intros.
 	cut (MapGet state d0 x0 = Some x). cut (prec_occur x2 a).
 	intros. elim (H1 x0 x x1 x2 a H14 H11 H13). intros. elim (classic (a0 = a)). intro. rewrite <- H16 in H15. rewrite H15 in H3. inversion H3.
-	intro. assumption. elim H12. intros. exact (prec_occur_1 a la ls x2 H13). rewrite H2 in H9. rewrite (MapPut_semantics state d0 a0 s) in H9. elim (bool_is_true_or_false (Neqb a0 x0)). intro. elim H12.
+	intro. assumption. elim H12. intros. exact (prec_occur_1 a la ls x2 H13). rewrite H2 in H9. rewrite (MapPut_semantics state d0 a0 s) in H9. elim (bool_is_true_or_false (N.eqb a0 x0)). intro. elim H12.
 	intros. elim (H15 (Neqb_complete _ _ H13)). intros. rewrite H13 in H9.
 	assumption. unfold prec_in_dta_diff_cont in H4. elim H4. intros. 
 	elim H5. intros. elim H6. intros. elim H7. intros. elim H8. intros.
@@ -2763,7 +2763,7 @@ Proof.
 	intros. elim H5. intros. elim H6. intros. elim H7. intros. elim H8.
 	intros. elim H10. intros. elim H12. intros. rewrite H2 in H9.
 	rewrite (MapPut_semantics state d0 a0 s) in H9.
-	elim (bool_is_true_or_false (Neqb a0 x0)); intro. elim (H14 (Neqb_complete _ _ H15)). rewrite H15 in H9. split with x. 
+	elim (bool_is_true_or_false (N.eqb a0 x0)); intro. elim (H14 (Neqb_complete _ _ H15)). rewrite H15 in H9. split with x. 
 	split with x0. split with x1. split with x2. split. assumption.
 	split. assumption. split; assumption.
 Qed.
@@ -2782,7 +2782,7 @@ Proof.
 	exact (prec_contained_1 a la ls x2 H12). assumption. elim H3. intros.
 	elim H4. intros. elim H5. intros. elim H6. intros. elim H7. intros.
 	elim H9. intros. elim H11. intros. split with x. split with x0. 
-	split with x1. split with x2. split. rewrite H1 in H8. rewrite (MapPut_semantics state d0 a0 s) in H8. elim (bool_is_true_or_false (Neqb a0 x0)); intro. elim (H13 (Neqb_complete _ _ H14)). 
+	split with x1. split with x2. split. rewrite H1 in H8. rewrite (MapPut_semantics state d0 a0 s) in H8. elim (bool_is_true_or_false (N.eqb a0 x0)); intro. elim (H13 (Neqb_complete _ _ H14)). 
 	rewrite H14 in H8. assumption. split. assumption. split; assumption.
 Qed.
 
@@ -2895,7 +2895,7 @@ Lemma insert_ostate_3 :
 Proof.
 	intros. split. intro. inversion H6. unfold insert_ostate in H7.
 	rewrite (MapPut_semantics state (u_merge d0 d1) a s) in H7.
-	elim (bool_is_true_or_false (Neqb a (uad_conv_0 a0))); intro.
+	elim (bool_is_true_or_false (N.eqb a (uad_conv_0 a0))); intro.
 	elim (H5 (Neqb_complete _ _ H12)). rewrite H12 in H7. induction  t as (a3, t).
 	inversion H8. apply (rec_st (insert_ostate (u_merge d0 d1) a (Some s)) s0' a3 t l). rewrite H7 in H1. inversion H1.
 	rewrite <- H20. assumption. assumption. intro.
@@ -2903,7 +2903,7 @@ Proof.
   (rec_dta (insert_ostate (u_merge d0 d1) a (Some s)) 
      (uad_conv_0 a0) t s0'). unfold insert_ostate in |- *.
 	rewrite (MapPut_semantics state (u_merge d0 d1) a s).
-	elim (bool_is_true_or_false (Neqb a (uad_conv_0 a0))); intro.
+	elim (bool_is_true_or_false (N.eqb a (uad_conv_0 a0))); intro.
 	elim (H5 (Neqb_complete _ _ H7)). rewrite H7. assumption.
 	assumption.
 Qed.
@@ -2923,7 +2923,7 @@ Lemma insert_ostate_4 :
 Proof.
 	intros. split. intro. inversion H6. unfold insert_ostate in H7.
 	rewrite (MapPut_semantics state (u_merge d0 d1) a s) in H7.
-	elim (bool_is_true_or_false (Neqb a (uad_conv_1 a1))); intro.
+	elim (bool_is_true_or_false (N.eqb a (uad_conv_1 a1))); intro.
 	elim (H5 (Neqb_complete _ _ H12)). rewrite H12 in H7. induction  t as (a3, t).
 	inversion H8. apply (rec_st (insert_ostate (u_merge d0 d1) a (Some s)) s1' a3 t l). rewrite H7 in H2. inversion H2.
 	rewrite <- H20. assumption. assumption. intro.
@@ -2931,7 +2931,7 @@ Proof.
   (rec_dta (insert_ostate (u_merge d0 d1) a (Some s)) 
      (uad_conv_1 a1) t s1'). unfold insert_ostate in |- *.
 	rewrite (MapPut_semantics state (u_merge d0 d1) a s).
-	elim (bool_is_true_or_false (Neqb a (uad_conv_1 a1))); intro.
+	elim (bool_is_true_or_false (N.eqb a (uad_conv_1 a1))); intro.
 	elim (H5 (Neqb_complete _ _ H7)). rewrite H7. assumption.
 	assumption.
 Qed.

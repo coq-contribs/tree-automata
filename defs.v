@@ -407,13 +407,13 @@ Qed.
 
 (* lemmes sur Ndouble, Ndouble_plus_one *)
 
-Lemma Ndouble_inv_N0 : forall x : ad, Ndouble x = N0 -> x = N0.
+Lemma Ndouble_inv_N0 : forall x : ad, N.double x = N0 -> x = N0.
 Proof.
 	simple induction x. intros. reflexivity. simpl in |- *. intros. inversion H.
 Qed.
 
 Lemma Ndouble_inv_xO :
- forall (x : ad) (p : positive), Ndouble x = Npos (xO p) -> x = Npos p.
+ forall (x : ad) (p : positive), N.double x = Npos (xO p) -> x = Npos p.
 Proof.
 	simple induction x. intros. inversion H. intros. simpl in H.
 	inversion H. reflexivity.

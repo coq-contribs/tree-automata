@@ -56,16 +56,16 @@ Proof.
 	simple induction s. intros. simpl in |- *. exact H. intros. simpl in |- *.
 	unfold state_correct_wrt_sign_with_offset in H.
 	unfold state_correct_wrt_sign_with_offset in |- *. intros.
-	simpl in H0. elim (H a a0). intros. split with x. elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H2 in H0. inversion H0. elim H1. intros. rewrite (Neqb_complete _ _ H2) in H3. split. exact H3. exact (upl_conv_0_correct_wrt_sign_invar _ _ H5). inversion H0. simpl in |- *. rewrite (Neqb_correct a). 
+	simpl in H0. elim (H a a0). intros. split with x. elim (bool_is_true_or_false (N.eqb a a1)); intros; rewrite H2 in H0. inversion H0. elim H1. intros. rewrite (Neqb_complete _ _ H2) in H3. split. exact H3. exact (upl_conv_0_correct_wrt_sign_invar _ _ H5). inversion H0. simpl in |- *. rewrite (Neqb_correct a). 
 	reflexivity. intros. unfold state_correct_wrt_sign_with_offset in H1.
 	unfold state_correct_wrt_sign_with_offset in |- *. intros. unfold state_correct_wrt_sign_with_offset in H. unfold state_correct_wrt_sign_with_offset in H0. induction  a as [| p0]. simpl in H2.
 	elim (H sigma (pre_ad_O pa)) with (a := N0) (p := p). intros.
-	split with x. simpl in H3. exact H3. intros. elim (H1 (Ndouble a) p0). intros. split with x. simpl in |- *. exact H4. induction  a as [| p1]; simpl in |- *; exact H3. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. elim (H0 sigma (pre_ad_I pa)) with (a := Npos p0) (p := p). intros. split with x. simpl in H3. exact H3.
+	split with x. simpl in H3. exact H3. intros. elim (H1 (N.double a) p0). intros. split with x. simpl in |- *. exact H4. induction  a as [| p1]; simpl in |- *; exact H3. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. elim (H0 sigma (pre_ad_I pa)) with (a := Npos p0) (p := p). intros. split with x. simpl in H3. exact H3.
 	intros. elim (H1 (Ndouble_plus_one a) p1). intros. split with x.
 	induction  a as [| p2]. simpl in H4. simpl in |- *. exact H4. simpl in H4. simpl in |- *.
 	exact H4. induction  a as [| p2]; simpl in |- *; exact H3. simpl in H2. exact H2.
 	elim (H sigma (pre_ad_O pa)) with (a := Npos p0) (p := p). intros.
-	split with x. simpl in H3. exact H3. intros. elim (H1 (Ndouble a) p1). intros. split with x. induction  a as [| p2]; simpl in H4; simpl in |- *; exact H4. induction  a as [| p2]; simpl in |- *; exact H3. simpl in H2. exact H2.
+	split with x. simpl in H3. exact H3. intros. elim (H1 (N.double a) p1). intros. split with x. induction  a as [| p2]; simpl in H4; simpl in |- *; exact H4. induction  a as [| p2]; simpl in |- *; exact H3. simpl in H2. exact H2.
 	elim (H0 sigma (pre_ad_I pa)) with (a := N0) (p := p). intros. split with x. simpl in H3. exact H3. intros. elim (H1 (Ndouble_plus_one a) p0). intros. split with x. induction  a as [| p1]; simpl in |- *; simpl in H4; exact H4. induction  a as [| p1]; simpl in |- *; exact H3. simpl in H2. exact H2.
 Qed.
 
@@ -89,16 +89,16 @@ Proof.
 	simple induction s. intros. simpl in |- *. exact H. intros. simpl in |- *.
 	unfold state_correct_wrt_sign_with_offset in H.
 	unfold state_correct_wrt_sign_with_offset in |- *. intros.
-	simpl in H0. elim (H a a0). intros. split with x. elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H2 in H0. inversion H0. elim H1. intros. rewrite (Neqb_complete _ _ H2) in H3. split. exact H3. exact (upl_conv_1_correct_wrt_sign_invar _ _ H5). inversion H0. simpl in |- *. rewrite (Neqb_correct a). 
+	simpl in H0. elim (H a a0). intros. split with x. elim (bool_is_true_or_false (N.eqb a a1)); intros; rewrite H2 in H0. inversion H0. elim H1. intros. rewrite (Neqb_complete _ _ H2) in H3. split. exact H3. exact (upl_conv_1_correct_wrt_sign_invar _ _ H5). inversion H0. simpl in |- *. rewrite (Neqb_correct a). 
 	reflexivity. intros. unfold state_correct_wrt_sign_with_offset in H1.
 	unfold state_correct_wrt_sign_with_offset in |- *. intros. unfold state_correct_wrt_sign_with_offset in H. unfold state_correct_wrt_sign_with_offset in H0. induction  a as [| p0]. simpl in H2.
 	elim (H sigma (pre_ad_O pa)) with (a := N0) (p := p). intros.
-	split with x. simpl in H3. exact H3. intros. elim (H1 (Ndouble a) p0). intros. split with x. simpl in |- *. exact H4. induction  a as [| p1]; simpl in |- *; exact H3. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. elim (H0 sigma (pre_ad_I pa)) with (a := Npos p0) (p := p). intros. split with x. simpl in H3. exact H3.
+	split with x. simpl in H3. exact H3. intros. elim (H1 (N.double a) p0). intros. split with x. simpl in |- *. exact H4. induction  a as [| p1]; simpl in |- *; exact H3. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. elim (H0 sigma (pre_ad_I pa)) with (a := Npos p0) (p := p). intros. split with x. simpl in H3. exact H3.
 	intros. elim (H1 (Ndouble_plus_one a) p1). intros. split with x.
 	induction  a as [| p2]. simpl in H4. simpl in |- *. exact H4. simpl in H4. simpl in |- *.
 	exact H4. induction  a as [| p2]; simpl in |- *; exact H3. simpl in H2. exact H2.
 	elim (H sigma (pre_ad_O pa)) with (a := Npos p0) (p := p). intros.
-	split with x. simpl in H3. exact H3. intros. elim (H1 (Ndouble a) p1). intros. split with x. induction  a as [| p2]; simpl in H4; simpl in |- *; exact H4. induction  a as [| p2]; simpl in |- *; exact H3. simpl in H2. exact H2.
+	split with x. simpl in H3. exact H3. intros. elim (H1 (N.double a) p1). intros. split with x. induction  a as [| p2]; simpl in H4; simpl in |- *; exact H4. induction  a as [| p2]; simpl in |- *; exact H3. simpl in H2. exact H2.
 	elim (H0 sigma (pre_ad_I pa)) with (a := N0) (p := p). intros. split with x. simpl in H3. exact H3. intros. elim (H1 (Ndouble_plus_one a) p0). intros. split with x. induction  a as [| p1]; simpl in |- *; simpl in H4; exact H4. induction  a as [| p1]; simpl in |- *; exact H3. simpl in H2. exact H2.
 Qed.
 
@@ -120,12 +120,12 @@ Lemma udta_conv_0_correct_wrt_sign_invar_0 :
  predta_correct_wrt_sign (udta_conv_0_aux d) sigma.
 Proof.
 	unfold predta_correct_wrt_sign in |- *. simple induction d. intros. inversion H0.
-	intros. simpl in H0. elim (bool_is_true_or_false (Neqb a a1)); intros. rewrite H1 in H0. inversion H0. apply (umpl_conv_0_correct_wrt_sign_invar a0 sigma). apply (H a a0).
+	intros. simpl in H0. elim (bool_is_true_or_false (N.eqb a a1)); intros. rewrite H1 in H0. inversion H0. apply (umpl_conv_0_correct_wrt_sign_invar a0 sigma). apply (H a a0).
 	simpl in |- *. rewrite (Neqb_correct a). reflexivity. rewrite H1 in H0.
-	inversion H0. intros. simpl in H2. induction  a as [| p]. apply (H sigma) with (a := N0) (s := s). intros. apply (H1 (Ndouble a) s0). 
+	inversion H0. intros. simpl in H2. induction  a as [| p]. apply (H sigma) with (a := N0) (s := s). intros. apply (H1 (N.double a) s0). 
 	induction  a as [| p]; simpl in |- *; exact H3. exact H2. induction  p as [p Hrecp| p Hrecp| ]; simpl in H2.
 	apply (H0 sigma) with (a := Npos p) (s := s). intros. apply (H1 (Ndouble_plus_one a) s0). induction  a as [| p0]; simpl in |- *; exact H3. exact H2.
-	apply (H sigma) with (a := Npos p) (s := s). intros. apply (H1 (Ndouble a) s0). induction  a as [| p0]; simpl in |- *; exact H3. exact H2. apply (H0 sigma) with (a := N0) (s := s). intros. apply (H1 (Ndouble_plus_one a) s0).
+	apply (H sigma) with (a := Npos p) (s := s). intros. apply (H1 (N.double a) s0). induction  a as [| p0]; simpl in |- *; exact H3. exact H2. apply (H0 sigma) with (a := N0) (s := s). intros. apply (H1 (Ndouble_plus_one a) s0).
 	induction  a as [| p]; simpl in |- *; exact H3. exact H2.
 Qed.
 
@@ -146,12 +146,12 @@ Lemma udta_conv_1_correct_wrt_sign_invar_0 :
  predta_correct_wrt_sign (udta_conv_1_aux d) sigma.
 Proof.
 	unfold predta_correct_wrt_sign in |- *. simple induction d. intros. inversion H0.
-	intros. simpl in H0. elim (bool_is_true_or_false (Neqb a a1)); intros. rewrite H1 in H0. inversion H0. apply (umpl_conv_1_correct_wrt_sign_invar a0 sigma). apply (H a a0).
+	intros. simpl in H0. elim (bool_is_true_or_false (N.eqb a a1)); intros. rewrite H1 in H0. inversion H0. apply (umpl_conv_1_correct_wrt_sign_invar a0 sigma). apply (H a a0).
 	simpl in |- *. rewrite (Neqb_correct a). reflexivity. rewrite H1 in H0.
-	inversion H0. intros. simpl in H2. induction  a as [| p]. apply (H sigma) with (a := N0) (s := s). intros. apply (H1 (Ndouble a) s0). 
+	inversion H0. intros. simpl in H2. induction  a as [| p]. apply (H sigma) with (a := N0) (s := s). intros. apply (H1 (N.double a) s0). 
 	induction  a as [| p]; simpl in |- *; exact H3. exact H2. induction  p as [p Hrecp| p Hrecp| ]; simpl in H2.
 	apply (H0 sigma) with (a := Npos p) (s := s). intros. apply (H1 (Ndouble_plus_one a) s0). induction  a as [| p0]; simpl in |- *; exact H3. exact H2.
-	apply (H sigma) with (a := Npos p) (s := s). intros. apply (H1 (Ndouble a) s0). induction  a as [| p0]; simpl in |- *; exact H3. exact H2. apply (H0 sigma) with (a := N0) (s := s). intros. apply (H1 (Ndouble_plus_one a) s0).
+	apply (H sigma) with (a := Npos p) (s := s). intros. apply (H1 (N.double a) s0). induction  a as [| p0]; simpl in |- *; exact H3. exact H2. apply (H0 sigma) with (a := N0) (s := s). intros. apply (H1 (Ndouble_plus_one a) s0).
 	induction  a as [| p]; simpl in |- *; exact H3. exact H2.
 Qed.
 
@@ -195,14 +195,14 @@ Lemma union_mpl_correct_wrt_sign_invar_0 :
 Proof.
 	simple induction s. unfold state_correct_wrt_sign_with_offset in |- *. intros.
 	exact (H0 _ _ H1). unfold state_correct_wrt_sign_with_offset in |- *.
-	intros. simpl in H1. elim (bool_is_true_or_false (Neqb a1 a)); intros; rewrite H2 in H1. elim (H a a0). intros. elim (H0 a p).
-	intros. elim H3. elim H4. intros. simpl in H1. elim (bool_is_true_or_false (Neqb a1 a2)); intros; rewrite H9 in H1;
+	intros. simpl in H1. elim (bool_is_true_or_false (N.eqb a1 a)); intros; rewrite H2 in H1. elim (H a a0). intros. elim (H0 a p).
+	intros. elim H3. elim H4. intros. simpl in H1. elim (bool_is_true_or_false (N.eqb a1 a2)); intros; rewrite H9 in H1;
   inversion H1. rewrite H7 in H5. inversion H5. split with x.
-	rewrite <- H12 in H6. split. rewrite <- (Neqb_complete _ _ H9). rewrite (Neqb_complete _ _ H2). exact H7. exact (union_pl_correct_wrt_sign_invar p a0 x H6 H8). simpl in |- *. rewrite H2. reflexivity. simpl in |- *. rewrite (Neqb_correct a). reflexivity. elim (Ndiscr (Nxor a a1)).
-	intro y. elim y. intros x y0. rewrite y0 in H1. rewrite (MapPut1_semantics prec_list x a a1 a0 p y0) in H1. elim (bool_is_true_or_false (Neqb a a2)); intros; rewrite H3 in H1. inversion H1. elim (H a a0). intros.
+	rewrite <- H12 in H6. split. rewrite <- (Neqb_complete _ _ H9). rewrite (Neqb_complete _ _ H2). exact H7. exact (union_pl_correct_wrt_sign_invar p a0 x H6 H8). simpl in |- *. rewrite H2. reflexivity. simpl in |- *. rewrite (Neqb_correct a). reflexivity. elim (N.discr (Nxor a a1)).
+	intro y. elim y. intros x y0. rewrite y0 in H1. rewrite (MapPut1_semantics prec_list x a a1 a0 p y0) in H1. elim (bool_is_true_or_false (N.eqb a a2)); intros; rewrite H3 in H1. inversion H1. elim (H a a0). intros.
 	elim H4. intros. split with x0. rewrite <- (Neqb_complete _ _ H3).
 	rewrite <- H5. exact H4. simpl in |- *. rewrite (Neqb_correct a).
-	reflexivity. elim (bool_is_true_or_false (Neqb a1 a2)); intros.
+	reflexivity. elim (bool_is_true_or_false (N.eqb a1 a2)); intros.
 	rewrite H4 in H1. inversion H1. elim (H0 a1 p). intros. split with x0. rewrite (Neqb_complete _ _ H4) in H5. rewrite H6 in H5.
 	exact H5. simpl in |- *. rewrite (Neqb_correct a1). reflexivity.
 	rewrite H4 in H1. inversion H1. intros y. rewrite (Neqb_comm a1 a) in H2. rewrite (Nxor_eq_true _ _ y) in H2. inversion H2.
@@ -217,9 +217,9 @@ Proof.
 	split with x. simpl in H7. exact H7. exact H3. elim (H _ _ _ _ H5 H6 (Npos p1) p0). intros. split with x. simpl in H7. exact H7.
 	exact H3. elim (H4 N0 p0). intros. split with x. simpl in H7.
 	exact H7. exact H3. unfold state_correct_wrt_sign_with_offset in |- *.
-	intros. elim (H2 (Ndouble a) p1). intros. split with x.
+	intros. elim (H2 (N.double a) p1). intros. split with x.
 	induction  a as [| p2]; simpl in |- *; simpl in H7; exact H7. simpl in H6. 
-	elim (Ndiscr a). intros y. elim y. intros x y0. rewrite y0 in H6.
+	elim (N.discr a). intros y. elim y. intros x y0. rewrite y0 in H6.
 	inversion H6. intros y. rewrite y in H6. rewrite y. simpl in |- *.
 	exact H6. induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. cut
   (state_correct_wrt_sign_with_offset (M1 prec_list (Npos p1) p) sigma
@@ -234,7 +234,7 @@ Proof.
 	exact H7. exact H3. induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]; simpl in H3. elim (H4 (Npos p2) p0).
 	intros. split with x. simpl in H7. exact H7. exact H3. elim (H _ _ _ _ H5 H6 (Npos p2) p0). intros. split with x. simpl in H7.
 	exact H7. exact H3. elim (H4 N0 p0). intros. split with x. simpl in H7. exact H7. exact H3. unfold state_correct_wrt_sign_with_offset in |- *.
-	intros. elim (H2 (Ndouble a) p2). intros. split with x. 
+	intros. elim (H2 (N.double a) p2). intros. split with x. 
 	induction  a as [| p3]; simpl in |- *; simpl in H7; exact H7. induction  a as [| p3]; simpl in |- *; exact H6. cut
   (state_correct_wrt_sign_with_offset (M1 prec_list N0 p) sigma
      (pre_ad_I pa)). intro. induction  a0 as [| p1]. simpl in H3.
@@ -244,7 +244,7 @@ Proof.
 	intros. split with x. simpl in H7. exact H7. exact H3. unfold state_correct_wrt_sign_with_offset in |- *. intros. elim (H2 (Ndouble_plus_one a) p1). intros. split with x. induction  a as [| p2]; simpl in |- *; simpl in H7; exact H7. induction  a as [| p2]; simpl in |- *. simpl in H6. exact H6. simpl in H6. inversion H6. unfold state_correct_wrt_sign_with_offset in |- *.
 	intros. elim (H1 (Ndouble_plus_one a1) p1). intros. split with x.
 	induction  a1 as [| p2]; simpl in H5; simpl in |- *; exact H5. induction  a1 as [| p2]; simpl in |- *; exact H4. unfold state_correct_wrt_sign_with_offset in |- *. intros.
-	elim (H1 (Ndouble a1) p1). intros. split with x. induction  a1 as [| p2]; simpl in |- *; simpl in H5; exact H5. induction  a1 as [| p2]; simpl in |- *; exact H4.
+	elim (H1 (N.double a1) p1). intros. split with x. induction  a1 as [| p2]; simpl in |- *; simpl in H5; exact H5. induction  a1 as [| p2]; simpl in |- *; exact H4.
 Qed.
 
 Lemma union_mpl_correct_wrt_sign_invar_1 :
@@ -254,16 +254,16 @@ Lemma union_mpl_correct_wrt_sign_invar_1 :
  state_correct_wrt_sign_with_offset (union_mpl s0 s1) sigma pa.
 Proof.
 	simple induction s0. simpl in |- *. simple induction s1; intros. exact H0. exact H0. exact H2.
-	simpl in |- *. simple induction s1. intros. exact (union_mpl_correct_wrt_sign_invar_0 (M0 prec_list) a a0 pa sigma H0 H). intros. elim (bool_is_true_or_false (Neqb a1 a)); intros; rewrite H1. unfold state_correct_wrt_sign_with_offset in |- *.
-	intros. simpl in H2. elim (bool_is_true_or_false (Neqb a1 a3)); intros; rewrite H3 in H2. inversion H2. elim (H a a0). intros. elim (H0 a1 a2).
+	simpl in |- *. simple induction s1. intros. exact (union_mpl_correct_wrt_sign_invar_0 (M0 prec_list) a a0 pa sigma H0 H). intros. elim (bool_is_true_or_false (N.eqb a1 a)); intros; rewrite H1. unfold state_correct_wrt_sign_with_offset in |- *.
+	intros. simpl in H2. elim (bool_is_true_or_false (N.eqb a1 a3)); intros; rewrite H3 in H2. inversion H2. elim (H a a0). intros. elim (H0 a1 a2).
 	intros. split with x. rewrite (Neqb_complete _ _ H1) in H6. split.
 	elim H4. intros. rewrite <- (Neqb_complete _ _ H3). rewrite (Neqb_complete _ _ H1). exact H7. elim H4. elim H6. intros.
 	rewrite H9 in H7. inversion H7. rewrite H12 in H10. exact (union_pl_correct_wrt_sign_invar _ _ _ H8 H10). simpl in |- *. rewrite (Neqb_correct a1). reflexivity. simpl in |- *. rewrite (Neqb_correct a).
-	reflexivity. inversion H2. elim (Ndiscr (Nxor a a1)); intro y. elim y.
+	reflexivity. inversion H2. elim (N.discr (Nxor a a1)); intro y. elim y.
 	intros x y0. rewrite y0. unfold state_correct_wrt_sign_with_offset in |- *. intros.
-	rewrite (MapPut1_semantics prec_list x a a1 a0 a2) in H2. elim (bool_is_true_or_false (Neqb a a3)); intros. rewrite H3 in H2.
+	rewrite (MapPut1_semantics prec_list x a a1 a0 a2) in H2. elim (bool_is_true_or_false (N.eqb a a3)); intros. rewrite H3 in H2.
 	inversion H2. elim (H a a0). intros. split with x0. rewrite (Neqb_complete _ _ H3) in H4. rewrite H5 in H4. exact H4. simpl in |- *.
-	rewrite (Neqb_correct a). reflexivity. rewrite H3 in H2. elim (bool_is_true_or_false (Neqb a1 a3)); intros. rewrite H4 in H2.
+	rewrite (Neqb_correct a). reflexivity. rewrite H3 in H2. elim (bool_is_true_or_false (N.eqb a1 a3)); intros. rewrite H4 in H2.
 	inversion H2. elim (H0 a1 a2). intros. split with x0. rewrite (Neqb_complete _ _ H4) in H5. rewrite H6 in H5. exact H5. simpl in |- *.
 	rewrite (Neqb_correct a1). reflexivity. rewrite H4 in H2. inversion H2. exact y0. rewrite (Neqb_comm a1 a) in H1. rewrite (Nxor_eq_true _ _ y) in H1. inversion H1. intros. simpl in |- *. induction  a as [| p]. exact (union_mpl_correct_wrt_sign_invar_0 _ _ _ _ _ H2 H1). induction  p as [p Hrecp| p Hrecp| ].
 	clear Hrecp. replace
@@ -357,7 +357,7 @@ Lemma insert_ostate_correct_wrt_sign_invar :
  predta_correct_wrt_sign (insert_ostate d a (Some s)) sigma.
 Proof.
 	unfold predta_correct_wrt_sign in |- *. unfold insert_ostate in |- *. intros.
-	rewrite (MapPut_semantics state d a s) in H1. elim (bool_is_true_or_false (Neqb a a0)); intros; rewrite H2 in H1.
+	rewrite (MapPut_semantics state d a s) in H1. elim (bool_is_true_or_false (N.eqb a a0)); intros; rewrite H2 in H1.
 	inversion H1. rewrite <- H4. exact H0. exact (H a0 s0 H1).
 Qed.
 
@@ -490,17 +490,17 @@ Lemma union_mpl_0_ref_ok_invar :
  state_ref_ok s d -> state_ref_ok (union_mpl_0 a p s) d.
 Proof.
 	simple induction s. simpl in |- *. intros. exact H. intros. simpl in |- *.  unfold state_ref_ok in |- *.
-	intros. elim (bool_is_true_or_false (Neqb a1 a)); intros; rewrite H2 in H1.
-	simpl in H1. elim (bool_is_true_or_false (Neqb a1 a2)); intros; rewrite H3 in H1. inversion H1. apply (union_pl_ref_ok_invar p a0 d). apply (H a1).
+	intros. elim (bool_is_true_or_false (N.eqb a1 a)); intros; rewrite H2 in H1.
+	simpl in H1. elim (bool_is_true_or_false (N.eqb a1 a2)); intros; rewrite H3 in H1. inversion H1. apply (union_pl_ref_ok_invar p a0 d). apply (H a1).
 	simpl in |- *. rewrite (Neqb_correct a1). reflexivity. apply (H0 a). simpl in |- *.
-	rewrite (Neqb_correct a). reflexivity. inversion H1. elim (Ndiscr (Nxor a a1)); intros y. elim y. intros x y0. rewrite y0 in H1. rewrite (MapPut1_semantics prec_list x a a1 a0 p) in H1. elim (bool_is_true_or_false (Neqb a a2)); intros; rewrite H3 in H1. inversion H1. rewrite <- H5.
-	apply (H0 a). simpl in |- *. rewrite (Neqb_correct a). reflexivity. elim (bool_is_true_or_false (Neqb a1 a2)); intros; rewrite H4 in H1;
+	rewrite (Neqb_correct a). reflexivity. inversion H1. elim (N.discr (Nxor a a1)); intros y. elim y. intros x y0. rewrite y0 in H1. rewrite (MapPut1_semantics prec_list x a a1 a0 p) in H1. elim (bool_is_true_or_false (N.eqb a a2)); intros; rewrite H3 in H1. inversion H1. rewrite <- H5.
+	apply (H0 a). simpl in |- *. rewrite (Neqb_correct a). reflexivity. elim (bool_is_true_or_false (N.eqb a1 a2)); intros; rewrite H4 in H1;
   inversion H1. rewrite <- H6. apply (H a1). simpl in |- *. rewrite (Neqb_correct a1). reflexivity. exact y0. rewrite (Neqb_comm a1 a) in H2. rewrite (Nxor_eq_true _ _ y) in H2. inversion H2. intros. simpl in |- *. unfold state_ref_ok in |- *. intros. cut (state_ref_ok m0 d). cut (state_ref_ok m d).
 	intros. induction  a as [| p1]. induction  a0 as [| p1]. simpl in H3. exact (H _ _ _ H1 H4 N0 p0 H3). induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]; simpl in H3. exact (H5 _ _ H3). exact (H _ _ _ H1 H4 _ _ H3). exact (H5 _ _ H3). induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]. clear Hrecp1.
 	induction  a0 as [| p2]. simpl in H3. exact (H4 _ _ H3). cut (state_ref_ok (M1 prec_list (Npos p1) p) d). intro. induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]; simpl in H3. exact (H0 _ _ _ H6 H5 _ _ H3). exact (H4 _ _ H3). exact (H0 _ _ _ H6 H5 _ _ H3).
 	unfold state_ref_ok in |- *. intros. apply (H1 (Ndouble_plus_one a) p3).
 	induction  a as [| p4]; simpl in |- *; exact H6. cut (state_ref_ok (M1 prec_list (Npos p1) p) d). intro. induction  a0 as [| p2]. simpl in H3. exact (H _ _ _ H6 H4 _ _ H3).
-	induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]; simpl in H3. exact (H5 _ _ H3). exact (H _ _ _ H6 H4 _ _ H3). exact (H5 _ _ H3). unfold state_ref_ok in |- *. intros. apply (H1 (Ndouble a) p2). induction  a as [| p3]; simpl in |- *; exact H6. cut (state_ref_ok (M1 prec_list N0 p) d). intros. induction  a0 as [| p1]. simpl in H3. exact (H4 _ _ H3). induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]; simpl in H3. exact (H0 _ _ _ H6 H5 _ _ H3). exact (H4 _ _ H3). exact (H0 _ _ _ H6 H5 _ _ H3). unfold state_ref_ok in |- *. intros. apply (H1 (Ndouble_plus_one a) p1). induction  a as [| p2]; exact H6. unfold state_ref_ok in |- *. intros. apply (H2 (Ndouble a1) p1).
+	induction  p2 as [p2 Hrecp2| p2 Hrecp2| ]; simpl in H3. exact (H5 _ _ H3). exact (H _ _ _ H6 H4 _ _ H3). exact (H5 _ _ H3). unfold state_ref_ok in |- *. intros. apply (H1 (N.double a) p2). induction  a as [| p3]; simpl in |- *; exact H6. cut (state_ref_ok (M1 prec_list N0 p) d). intros. induction  a0 as [| p1]. simpl in H3. exact (H4 _ _ H3). induction  p1 as [p1 Hrecp1| p1 Hrecp1| ]; simpl in H3. exact (H0 _ _ _ H6 H5 _ _ H3). exact (H4 _ _ H3). exact (H0 _ _ _ H6 H5 _ _ H3). unfold state_ref_ok in |- *. intros. apply (H1 (Ndouble_plus_one a) p1). induction  a as [| p2]; exact H6. unfold state_ref_ok in |- *. intros. apply (H2 (N.double a1) p1).
 	induction  a1 as [| p2]; exact H4. unfold state_ref_ok in |- *. intros. apply (H2 (Ndouble_plus_one a1) p1). induction  a1 as [| p2]; exact H4.
 Qed.
 
@@ -532,26 +532,26 @@ Proof.
   (MapPut_semantics state (u_merge p p0) (new_preDTA_ad (u_merge p p0))
      (union_mpl x x0)). rewrite
   (MapPut_semantics state (u_merge p p0) (new_preDTA_ad (u_merge p p0))
-     (union_mpl x x0)) in H1. elim (bool_is_true_or_false (Neqb (new_preDTA_ad (u_merge p p0)) a1));
+     (union_mpl x x0)) in H1. elim (bool_is_true_or_false (N.eqb (new_preDTA_ad (u_merge p p0)) a1));
   intros; rewrite H4 in H1. inversion H1.
-	elim (bool_is_true_or_false (Neqb (new_preDTA_ad (u_merge p p0)) b));
+	elim (bool_is_true_or_false (N.eqb (new_preDTA_ad (u_merge p p0)) b));
   intros; rewrite H5. split with (union_mpl x x0).
 	reflexivity. cut (state_ref_ok (union_mpl x x0) (u_merge p p0)).
 	intro. rewrite <- H6 in H2. exact (H7 c pl H2 b H3).
 	apply (union_mpl_correct_ref_ok_invar x x0 (u_merge p p0)).
-	elim (preDTA_ref_ok_def (u_merge p p0)). intros. exact (H7 (u_merge_ref_ok_invar p p0 H H0) _ _ y0). elim (preDTA_ref_ok_def (u_merge p p0)). intros. exact (H7 (u_merge_ref_ok_invar p p0 H H0) _ _ y2). elim (u_merge_ref_ok_invar p p0 H H0 a1 s c pl b H1 H2 H3). intros. elim (bool_is_true_or_false (Neqb (new_preDTA_ad (u_merge p p0)) b));
+	elim (preDTA_ref_ok_def (u_merge p p0)). intros. exact (H7 (u_merge_ref_ok_invar p p0 H H0) _ _ y0). elim (preDTA_ref_ok_def (u_merge p p0)). intros. exact (H7 (u_merge_ref_ok_invar p p0 H H0) _ _ y2). elim (u_merge_ref_ok_invar p p0 H H0 a1 s c pl b H1 H2 H3). intros. elim (bool_is_true_or_false (N.eqb (new_preDTA_ad (u_merge p p0)) b));
   intros; rewrite H6.
 	split with (union_mpl x x0). reflexivity. split with x1.
 	exact H5. rewrite y1. intros. rewrite
   (MapPut_semantics state (u_merge p p0) (new_preDTA_ad (u_merge p p0)) x)
   . rewrite
   (MapPut_semantics state (u_merge p p0) (new_preDTA_ad (u_merge p p0)) x)
-   in H1. elim (bool_is_true_or_false (Neqb (new_preDTA_ad (u_merge p p0)) a1));
+   in H1. elim (bool_is_true_or_false (N.eqb (new_preDTA_ad (u_merge p p0)) a1));
   intros; rewrite H4 in H1.
-	inversion H1. rewrite <- H6. elim (bool_is_true_or_false (Neqb (new_preDTA_ad (u_merge p p0)) b));
+	inversion H1. rewrite <- H6. elim (bool_is_true_or_false (N.eqb (new_preDTA_ad (u_merge p p0)) b));
   intros; rewrite H5.
 	split with x. reflexivity. elim (preDTA_ref_ok_def (u_merge p p0)).
-	intros. rewrite <- H6 in H2. exact (H7 (u_merge_ref_ok_invar _ _ H H0) (uad_conv_0 a) x y0 c pl H2 b H3). elim (bool_is_true_or_false (Neqb (new_preDTA_ad (u_merge p p0)) b));
+	intros. rewrite <- H6 in H2. exact (H7 (u_merge_ref_ok_invar _ _ H H0) (uad_conv_0 a) x y0 c pl H2 b H3). elim (bool_is_true_or_false (N.eqb (new_preDTA_ad (u_merge p p0)) b));
   intros; rewrite H5. split with x. reflexivity. exact (u_merge_ref_ok_invar _ _ H H0 a1 s c pl b H1 H2 H3).
 	intro y. rewrite y. elim (option_sum state (MapGet state (u_merge p p0) (uad_conv_1 a0)));
   intros. elim a1. intros x y1.
@@ -559,9 +559,9 @@ Proof.
   (MapPut_semantics state (u_merge p p0) (new_preDTA_ad (u_merge p p0)) x)
   . rewrite
   (MapPut_semantics state (u_merge p p0) (new_preDTA_ad (u_merge p p0)) x)
-   in H1. elim (bool_is_true_or_false (Neqb (new_preDTA_ad (u_merge p p0)) b));
+   in H1. elim (bool_is_true_or_false (N.eqb (new_preDTA_ad (u_merge p p0)) b));
   intros; rewrite H4.
-	split with x. reflexivity. elim (bool_is_true_or_false (Neqb (new_preDTA_ad (u_merge p p0)) a2));
+	split with x. reflexivity. elim (bool_is_true_or_false (N.eqb (new_preDTA_ad (u_merge p p0)) a2));
   intros; rewrite H5 in H1.
 	inversion H1. rewrite <- H7 in H2. exact (u_merge_ref_ok_invar _ _ H H0 _ _ c pl b y1 H2 H3). exact (u_merge_ref_ok _ _ H H0 _ _ _ _ _ H1 H2 H3). rewrite b. rewrite b in H1.
 	exact (u_merge_ref_ok _ _ H H0 _ _ _ _ _ H1 H2 H3).
@@ -584,14 +584,14 @@ Proof.
 	split with (union_mpl (umpl_conv_0 x0) (umpl_conv_1 x)).
 	rewrite
   (MapPut_semantics state (u_merge p p0)
-     (Nmin
-        (Ndouble
+     (N.min
+        (N.double
            (new_preDTA_ad (MapMerge state (udta_conv_0_aux p) (M0 state))))
         (Ndouble_plus_one (new_preDTA_ad (udta_conv_1_aux p0))))
      (union_mpl (umpl_conv_0 x0) (umpl_conv_1 x))). rewrite
   (Neqb_correct
-     (Nmin
-        (Ndouble
+     (N.min
+        (N.double
            (new_preDTA_ad (MapMerge state (udta_conv_0_aux p) (M0 state))))
         (Ndouble_plus_one (new_preDTA_ad (udta_conv_1_aux p0)))))
   . reflexivity.

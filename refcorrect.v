@@ -60,7 +60,7 @@ Lemma state_ref_ok_M2_destr :
  state_ref_ok (M2 prec_list s0 s1) d ->
  state_ref_ok s0 d /\ state_ref_ok s1 d.
 Proof.
-	unfold state_ref_ok in |- *. intros. split; intros. apply (H (Ndouble a) p). induction  a as [| p0]; exact H0. apply (H (Ndouble_plus_one a) p).
+	unfold state_ref_ok in |- *. intros. split; intros. apply (H (N.double a) p). induction  a as [| p0]; exact H0. apply (H (Ndouble_plus_one a) p).
 	induction  a as [| p0]; exact H0.
 Qed.
 
@@ -80,7 +80,7 @@ Lemma preDTA_ref_ok_distinct_dest :
  preDTA_ref_ok_distinct d0 d /\ preDTA_ref_ok_distinct d1 d.
 Proof.
 	unfold preDTA_ref_ok_distinct in |- *. intros. split. intros.
-	apply (H (Ndouble a) s). induction  a as [| p]; exact H0. intros.
+	apply (H (N.double a) s). induction  a as [| p]; exact H0. intros.
 	apply (H (Ndouble_plus_one a) s). induction  a as [| p]; exact H0.
 Qed.
 
@@ -138,7 +138,7 @@ Proof.
 	simpl in |- *. apply (prec_list_ref_ok_check_correct a0 d). apply (H a a0).
 	simpl in |- *. rewrite (Neqb_correct a). reflexivity. intros. simpl in |- *.
 	rewrite (H d). rewrite (H0 d). reflexivity. intros. apply (H1 (Ndouble_plus_one a) p). induction  a as [| p0]; simpl in |- *; exact H2. intros.
-	apply (H1 (Ndouble a) p). induction  a as [| p0]; simpl in |- *; exact H2.
+	apply (H1 (N.double a) p). induction  a as [| p0]; simpl in |- *; exact H2.
 Qed.
 
 Lemma state_ref_ok_check_complete :
@@ -146,7 +146,7 @@ Lemma state_ref_ok_check_complete :
  state_ref_ok_check s d = true -> state_ref_ok s d.
 Proof.
 	unfold state_ref_ok in |- *. simple induction s. intros. inversion H0. intros.
-	simpl in H0. elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H1 in H0. inversion H0. simpl in H. rewrite H3 in H.
+	simpl in H0. elim (bool_is_true_or_false (N.eqb a a1)); intros; rewrite H1 in H0. inversion H0. simpl in H. rewrite H3 in H.
 	exact (prec_list_ref_ok_check_complete p d H). inversion H0. intros.
 	simpl in H1. elim (bool_is_true_or_false (state_ref_ok_check m d)); intros;
   rewrite H3 in H1. elim (bool_is_true_or_false (state_ref_ok_check m0 d)); intros;
@@ -172,7 +172,7 @@ Proof.
 	intros. unfold preDTA_ref_ok_distinct in H. induction  d as [| a a0| d1 Hrecd1 d0 Hrecd0]. intros.
 	reflexivity. simpl in |- *. apply (state_ref_ok_check_correct a0 d'). apply (H a a0). simpl in |- *. rewrite (Neqb_correct a). reflexivity. simpl in |- *.
 	rewrite Hrecd1. rewrite Hrecd0. reflexivity. intros. apply (H (Ndouble_plus_one a) s). induction  a as [| p]; simpl in |- *; exact H0. intros.
-	apply (H (Ndouble a) s). induction  a as [| p]; simpl in |- *; exact H0. 
+	apply (H (N.double a) s). induction  a as [| p]; simpl in |- *; exact H0. 
 Qed.
 
 Lemma predta_ref_ok_check_complete_0 :
@@ -180,7 +180,7 @@ Lemma predta_ref_ok_check_complete_0 :
  predta_ref_ok_check_0 d d' = true -> preDTA_ref_ok_distinct d d'.
 Proof.
 	unfold preDTA_ref_ok_distinct in |- *. simple induction d; simpl in |- *; intros. inversion H0.
-	elim (bool_is_true_or_false (Neqb a a1)); intros; rewrite H1 in H0;
+	elim (bool_is_true_or_false (N.eqb a a1)); intros; rewrite H1 in H0;
   inversion H0. rewrite <- H3. exact (state_ref_ok_check_complete _ _ H).
  	elim (bool_is_true_or_false (predta_ref_ok_check_0 m d')); intros;
    rewrite H3 in H1. elim (bool_is_true_or_false (predta_ref_ok_check_0 m0 d')); intros;

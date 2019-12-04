@@ -1349,7 +1349,7 @@ Fixpoint s_produit_l (a : ad) (p : prec_list) (s : state) {struct s} :
   match s with
   | M0 => M0 prec_list
   | M1 a' p' =>
-      if Neqb a a' then M1 prec_list a (pl_produit p p') else M0 prec_list
+      if N.eqb a a' then M1 prec_list a (pl_produit p p') else M0 prec_list
   | M2 s0 s1 =>
       match a with
       | N0 => M2 prec_list (s_produit_l N0 p s0) (M0 prec_list)
@@ -1377,8 +1377,8 @@ Lemma sproductl_0_1 :
  forall (a : ad) (a0 : prec_list), sproductl_0_def (M1 prec_list a a0).
 Proof.
 	unfold sproductl_0_def in |- *. intros. simpl in H. simpl in H0.
-	elim (bool_is_true_or_false (Neqb a1 c)); intro; rewrite H1 in H.
-	elim (bool_is_true_or_false (Neqb a c)); intro; rewrite H2 in H0.
+	elim (bool_is_true_or_false (N.eqb a1 c)); intro; rewrite H1 in H.
+	elim (bool_is_true_or_false (N.eqb a c)); intro; rewrite H2 in H0.
 	inversion H. inversion H0. rewrite (Neqb_complete _ _ H1).
 	rewrite (Neqb_complete _ _ H2). simpl in |- *. rewrite (Neqb_correct c).
 	simpl in |- *. rewrite (Neqb_correct c). trivial. inversion H0. inversion H.
@@ -1390,7 +1390,7 @@ Lemma sproductl_0_2 :
  forall m0 : state, sproductl_0_def m0 -> sproductl_0_def (M2 prec_list m m0).
 Proof.
 	unfold sproductl_0_def in |- *.
-	intros. simpl in H1. elim (bool_is_true_or_false (Neqb a c)); intro.
+	intros. simpl in H1. elim (bool_is_true_or_false (N.eqb a c)); intro.
 	rewrite H3 in H1. inversion H1. rewrite (Neqb_complete _ _ H3). 
 	induction  c as [| p0]. simpl in |- *. elim (H N0 r0 N0 r0 r1). reflexivity. reflexivity.
 	simpl in H2. exact H2.  induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H0 (Npos p0) r0 (Npos p0) r0 r1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p0).
@@ -1433,7 +1433,7 @@ Qed.
 Lemma sproductl_1_1 :
  forall (a : ad) (a0 : prec_list), sproductl_1_def (M1 prec_list a a0).
 Proof.
-	unfold sproductl_1_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (Neqb a1 a)); intro; rewrite H0 in H. simpl in H. elim (bool_is_true_or_false (Neqb a1 c)); intro; rewrite H1 in H. split with p. split with a0. simpl in |- *.
+	unfold sproductl_1_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (N.eqb a1 a)); intro; rewrite H0 in H. simpl in H. elim (bool_is_true_or_false (N.eqb a1 c)); intro; rewrite H1 in H. split with p. split with a0. simpl in |- *.
 	split. rewrite H1. reflexivity. rewrite <- (Neqb_complete _ _ H0).
 	rewrite H1. reflexivity. inversion H. inversion H.
 Qed.
@@ -1489,7 +1489,7 @@ Fixpoint s_produit_r (a : ad) (p : prec_list) (s : state) {struct s} :
   match s with
   | M0 => M0 prec_list
   | M1 a' p' =>
-      if Neqb a a' then M1 prec_list a (pl_produit p' p) else M0 prec_list
+      if N.eqb a a' then M1 prec_list a (pl_produit p' p) else M0 prec_list
   | M2 s0 s1 =>
       match a with
       | N0 => M2 prec_list (s_produit_r N0 p s0) (M0 prec_list)
@@ -1517,8 +1517,8 @@ Lemma sproductr_0_1 :
  forall (a : ad) (a0 : prec_list), sproductr_0_def (M1 prec_list a a0).
 Proof.
 	unfold sproductr_0_def in |- *. intros. simpl in H. simpl in H0.
-	elim (bool_is_true_or_false (Neqb a1 c)); intro; rewrite H1 in H.
-	elim (bool_is_true_or_false (Neqb a c)); intro; rewrite H2 in H0.
+	elim (bool_is_true_or_false (N.eqb a1 c)); intro; rewrite H1 in H.
+	elim (bool_is_true_or_false (N.eqb a c)); intro; rewrite H2 in H0.
 	inversion H. inversion H0. rewrite (Neqb_complete _ _ H1).
 	rewrite (Neqb_complete _ _ H2). simpl in |- *. rewrite (Neqb_correct c).
 	simpl in |- *. rewrite (Neqb_correct c). trivial. inversion H0. inversion H.
@@ -1530,7 +1530,7 @@ Lemma sproductr_0_2 :
  forall m0 : state, sproductr_0_def m0 -> sproductr_0_def (M2 prec_list m m0).
 Proof.
 	unfold sproductr_0_def in |- *.
-	intros. simpl in H1. elim (bool_is_true_or_false (Neqb a c)); intro; rewrite H3 in H1. inversion H1. rewrite (Neqb_complete _ _ H3).
+	intros. simpl in H1. elim (bool_is_true_or_false (N.eqb a c)); intro; rewrite H3 in H1. inversion H1. rewrite (Neqb_complete _ _ H3).
 	induction  c as [| p0]. simpl in |- *. elim (H N0 r0 N0 r0 r1). reflexivity. reflexivity.
 	simpl in H2. exact H2. induction  p0 as [p0 Hrecp0| p0 Hrecp0| ]. simpl in |- *. elim (H0 (Npos p0) r0 (Npos p0) r0 r1). reflexivity. simpl in |- *. rewrite (aux_Neqb_1_0 p0). reflexivity.
 	simpl in H2. exact H2. simpl in |- *. elim (H (Npos p0) r0 (Npos p0) r0 r1).
@@ -1574,7 +1574,7 @@ Lemma sproductr_1_1 :
  forall (a : ad) (a0 : prec_list), sproductr_1_def (M1 prec_list a a0).
 Proof.
 	unfold sproductr_1_def in |- *.
-	intros. simpl in H. elim (bool_is_true_or_false (Neqb a1 a)); intro; rewrite H0 in H. simpl in H. elim (bool_is_true_or_false (Neqb a1 c)); intro; rewrite H1 in H. split with p. split with a0. simpl in |- *. split. rewrite H1.
+	intros. simpl in H. elim (bool_is_true_or_false (N.eqb a1 a)); intro; rewrite H0 in H. simpl in H. elim (bool_is_true_or_false (N.eqb a1 c)); intro; rewrite H1 in H. split with p. split with a0. simpl in |- *. split. rewrite H1.
 	reflexivity. rewrite <- (Neqb_complete _ _ H0). rewrite H1. reflexivity.
 	inversion H. inversion H.
 Qed.
@@ -1777,8 +1777,8 @@ Lemma predta_produit_0_1 :
  forall (a : ad) (a0 : state), predta_produit_0d_def (M1 state a a0).
 Proof.
 	unfold predta_produit_0d_def in |- *. intros. simpl in H. simpl in H0.
-	elim (bool_is_true_or_false (Neqb a1 a2)); intro; rewrite H1 in H.
-	rewrite (Neqb_complete a1 a2 H1). elim (bool_is_true_or_false (Neqb a a3)); intro; rewrite H2 in H0. rewrite (Neqb_complete a a3 H2). inversion H.
+	elim (bool_is_true_or_false (N.eqb a1 a2)); intro; rewrite H1 in H.
+	rewrite (Neqb_complete a1 a2 H1). elim (bool_is_true_or_false (N.eqb a a3)); intro; rewrite H2 in H0. rewrite (Neqb_complete a a3 H2). inversion H.
 	inversion H0. simpl in |- *. rewrite (Neqb_correct (iad_conv a2 a3)). trivial.
 	inversion H0. inversion H.
 Qed.
@@ -1790,7 +1790,7 @@ Lemma predta_produit_0_2 :
  predta_produit_0d_def m0 -> predta_produit_0d_def (M2 state m m0).
 Proof.
 	unfold predta_produit_0d_def in |- *. intros. simpl in H1.
-	elim (bool_is_true_or_false (Neqb a a0)); intro; rewrite H3 in H1.
+	elim (bool_is_true_or_false (N.eqb a a0)); intro; rewrite H3 in H1.
 	inversion H1. induction  a1 as [| p]. induction  a0 as [| p]. rewrite (Neqb_complete a N0 H3). simpl in |- *. elim (H N0 s0 N0 N0 s0 s1). simpl in |- *. trivial.
 	simpl in |- *. trivial. simpl in H2. exact H2. induction  p as [p Hrecp| p Hrecp| ]. rewrite (Neqb_complete _ _ H3). simpl in |- *. elim (H (Npos p) s0 (Npos p) N0 s0 s1). simpl in |- *. trivial.
 	simpl in |- *. rewrite (aux_Neqb_1_0 p). trivial. simpl in H2. assumption.
@@ -1854,8 +1854,8 @@ Lemma predta_produit_1_1 :
  forall (a : ad) (a0 : state), predta_produit_1_def (M1 state a a0).
 Proof.
 	unfold predta_produit_1_def in |- *. intros. simpl in H. simpl in H0.
-	elim (bool_is_true_or_false (Neqb a1 a2)); intro; rewrite H1 in H.
-	elim (bool_is_true_or_false (Neqb a a3)); intro; rewrite H2 in H0.
+	elim (bool_is_true_or_false (N.eqb a1 a2)); intro; rewrite H1 in H.
+	elim (bool_is_true_or_false (N.eqb a a3)); intro; rewrite H2 in H0.
 	inversion H. inversion H0. rewrite (Neqb_complete _ _ H1).
 	rewrite (Neqb_complete _ _ H2). simpl in |- *. rewrite (Neqb_correct (iad_conv a3 a2)). trivial. inversion H0. inversion H.
 Qed.
@@ -1867,7 +1867,7 @@ Lemma predta_produit_1_2 :
  predta_produit_1_def m0 -> predta_produit_1_def (M2 state m m0).
 Proof.
 	unfold predta_produit_1_def in |- *. intros. simpl in H1. 
-	elim (bool_is_true_or_false (Neqb a a0)); intro; rewrite H3 in H1.
+	elim (bool_is_true_or_false (N.eqb a a0)); intro; rewrite H3 in H1.
 	rewrite (Neqb_complete _ _ H3). inversion H1. induction  a0 as [| p]. induction  a1 as [| p].
 	simpl in |- *. elim (H N0 s0 N0 N0 s0 s1). reflexivity. reflexivity.
 	simpl in H2. exact H2. induction  p as [p Hrecp| p Hrecp| ]. simpl in |- *. elim (H0 N0 s0 N0 (Npos p) s0 s1). reflexivity. reflexivity. simpl in H2. exact H2. simpl in |- *.
@@ -1952,7 +1952,7 @@ Lemma predta_produit_3_1 :
  forall (a : ad) (a0 : state), predta_produit_3_def (M1 state a a0).
 Proof.
 	unfold predta_produit_3_def in |- *. intros. simpl in H. split with a2.
-	split with a. split with s0. split with a0. elim (bool_is_true_or_false (Neqb (iad_conv a2 a) a1)); intro. rewrite (Neqb_complete _ _ H0).
+	split with a. split with s0. split with a0. elim (bool_is_true_or_false (N.eqb (iad_conv a2 a) a1)); intro. rewrite (Neqb_complete _ _ H0).
 	split. reflexivity. split. simpl in |- *. rewrite (Neqb_correct a2). reflexivity.
 	simpl in |- *. rewrite (Neqb_correct a). reflexivity. rewrite H0 in H.
 	inversion H.
@@ -2159,7 +2159,7 @@ Qed.
 Lemma predta_produit_4_1 :
  forall (a : ad) (a0 : state), predta_produit_4_def (M1 state a a0).
 Proof.
-	unfold predta_produit_4_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (Neqb (iad_conv a a2) a1)). intro. rewrite H0 in H. inversion H. split with a.
+	unfold predta_produit_4_def in |- *. intros. simpl in H. elim (bool_is_true_or_false (N.eqb (iad_conv a a2) a1)). intro. rewrite H0 in H. inversion H. split with a.
 	split with a2. split with s0. split with a0. split. symmetry  in |- *. 
 	exact (Neqb_complete _ _ H0). split. simpl in |- *. rewrite (Neqb_correct a2).
 	reflexivity. simpl in |- *. rewrite (Neqb_correct a). reflexivity. intro.
